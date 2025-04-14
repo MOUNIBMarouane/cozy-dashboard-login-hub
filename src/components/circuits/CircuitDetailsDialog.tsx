@@ -41,8 +41,10 @@ export default function CircuitDetailsDialog({
     queryKey: ['circuit-details', circuit.id],
     queryFn: () => circuitService.getCircuitDetailsByCircuitId(circuit.id),
     enabled: open,
-    onError: (err) => {
-      console.error('Failed to load circuit details:', err);
+    meta: {
+      onError: (err) => {
+        console.error('Failed to load circuit details:', err);
+      }
     }
   });
 
