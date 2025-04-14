@@ -1,4 +1,5 @@
-import api from './api';
+
+import api from './api/index';
 import { DocumentCircuitHistory, ProcessCircuitRequest, MoveDocumentStepRequest, AssignCircuitRequest } from '@/models/documentCircuit';
 
 /**
