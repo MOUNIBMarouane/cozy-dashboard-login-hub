@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from "@/components/ui/use-toast";
 import { ShieldCheck, ChevronLeft } from 'lucide-react';
-import { useMultiStepForm } from '@/context/form';
 import DocuVerseLogo from '@/components/DocuVerseLogo';
 import authService from '@/services/authService';
 
@@ -15,19 +14,15 @@ const EmailVerification = () => {
   const [verificationCode, setVerificationCode] = useState('');
   const { email } = useParams<{ email?: string }>();
   const navigate = useNavigate();
-  const { verifyEmail } = useMultiStepForm();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!email) {
-      // If no email in URL, check if we can grab it from context
-      // This is a fallback if redirection didn't work properly
       console.log("No email found in URL params");
     }
   }, [email]);
 
-  // Function to handle resending verification code
   const handleResendCode = async () => {
     if (!email) {
       toast({
@@ -80,14 +75,12 @@ const EmailVerification = () => {
     }
 
     try {
-      // Call verifyEmail with email from URL and the entered code
       const success = await authService.verifyEmail(email, verificationCode);
       if (success) {
         toast({
           title: "Success",
           description: "Email verified successfully!",
         });
-        // Redirect to welcome page after successful verification
         navigate('/welcome', { 
           state: { 
             verified: true,

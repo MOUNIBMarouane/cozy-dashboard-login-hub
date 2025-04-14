@@ -19,14 +19,8 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
     setFormDataState((prev) => ({ ...prev, ...data }));
   };
 
-  const nextStep = () => {
-    setCurrentStep((prev) => prev + 1);
-  };
-
-  const prevStep = () => {
-    setCurrentStep((prev) => Math.max(1, prev - 1));
-  };
-
+  const nextStep = () => setCurrentStep((prev) => prev + 1);
+  const prevStep = () => setCurrentStep((prev) => Math.max(1, prev - 1));
   const resetForm = () => {
     setCurrentStep(1);
     setFormDataState(initialFormData);
@@ -36,7 +30,6 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
   const validateUsername = async (): Promise<boolean> => {
     setStepValidation((prev) => ({ ...prev, isLoading: true, errors: {} }));
     try {
-      // Call API to validate username
       const isValid = await authService.validateUsername(formData.username);
       
       if (!isValid) {
@@ -67,7 +60,6 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
   const validateEmail = async (): Promise<boolean> => {
     setStepValidation((prev) => ({ ...prev, isLoading: true, errors: {} }));
     try {
-      // Call API to validate email
       const isValid = await authService.validateEmail(formData.email);
       
       if (!isValid) {
@@ -98,32 +90,7 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
   const registerUser = async (): Promise<boolean> => {
     setStepValidation((prev) => ({ ...prev, isLoading: true, errors: {} }));
     try {
-      console.log("Registering user with data:", {
-        email: formData.email,
-        passwordHash: formData.password,
-        confirmPassword: formData.confirmPassword,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        username: formData.username,
-        adminSecretKey: formData.adminSecretKey ? formData.adminSecretKey : undefined,
-        userType: formData.userType,
-        // Include additional fields based on user type
-        ...(formData.userType === 'personal' ? {
-          cin: formData.cin,
-          personalAddress: formData.personalAddress,
-          personalPhone: formData.personalPhone,
-        } : {
-          companyName: formData.companyName,
-          companyIRC: formData.companyIRC,
-          companyAddress: formData.companyAddress,
-          companyPhone: formData.companyPhone,
-          companyEmail: formData.companyEmail,
-          companyWebsite: formData.companyWebsite,
-        })
-      });
-      
-      // Call API to register user
-      const response = await authService.register({
+      const userData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -145,9 +112,9 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
           companyEmail: formData.companyEmail,
           companyWebsite: formData.companyWebsite,
         })
-      });
+      };
       
-      console.log("Registration response:", response);
+      await authService.register(userData);
       
       setStepValidation((prev) => ({ ...prev, isLoading: false }));
       toast.success('Registration successful! Please check your email for verification.');
@@ -155,7 +122,6 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
       // Redirect to verification page with email
       navigate(`/verify/${formData.email}`);
       
-      // Return true to indicate successful registration
       return true;
     } catch (error: any) {
       console.error('Registration error:', error);
@@ -173,7 +139,6 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
   const verifyEmail = async (code: string): Promise<boolean> => {
     setStepValidation((prev) => ({ ...prev, isLoading: true, errors: {} }));
     try {
-      // Call API to verify email
       const isVerified = await authService.verifyEmail(formData.email, code);
       
       if (!isVerified) {
