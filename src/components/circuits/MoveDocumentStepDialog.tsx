@@ -6,6 +6,7 @@ import * as z from 'zod';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import circuitService from '@/services/circuitService';
+import { useDocumentMovement } from '@/hooks/useDocumentMovement';
 import {
   Dialog,
   DialogContent,
@@ -57,8 +58,10 @@ export default function MoveDocumentStepDialog({
   onOpenChange,
   onSuccess,
 }: MoveDocumentStepDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { isMoving, moveDocument } = useDocumentMovement({
+    onMoveSuccess: onSuccess
+  });
 
   // Fetch circuit details
   const { data: circuitDetails, isLoading } = useQuery({
@@ -75,7 +78,6 @@ export default function MoveDocumentStepDialog({
   });
 
   const onSubmit = async (values: FormValues) => {
-    setIsSubmitting(true);
     setError(null);
     
     try {
@@ -83,49 +85,22 @@ export default function MoveDocumentStepDialog({
       const currentStep = circuitDetails?.find(step => step.id === currentStepId);
       const targetStep = circuitDetails?.find(step => step.id === targetStepId);
       
-      if (!currentStep || !targetStep) {
-        throw new Error("Could not find step information");
-      }
-      
-      // Determine if we're moving forward or backward
-      const isNextStep = targetStep.orderIndex > currentStep.orderIndex;
-      const isPreviousStep = targetStep.orderIndex < currentStep.orderIndex;
-      
-      console.log("Moving document to step:", {
+      const success = await moveDocument({
         documentId,
+        currentStepId,
         targetStepId,
-        direction: isNextStep ? "forward" : (isPreviousStep ? "backward" : "unknown")
+        currentStep,
+        targetStep,
+        comments: `Moved document from dialog to step #${targetStepId}`
       });
       
-      if (isNextStep) {
-        // Use the move-next endpoint for forward moves
-        await circuitService.moveDocumentToNextStep({
-          documentId,
-          currentStepId: currentStepId!,
-          nextStepId: targetStepId,
-          comments: `Moved document from dialog to next step #${targetStepId}`
-        });
-        toast.success('Document moved to next step successfully');
-      } else if (isPreviousStep) {
-        // Use the return-to-previous endpoint for backward moves
-        await circuitService.moveDocumentToStep({
-          documentId,
-          circuitDetailId: targetStepId,
-        });
-        toast.success('Document returned to previous step successfully');
-      } else {
-        throw new Error("Could not determine direction of movement");
+      if (success) {
+        onOpenChange(false);
       }
-      
-      onOpenChange(false);
-      onSuccess();
     } catch (error: any) {
       console.error("Error moving document:", error);
       const errorMessage = error?.response?.data || 'Failed to move document to new step';
-      toast.error(errorMessage);
       setError(errorMessage);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -190,17 +165,17 @@ export default function MoveDocumentStepDialog({
                   type="button"
                   variant="outline"
                   onClick={() => onOpenChange(false)}
-                  disabled={isSubmitting}
+                  disabled={isMoving}
                   className="border-blue-900/30 text-white hover:bg-blue-900/20"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit" 
-                  disabled={isSubmitting}
+                  disabled={isMoving}
                   className="bg-green-600 hover:bg-green-700"
                 >
-                  {isSubmitting ? 
+                  {isMoving ? 
                     <>Moving... <Loader2 className="ml-2 h-4 w-4 animate-spin" /></> : 
                     <>Move Document <ArrowRightFromLine className="ml-2 h-4 w-4" /></>
                   }

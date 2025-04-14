@@ -6,8 +6,7 @@ import { CircuitStepCard } from './CircuitStepCard';
 import { DocumentCircuitHistory, DocumentWorkflowStatus } from '@/models/documentCircuit';
 import { Document } from '@/models/document';
 import { DraggableDocumentCard } from './DraggableDocumentCard';
-import { toast } from 'sonner';
-import circuitService from '@/services/circuitService';
+import { useDocumentMovement } from '@/hooks/useDocumentMovement';
 import { CircuitStepsSectionHeader } from './CircuitStepsSectionHeader';
 
 interface CircuitStepsSectionProps {
@@ -35,8 +34,11 @@ export const CircuitStepsSection = ({
 }: CircuitStepsSectionProps) => {
   const [showHelp, setShowHelp] = useState(false);
   const [draggedOverStepId, setDraggedOverStepId] = useState<number | null>(null);
-  const [isMoving, setIsMoving] = useState(false);
   const currentStepId = workflowStatus?.currentStepId;
+  
+  const { isMoving, moveDocument } = useDocumentMovement({
+    onMoveSuccess: onDocumentMoved
+  });
   
   if (!circuitDetails || circuitDetails.length === 0) {
     return (
@@ -65,55 +67,28 @@ export const CircuitStepsSection = ({
     setDraggedOverStepId(null);
     
     // Prevent drops for simple users or if dropping onto current step
-    if (isSimpleUser || stepId === currentStepId) {
+    if (isSimpleUser || stepId === currentStepId || !currentStepId) {
       return;
     }
 
     try {
       const data = JSON.parse(e.dataTransfer.getData('application/json'));
       if (data.documentId && document?.id === data.documentId) {
-        setIsMoving(true);
-        
         // Get current and target step information
         const currentStep = circuitDetails.find(step => step.id === currentStepId);
         const targetStep = circuitDetails.find(step => step.id === stepId);
         
-        if (!currentStep || !targetStep) {
-          throw new Error("Could not find step information");
-        }
-        
-        // Determine if this is a next step or previous step move
-        const isNextStep = targetStep.orderIndex > currentStep.orderIndex;
-        const isPreviousStep = targetStep.orderIndex < currentStep.orderIndex;
-        
-        if (isNextStep) {
-          // Moving forward - use move-next endpoint
-          await circuitService.moveDocumentToNextStep({
-            documentId: document.id,
-            currentStepId: currentStepId!,
-            nextStepId: stepId,
-            comments: `Moved document to next step #${stepId}`
-          });
-          toast.success(`Document moved to next step successfully`);
-        } else if (isPreviousStep) {
-          // Moving backward - use return-to-previous endpoint
-          await circuitService.moveDocumentToStep({
-            documentId: document.id,
-            circuitDetailId: stepId,
-          });
-          toast.success(`Document returned to previous step successfully`);
-        } else {
-          // This case shouldn't happen with proper orderIndex values
-          throw new Error("Could not determine direction of movement");
-        }
-        
-        onDocumentMoved();
+        await moveDocument({
+          documentId: document.id,
+          currentStepId,
+          targetStepId: stepId,
+          currentStep,
+          targetStep,
+          comments: `Moved document from drag and drop to step #${stepId}`
+        });
       }
     } catch (error) {
       console.error('Error moving document:', error);
-      toast.error('Failed to move document to this step');
-    } finally {
-      setIsMoving(false);
     }
   };
   

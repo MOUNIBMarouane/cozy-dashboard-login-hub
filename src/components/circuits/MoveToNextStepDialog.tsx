@@ -6,6 +6,7 @@ import * as z from 'zod';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import circuitService from '@/services/circuitService';
+import { useDocumentMovement } from '@/hooks/useDocumentMovement';
 import {
   Dialog,
   DialogContent,
@@ -25,7 +26,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   nextStepId: z.string().min(1, { message: 'Next step is required' }),
@@ -53,7 +54,9 @@ export default function MoveToNextStepDialog({
   onOpenChange,
   onSuccess,
 }: MoveToNextStepDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isMoving, moveDocument } = useDocumentMovement({
+    onMoveSuccess: onSuccess
+  });
 
   // Fetch all steps for the current circuit
   const { data: circuitDetails, isLoading: isLoadingCircuitDetails } = useQuery({
@@ -79,24 +82,27 @@ export default function MoveToNextStepDialog({
       return;
     }
     
-    setIsSubmitting(true);
     try {
-      await circuitService.moveDocumentToNextStep({
+      const targetStepId = parseInt(values.nextStepId);
+      const currentStep = circuitDetails?.find(step => step.id === currentStepId);
+      const targetStep = circuitDetails?.find(step => step.id === targetStepId);
+      
+      const success = await moveDocument({
         documentId,
         currentStepId,
-        nextStepId: parseInt(values.nextStepId),
-        comments: values.comments,
+        targetStepId,
+        currentStep,
+        targetStep,
+        comments: values.comments
       });
       
-      toast.success('Document moved to next step successfully');
-      form.reset();
-      onOpenChange(false);
-      onSuccess();
+      if (success) {
+        form.reset();
+        onOpenChange(false);
+      }
     } catch (error) {
       console.error('Error moving document:', error);
       toast.error('Failed to move document to the selected step');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -121,7 +127,7 @@ export default function MoveToNextStepDialog({
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
-                    disabled={isLoadingCircuitDetails}
+                    disabled={isLoadingCircuitDetails || isMoving}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -152,6 +158,7 @@ export default function MoveToNextStepDialog({
                       placeholder="Add your comments about this move"
                       {...field}
                       rows={4}
+                      disabled={isMoving}
                     />
                   </FormControl>
                   <FormMessage />
@@ -164,16 +171,18 @@ export default function MoveToNextStepDialog({
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
+                disabled={isMoving}
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
-                disabled={isSubmitting || isLoadingCircuitDetails}
+                disabled={isMoving || isLoadingCircuitDetails}
                 className="bg-blue-600 hover:bg-blue-700"
               >
-                {isSubmitting ? 'Moving...' : (
+                {isMoving ? (
+                  <>Moving... <Loader2 className="ml-2 h-4 w-4 animate-spin" /></>
+                ) : (
                   <>
                     <ArrowRight className="mr-2 h-4 w-4" /> 
                     Move to Next Step
