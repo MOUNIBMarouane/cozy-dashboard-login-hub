@@ -1,4 +1,3 @@
-
 import api from './api';
 import { DocumentCircuitHistory, ProcessCircuitRequest, MoveDocumentStepRequest, AssignCircuitRequest } from '@/models/documentCircuit';
 
@@ -33,8 +32,9 @@ const circuitService = {
   // Circuit Steps endpoints - these were renamed from CircuitDetail to Steps in the API
   getCircuitDetailsByCircuitId: async (circuitId: number): Promise<CircuitDetail[]> => {
     if (circuitId === 0 || !circuitId) return [];
-    // This endpoint has changed to use the Steps entity
-    const response = await api.get(`/Circuit/${circuitId}/steps`);
+    
+    // Changed from GET to POST since the API is returning 405 for GET
+    const response = await api.post(`/Circuit/${circuitId}/steps`);
     
     // Map the response to match the CircuitDetail interface
     return response.data.map((step: any) => ({

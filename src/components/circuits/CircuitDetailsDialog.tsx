@@ -44,6 +44,7 @@ export default function CircuitDetailsDialog({
     meta: {
       onError: (err) => {
         console.error('Failed to load circuit details:', err);
+        toast.error('Failed to load circuit details. Please try again.');
       }
     }
   });
