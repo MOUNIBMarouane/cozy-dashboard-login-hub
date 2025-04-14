@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -74,17 +75,19 @@ export const CircuitStepsSection = ({
         setIsMoving(true);
         
         // Get current and target step information
+        const currentStep = circuitDetails.find(step => step.id === currentStepId);
         const targetStep = circuitDetails.find(step => step.id === stepId);
         
-        // Find next step in ordered flow if it matches target
-        const nextStep = circuitDetails.find(step => 
-          step.id !== currentStepId && 
-          ((workflowStatus.canAdvanceToNextStep && stepId === currentStepId + 1) || 
-           (targetStep && targetStep.orderIndex > 0))
-        );
-
-        // If it's the next step in sequence, use move-next endpoint
-        if (nextStep && nextStep.id === stepId) {
+        if (!currentStep || !targetStep) {
+          throw new Error("Could not find step information");
+        }
+        
+        // Determine if this is a next step or previous step move
+        const isNextStep = targetStep.orderIndex > currentStep.orderIndex;
+        const isPreviousStep = targetStep.orderIndex < currentStep.orderIndex;
+        
+        if (isNextStep) {
+          // Moving forward - use move-next endpoint
           await circuitService.moveDocumentToNextStep({
             documentId: document.id,
             currentStepId: currentStepId!,
@@ -92,13 +95,16 @@ export const CircuitStepsSection = ({
             comments: `Moved document to next step #${stepId}`
           });
           toast.success(`Document moved to next step successfully`);
-        } else {
-          // Otherwise use the regular move endpoint
+        } else if (isPreviousStep) {
+          // Moving backward - use return-to-previous endpoint
           await circuitService.moveDocumentToStep({
             documentId: document.id,
             circuitDetailId: stepId,
           });
-          toast.success(`Document moved to step successfully`);
+          toast.success(`Document returned to previous step successfully`);
+        } else {
+          // This case shouldn't happen with proper orderIndex values
+          throw new Error("Could not determine direction of movement");
         }
         
         onDocumentMoved();

@@ -80,35 +80,43 @@ export default function MoveDocumentStepDialog({
     
     try {
       const targetStepId = parseInt(values.circuitDetailId);
+      const currentStep = circuitDetails?.find(step => step.id === currentStepId);
+      const targetStep = circuitDetails?.find(step => step.id === targetStepId);
+      
+      if (!currentStep || !targetStep) {
+        throw new Error("Could not find step information");
+      }
+      
+      // Determine if we're moving forward or backward
+      const isNextStep = targetStep.orderIndex > currentStep.orderIndex;
+      const isPreviousStep = targetStep.orderIndex < currentStep.orderIndex;
+      
       console.log("Moving document to step:", {
         documentId,
-        circuitDetailId: targetStepId
+        targetStepId,
+        direction: isNextStep ? "forward" : (isPreviousStep ? "backward" : "unknown")
       });
       
-      // Determine if this is a move to next step or a different kind of move
-      const isNextStep = circuitDetails?.some(detail => 
-        detail.id === targetStepId && 
-        detail.orderIndex === (currentStepId ? 
-          circuitDetails.find(d => d.id === currentStepId)?.orderIndex + 1 : 0)
-      );
-      
-      if (isNextStep && currentStepId) {
-        // Use the move-next endpoint for sequential moves
+      if (isNextStep) {
+        // Use the move-next endpoint for forward moves
         await circuitService.moveDocumentToNextStep({
           documentId,
-          currentStepId,
+          currentStepId: currentStepId!,
           nextStepId: targetStepId,
           comments: `Moved document from dialog to next step #${targetStepId}`
         });
-      } else {
-        // Use the return-to-previous endpoint for non-sequential moves
+        toast.success('Document moved to next step successfully');
+      } else if (isPreviousStep) {
+        // Use the return-to-previous endpoint for backward moves
         await circuitService.moveDocumentToStep({
           documentId,
           circuitDetailId: targetStepId,
         });
+        toast.success('Document returned to previous step successfully');
+      } else {
+        throw new Error("Could not determine direction of movement");
       }
       
-      toast.success('Document moved to new step successfully');
       onOpenChange(false);
       onSuccess();
     } catch (error: any) {
