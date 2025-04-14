@@ -12,24 +12,28 @@ interface CircuitStepCardProps {
   isSimpleUser: boolean;
   onMoveClick: () => void;
   onProcessClick: () => void;
+  isDraggedOver?: boolean;
 }
 
 export const CircuitStepCard = ({ 
   detail, 
   currentStepId, 
   historyForStep, 
-  isSimpleUser, 
+  isSimpleUser,
   onMoveClick,
-  onProcessClick
+  onProcessClick,
+  isDraggedOver = false
 }: CircuitStepCardProps) => {
   const isCurrentStep = detail.id === currentStepId;
   
   return (
     <Card 
       className={`h-full ${
-        isCurrentStep 
-          ? 'bg-[#0a1033] border-green-500 shadow-md shadow-green-500/20' 
-          : 'bg-[#0a1033] border-blue-900/30'
+        isDraggedOver 
+          ? 'bg-[#0a1033] border-green-500 shadow-lg shadow-green-500/20 transition-all duration-300' 
+          : isCurrentStep 
+            ? 'bg-[#0a1033] border-green-500/60 shadow-md shadow-green-500/20' 
+            : 'bg-[#0a1033] border-blue-900/30'
       }`}
     >
       <CardHeader className={`pb-3 ${

@@ -135,23 +135,22 @@ const DocumentFlowPage = () => {
         <LoadingState />
       ) : (
         <div className="flex flex-col gap-6">
-          {/* Trello-like board layout */}
-          <div className="grid grid-cols-1 gap-6">
-            {/* Document Card */}
-            {document && <DocumentCard document={document} />}
-
-            {/* Circuit Steps */}
-            {circuitDetails && circuitDetails.length > 0 && (
-              <CircuitStepsSection
-                circuitDetails={circuitDetails}
-                circuitHistory={circuitHistory || []}
-                currentStepId={currentStepId}
-                isSimpleUser={isSimpleUser}
-                onMoveClick={() => setMoveDialogOpen(true)}
-                onProcessClick={() => setProcessDialogOpen(true)}
-              />
-            )}
-          </div>
+          {/* Circuit Steps */}
+          {circuitDetails && circuitDetails.length > 0 && document && (
+            <CircuitStepsSection
+              document={document}
+              circuitDetails={circuitDetails}
+              circuitHistory={circuitHistory || []}
+              currentStepId={currentStepId}
+              isSimpleUser={isSimpleUser}
+              onMoveClick={() => setMoveDialogOpen(true)}
+              onProcessClick={() => setProcessDialogOpen(true)}
+              onDocumentMoved={() => {
+                refetchDocument();
+                refetchHistory();
+              }}
+            />
+          )}
         </div>
       )}
       
