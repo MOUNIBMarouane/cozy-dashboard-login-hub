@@ -170,6 +170,15 @@ const circuitService = {
     const response = await api.get(`/Status/step/${stepId}`);
     return response.data;
   },
+
+  // Method to update a step status
+  updateStepStatus: async (statusId: number, data: { 
+    title: string; 
+    isRequired: boolean; 
+    isComplete: boolean; 
+  }): Promise<void> => {
+    await api.put(`/Status/${statusId}`, data);
+  },
 };
 
 export default circuitService;

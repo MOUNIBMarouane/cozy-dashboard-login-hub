@@ -1,10 +1,11 @@
-
 import { Badge } from '@/components/ui/badge';
-import { Check, Clock, AlertCircle } from 'lucide-react';
+import { Check, Clock, AlertCircle, Settings } from 'lucide-react';
 import { DocumentStatus, DocumentWorkflowStatus } from '@/models/documentCircuit';
 import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import api from '@/services/api/core';
+import { Button } from '@/components/ui/button';
+import { EditStepStatusDialog } from './EditStepStatusDialog';
 
 interface StatusItem {
   statusId: number;
@@ -21,14 +22,15 @@ interface StepRequirementsCardProps {
 }
 
 export function StepRequirementsCard({ statuses, workflowStatus }: StepRequirementsCardProps) {
-  // Get current step ID from workflow status
+  const [selectedStatus, setSelectedStatus] = useState<DocumentStatus | null>(null);
   const currentStepId = workflowStatus?.currentStepId;
   
   // Fetch status for the current step directly from API
   const { 
     data: stepStatuses, 
     isLoading, 
-    error 
+    error,
+    refetch 
   } = useQuery({
     queryKey: ['step-statuses', currentStepId],
     queryFn: async () => {
@@ -41,7 +43,11 @@ export function StepRequirementsCard({ statuses, workflowStatus }: StepRequireme
 
   // Decide which statuses to display - use API data if available, otherwise fallback to passed props
   const displayStatuses = stepStatuses || statuses;
-  
+
+  const handleEditStatus = (status: DocumentStatus) => {
+    setSelectedStatus(status);
+  };
+
   return (
     <div className="space-y-2">
       <h3 className="text-lg font-medium">Step Requirements</h3>
@@ -107,6 +113,15 @@ export function StepRequirementsCard({ statuses, workflowStatus }: StepRequireme
                   {status.isComplete && status.completedBy && (
                     <span className="text-xs text-green-300">by {status.completedBy}</span>
                   )}
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-full hover:bg-blue-900/20"
+                    onClick={() => handleEditStatus(status)}
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             ))}
@@ -115,6 +130,19 @@ export function StepRequirementsCard({ statuses, workflowStatus }: StepRequireme
           <div className="text-center text-gray-500 py-4">No requirements for this step</div>
         )}
       </div>
+
+      {selectedStatus && (
+        <EditStepStatusDialog
+          open={!!selectedStatus}
+          onOpenChange={(open) => !open && setSelectedStatus(null)}
+          status={selectedStatus}
+          onSuccess={() => {
+            setSelectedStatus(null);
+            // Refetch the statuses
+            refetch();
+          }}
+        />
+      )}
     </div>
   );
 }
