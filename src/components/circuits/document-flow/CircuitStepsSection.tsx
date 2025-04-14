@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { GitBranch, MoveRight, AlertCircle, Check, ArrowRightCircle } from 'lucide-react';
+import { GitBranch, MoveRight, AlertCircle, Check, ArrowRightCircle, MoveHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CircuitStepCard } from './CircuitStepCard';
@@ -18,6 +18,7 @@ interface CircuitStepsSectionProps {
   isSimpleUser: boolean;
   onMoveClick: () => void;
   onProcessClick: () => void;
+  onNextStepClick: () => void;
   onDocumentMoved: () => void;
 }
 
@@ -29,6 +30,7 @@ export const CircuitStepsSection = ({
   isSimpleUser,
   onMoveClick,
   onProcessClick,
+  onNextStepClick,
   onDocumentMoved
 }: CircuitStepsSectionProps) => {
   const [showHelp, setShowHelp] = useState(false);
@@ -140,6 +142,17 @@ export const CircuitStepsSection = ({
                 <Check className="mr-2 h-4 w-4" /> Process Current Step
               </Button>
               
+              {workflowStatus.canAdvanceToNextStep && (
+                <Button 
+                  onClick={onNextStepClick}
+                  variant="outline"
+                  className="border-blue-500/30 text-white hover:bg-blue-500/20"
+                  disabled={isMoving}
+                >
+                  <ArrowRightCircle className="mr-2 h-4 w-4" /> Move to Next Step
+                </Button>
+              )}
+              
               {workflowStatus.canReturnToPreviousStep && (
                 <Button 
                   onClick={onMoveClick}
@@ -147,7 +160,7 @@ export const CircuitStepsSection = ({
                   className="border-blue-900/30 text-white hover:bg-blue-900/20"
                   disabled={isMoving}
                 >
-                  <MoveRight className="mr-2 h-4 w-4" /> Move Document
+                  <MoveHorizontal className="mr-2 h-4 w-4" /> Move Document
                 </Button>
               )}
             </>

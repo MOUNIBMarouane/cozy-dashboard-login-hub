@@ -10,6 +10,7 @@ import { Document } from '@/models/document';
 import { DocumentWorkflowStatus } from '@/models/documentCircuit';
 import MoveDocumentStepDialog from '@/components/circuits/MoveDocumentStepDialog';
 import ProcessCircuitStepDialog from '@/components/circuits/ProcessCircuitStepDialog';
+import MoveToNextStepDialog from '@/components/circuits/MoveToNextStepDialog';
 import { DocumentFlowHeader } from '@/components/circuits/document-flow/DocumentFlowHeader';
 import { DocumentCard } from '@/components/circuits/document-flow/DocumentCard';
 import { CircuitStepsSection } from '@/components/circuits/document-flow/CircuitStepsSection';
@@ -25,6 +26,7 @@ const DocumentFlowPage = () => {
   const [document, setDocument] = useState<Document | null>(null);
   const [moveDialogOpen, setMoveDialogOpen] = useState(false);
   const [processDialogOpen, setProcessDialogOpen] = useState(false);
+  const [nextStepDialogOpen, setNextStepDialogOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch document data
@@ -87,6 +89,13 @@ const DocumentFlowPage = () => {
     refetchHistory();
     refetchWorkflow();
     toast.success("Document step processed successfully");
+  };
+  
+  const handleNextStepSuccess = () => {
+    refetchDocument();
+    refetchHistory();
+    refetchWorkflow();
+    toast.success("Document moved to next step successfully");
   };
 
   console.log('Workflow status:', workflowStatus);
@@ -201,6 +210,7 @@ const DocumentFlowPage = () => {
               isSimpleUser={isSimpleUser}
               onMoveClick={() => setMoveDialogOpen(true)}
               onProcessClick={() => setProcessDialogOpen(true)}
+              onNextStepClick={() => setNextStepDialogOpen(true)}
               onDocumentMoved={() => {
                 refetchDocument();
                 refetchHistory();
@@ -231,6 +241,18 @@ const DocumentFlowPage = () => {
               open={processDialogOpen}
               onOpenChange={setProcessDialogOpen}
               onSuccess={handleProcessSuccess}
+            />
+          )}
+          
+          {document.circuitId && workflowStatus.currentStepId && (
+            <MoveToNextStepDialog
+              documentId={Number(id)}
+              documentTitle={document.title}
+              circuitId={document.circuitId}
+              currentStepId={workflowStatus.currentStepId}
+              open={nextStepDialogOpen}
+              onOpenChange={setNextStepDialogOpen}
+              onSuccess={handleNextStepSuccess}
             />
           )}
         </>

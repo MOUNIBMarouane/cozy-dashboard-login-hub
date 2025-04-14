@@ -31,6 +31,13 @@ export interface MoveDocumentStepRequest {
   circuitDetailId: number;
 }
 
+export interface MoveToNextStepRequest {
+  documentId: number;
+  currentStepId: number;
+  nextStepId: number;
+  comments: string;
+}
+
 export interface AssignCircuitRequest {
   documentId: number;
   circuitId: number;

@@ -1,5 +1,13 @@
+
 import api from './api/index';
-import { DocumentCircuitHistory, ProcessCircuitRequest, MoveDocumentStepRequest, AssignCircuitRequest, DocumentWorkflowStatus } from '@/models/documentCircuit';
+import { 
+  DocumentCircuitHistory, 
+  ProcessCircuitRequest, 
+  MoveDocumentStepRequest, 
+  AssignCircuitRequest, 
+  DocumentWorkflowStatus,
+  MoveToNextStepRequest
+} from '@/models/documentCircuit';
 
 /**
  * Service for managing circuits
@@ -119,6 +127,11 @@ const circuitService = {
   moveDocumentToStep: async (request: MoveDocumentStepRequest): Promise<void> => {
     console.log('Moving document to step:', request);
     await api.post('/Workflow/return-to-previous', request);
+  },
+
+  moveDocumentToNextStep: async (request: MoveToNextStepRequest): Promise<void> => {
+    console.log('Moving document to next step:', request);
+    await api.post('/Workflow/move', request);
   },
 
   getDocumentCircuitHistory: async (documentId: number): Promise<DocumentCircuitHistory[]> => {
