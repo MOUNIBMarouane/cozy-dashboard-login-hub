@@ -1,13 +1,17 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Check, Clock, AlertCircle } from 'lucide-react';
-import { DocumentStatus } from '@/models/documentCircuit';
+import { DocumentStatus, DocumentWorkflowStatus } from '@/models/documentCircuit';
 
 interface StepRequirementsCardProps {
   statuses: DocumentStatus[];
+  workflowStatus?: DocumentWorkflowStatus;
 }
 
-export function StepRequirementsCard({ statuses }: StepRequirementsCardProps) {
+export function StepRequirementsCard({ statuses, workflowStatus }: StepRequirementsCardProps) {
+  // Filter statuses to only show those for the current step
+  const currentStepId = workflowStatus?.currentStepId;
+  
   return (
     <div className="space-y-2">
       <h3 className="text-lg font-medium">Step Requirements</h3>
