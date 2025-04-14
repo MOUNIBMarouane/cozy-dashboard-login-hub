@@ -16,6 +16,7 @@ import { CircuitStepsSection } from '@/components/circuits/document-flow/Circuit
 import { NoCircuitAssignedCard } from '@/components/circuits/document-flow/NoCircuitAssignedCard';
 import { LoadingState } from '@/components/circuits/document-flow/LoadingState';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 const DocumentFlowPage = () => {
   const { id } = useParams();
@@ -227,7 +228,6 @@ const DocumentFlowPage = () => {
               documentId={Number(id)}
               documentTitle={document.title}
               currentStep={currentStepDetail.title}
-              availableActions={workflowStatus.availableActions || []}
               open={processDialogOpen}
               onOpenChange={setProcessDialogOpen}
               onSuccess={handleProcessSuccess}

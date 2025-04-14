@@ -1,9 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
 import circuitService from '@/services/circuitService';
 import {
   Dialog,
@@ -24,10 +25,12 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { ActionDto } from '@/models/documentCircuit';
 
 const formSchema = z.object({
   comments: z.string().min(3, { message: 'Comments must be at least 3 characters' }),
   isApproved: z.boolean(),
+  actionId: z.number().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -51,19 +54,50 @@ export default function ProcessCircuitStepDialog({
 }: ProcessCircuitStepDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Fetch available actions
+  const { data: workflowStatus } = useQuery({
+    queryKey: ['document-workflow-status', documentId],
+    queryFn: () => circuitService.getDocumentCurrentStatus(documentId),
+    enabled: open && !!documentId,
+  });
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       comments: '',
       isApproved: true,
+      actionId: undefined,
     },
   });
 
+  // Set default action when available actions are loaded
+  useEffect(() => {
+    if (workflowStatus?.availableActions?.length > 0) {
+      // Default to the first available action or an approval action if found
+      const approvalAction = workflowStatus.availableActions.find(
+        a => a.actionKey.includes('APPROVE') || a.title.toLowerCase().includes('approve')
+      );
+      
+      const defaultAction = approvalAction || workflowStatus.availableActions[0];
+      form.setValue('actionId', defaultAction.actionId);
+    }
+  }, [workflowStatus, form]);
+
   const onSubmit = async (values: FormValues) => {
+    if (!values.actionId && workflowStatus?.availableActions?.length > 0) {
+      values.actionId = workflowStatus.availableActions[0].actionId;
+    }
+    
+    if (!values.actionId) {
+      toast.error('No action available to process this step');
+      return;
+    }
+    
     setIsSubmitting(true);
     try {
-      await circuitService.processCircuitStep({
+      await circuitService.performAction({
         documentId,
+        actionId: values.actionId,
         comments: values.comments,
         isApproved: values.isApproved,
       });
@@ -82,6 +116,18 @@ export default function ProcessCircuitStepDialog({
 
   const handleApproveOrReject = (isApproved: boolean) => {
     form.setValue('isApproved', isApproved);
+    
+    // Set appropriate action based on approval status
+    if (workflowStatus?.availableActions?.length > 0) {
+      const actionToUse = isApproved
+        ? workflowStatus.availableActions.find(a => 
+            a.actionKey.includes('APPROVE') || a.title.toLowerCase().includes('approve'))
+        : workflowStatus.availableActions.find(a => 
+            a.actionKey.includes('REJECT') || a.title.toLowerCase().includes('reject'));
+      
+      // Default to first action if no specific action found
+      form.setValue('actionId', actionToUse?.actionId || workflowStatus.availableActions[0].actionId);
+    }
   };
 
   return (
@@ -142,6 +188,13 @@ export default function ProcessCircuitStepDialog({
               )}
             />
 
+            {/* Hidden action ID field */}
+            <FormField
+              control={form.control}
+              name="actionId"
+              render={() => <></>}
+            />
+
             <DialogFooter>
               <Button
                 type="button"
@@ -153,7 +206,7 @@ export default function ProcessCircuitStepDialog({
               </Button>
               <Button 
                 type="submit" 
-                disabled={isSubmitting}
+                disabled={isSubmitting || !workflowStatus?.availableActions?.length}
                 className={form.watch('isApproved') ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}
               >
                 {isSubmitting ? 'Processing...' : form.watch('isApproved') ? 'Approve & Submit' : 'Reject & Submit'}

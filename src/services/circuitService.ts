@@ -112,7 +112,7 @@ const circuitService = {
   },
 
   processCircuitStep: async (request: ProcessCircuitRequest): Promise<void> => {
-    console.log('Processing circuit step:', request);
+    console.log('Processing circuit step with action:', request);
     await api.post('/Workflow/perform-action', request);
   },
 
@@ -138,14 +138,14 @@ const circuitService = {
     return response.data;
   },
 
-  // New method to get document current status
+  // Method to get document current status
   getDocumentCurrentStatus: async (documentId: number): Promise<DocumentWorkflowStatus> => {
     if (!documentId) throw new Error("Document ID is required");
     const response = await api.get(`/Workflow/document/${documentId}/current-status`);
     return response.data;
   },
 
-  // Updated method to perform an action
+  // Method to perform an action
   performAction: async (request: ProcessCircuitRequest): Promise<void> => {
     console.log('Performing action:', request);
     await api.post('/Workflow/perform-action', request);
