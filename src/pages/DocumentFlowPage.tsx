@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import documentService from '@/services/documentService';
 import circuitService from '@/services/circuitService';
 import { Document } from '@/models/document';
+import { DocumentWorkflowStatus } from '@/models/documentCircuit';
 import MoveDocumentStepDialog from '@/components/circuits/MoveDocumentStepDialog';
 import ProcessCircuitStepDialog from '@/components/circuits/ProcessCircuitStepDialog';
 import { DocumentFlowHeader } from '@/components/circuits/document-flow/DocumentFlowHeader';
@@ -31,6 +32,13 @@ const DocumentFlowPage = () => {
     queryFn: () => documentService.getDocumentById(Number(id)),
   });
 
+  // Fetch workflow status
+  const { data: workflowStatus, isLoading: isLoadingWorkflow, refetch: refetchWorkflow, error: workflowError } = useQuery({
+    queryKey: ['document-workflow-status', id],
+    queryFn: () => circuitService.getDocumentCurrentStatus(Number(id)),
+    enabled: !!id,
+  });
+
   // Fetch circuit details
   const { data: circuitDetails, isLoading: isLoadingCircuitDetails, error: circuitDetailsError } = useQuery({
     queryKey: ['circuit-details', documentData?.circuitId],
@@ -52,14 +60,14 @@ const DocumentFlowPage = () => {
     }
     
     // Collect any errors
-    const allErrors = [documentError, circuitDetailsError, historyError].filter(Boolean);
+    const allErrors = [documentError, circuitDetailsError, historyError, workflowError].filter(Boolean);
     if (allErrors.length > 0) {
       console.error('Errors loading document flow data:', allErrors);
       setError('Error loading document flow data. Please try again.');
     } else {
       setError(null);
     }
-  }, [documentData, documentError, circuitDetailsError, historyError]);
+  }, [documentData, documentError, circuitDetailsError, historyError, workflowError]);
 
   if (!id) {
     navigate('/documents');
@@ -69,19 +77,21 @@ const DocumentFlowPage = () => {
   const handleMoveSuccess = () => {
     refetchDocument();
     refetchHistory();
+    refetchWorkflow();
     toast.success("Document moved successfully");
   };
 
   const handleProcessSuccess = () => {
     refetchDocument();
     refetchHistory();
+    refetchWorkflow();
     toast.success("Document step processed successfully");
   };
 
-  console.log('Circuit ID from document:', documentData?.circuitId);
+  console.log('Workflow status:', workflowStatus);
   
   // Check if the document has been loaded and doesn't have a circuit assigned
-  const isNoCircuit = !isLoadingDocument && documentData && documentData.circuitId === null;
+  const isNoCircuit = !isLoadingDocument && documentData && !documentData.circuitId;
 
   // If document is not in a circuit
   if (isNoCircuit) {
@@ -101,11 +111,11 @@ const DocumentFlowPage = () => {
     );
   }
 
-  const isLoading = isLoadingDocument || isLoadingCircuitDetails || isLoadingHistory;
-  const currentStepId = document?.currentCircuitDetailId;
+  const isLoading = isLoadingDocument || isLoadingCircuitDetails || isLoadingHistory || isLoadingWorkflow;
   const isSimpleUser = user?.role === 'SimpleUser';
 
   // Find current step details for processing
+  const currentStepId = workflowStatus?.currentStepId;
   const currentStepDetail = circuitDetails?.find(d => d.id === currentStepId);
 
   return (
@@ -135,32 +145,78 @@ const DocumentFlowPage = () => {
         <LoadingState />
       ) : (
         <div className="flex flex-col gap-6">
+          {/* Document information and statuses */}
+          {workflowStatus && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <h3 className="text-lg font-medium">Document Status</h3>
+                <div className="bg-[#0a1033] border border-blue-900/30 p-4 rounded-md">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-blue-300">Status:</span>
+                    <Badge variant={workflowStatus.status === 2 ? "success" : "outline"}>
+                      {workflowStatus.statusText}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-blue-300">Circuit:</span>
+                    <span>{workflowStatus.circuitTitle}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-blue-300">Current Step:</span>
+                    <span>{workflowStatus.currentStepTitle || 'None'}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="text-lg font-medium">Step Requirements</h3>
+                <div className="bg-[#0a1033] border border-blue-900/30 p-4 rounded-md">
+                  {workflowStatus.statuses && workflowStatus.statuses.length > 0 ? (
+                    <div className="space-y-2">
+                      {workflowStatus.statuses.map(status => (
+                        <div key={status.statusId} className="flex items-center justify-between">
+                          <span>{status.title}</span>
+                          <Badge variant={status.isComplete ? "success" : status.isRequired ? "destructive" : "outline"}>
+                            {status.isComplete ? "Complete" : status.isRequired ? "Required" : "Optional"}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-500 py-2">No requirements for this step</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Circuit Steps */}
-          {circuitDetails && circuitDetails.length > 0 && document && (
+          {circuitDetails && circuitDetails.length > 0 && document && workflowStatus && (
             <CircuitStepsSection
               document={document}
               circuitDetails={circuitDetails}
               circuitHistory={circuitHistory || []}
-              currentStepId={currentStepId}
+              workflowStatus={workflowStatus}
               isSimpleUser={isSimpleUser}
               onMoveClick={() => setMoveDialogOpen(true)}
               onProcessClick={() => setProcessDialogOpen(true)}
               onDocumentMoved={() => {
                 refetchDocument();
                 refetchHistory();
+                refetchWorkflow();
               }}
             />
           )}
         </div>
       )}
       
-      {document && (
+      {document && workflowStatus && (
         <>
           <MoveDocumentStepDialog
             documentId={Number(id)}
             documentTitle={document.title}
             circuitId={document.circuitId!}
-            currentStepId={document.currentCircuitDetailId}
+            currentStepId={workflowStatus.currentStepId}
             open={moveDialogOpen}
             onOpenChange={setMoveDialogOpen}
             onSuccess={handleMoveSuccess}
@@ -171,6 +227,7 @@ const DocumentFlowPage = () => {
               documentId={Number(id)}
               documentTitle={document.title}
               currentStep={currentStepDetail.title}
+              availableActions={workflowStatus.availableActions || []}
               open={processDialogOpen}
               onOpenChange={setProcessDialogOpen}
               onSuccess={handleProcessSuccess}

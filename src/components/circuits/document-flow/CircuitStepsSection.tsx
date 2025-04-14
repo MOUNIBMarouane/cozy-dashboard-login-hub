@@ -1,10 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GitBranch, MoveRight, AlertCircle, Check, ArrowRightCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CircuitStepCard } from './CircuitStepCard';
-import { DocumentCircuitHistory } from '@/models/documentCircuit';
+import { DocumentCircuitHistory, DocumentWorkflowStatus } from '@/models/documentCircuit';
 import { Document } from '@/models/document';
 import { DraggableDocumentCard } from './DraggableDocumentCard';
 import { toast } from 'sonner';
@@ -14,7 +14,7 @@ interface CircuitStepsSectionProps {
   circuitDetails: any[];
   circuitHistory: DocumentCircuitHistory[];
   document: Document;
-  currentStepId: number | undefined | null;
+  workflowStatus: DocumentWorkflowStatus;
   isSimpleUser: boolean;
   onMoveClick: () => void;
   onProcessClick: () => void;
@@ -25,7 +25,7 @@ export const CircuitStepsSection = ({
   circuitDetails,
   circuitHistory,
   document,
-  currentStepId,
+  workflowStatus,
   isSimpleUser,
   onMoveClick,
   onProcessClick,
@@ -34,6 +34,7 @@ export const CircuitStepsSection = ({
   const [showHelp, setShowHelp] = useState(false);
   const [draggedOverStepId, setDraggedOverStepId] = useState<number | null>(null);
   const [isMoving, setIsMoving] = useState(false);
+  const currentStepId = workflowStatus?.currentStepId;
   
   if (!circuitDetails || circuitDetails.length === 0) {
     return (
@@ -70,12 +71,28 @@ export const CircuitStepsSection = ({
       const data = JSON.parse(e.dataTransfer.getData('application/json'));
       if (data.documentId && document?.id === data.documentId) {
         setIsMoving(true);
-        await circuitService.moveDocumentToStep({
-          documentId: document.id,
-          circuitDetailId: stepId,
-        });
         
-        toast.success(`Document moved to step successfully`);
+        // Find available action for moving to this step
+        const moveAction = workflowStatus.availableActions.find(action => 
+          action.actionKey.includes('MOVE') || action.title.toLowerCase().includes('move')
+        );
+        
+        if (moveAction) {
+          await circuitService.performAction({
+            documentId: document.id,
+            actionId: moveAction.actionId,
+            comments: `Moved document to step #${stepId}`,
+            isApproved: true
+          });
+          toast.success(`Document moved to step successfully`);
+        } else {
+          await circuitService.moveDocumentToStep({
+            documentId: document.id,
+            circuitDetailId: stepId,
+          });
+          toast.success(`Document moved to step successfully`);
+        }
+        
         onDocumentMoved();
       }
     } catch (error) {
@@ -112,7 +129,7 @@ export const CircuitStepsSection = ({
             <AlertCircle className="h-4 w-4" />
           </Button>
           
-          {!isSimpleUser && (
+          {!isSimpleUser && workflowStatus?.availableActions?.length > 0 && (
             <>
               <Button 
                 onClick={onProcessClick}
@@ -123,28 +140,19 @@ export const CircuitStepsSection = ({
                 <Check className="mr-2 h-4 w-4" /> Process Current Step
               </Button>
               
-              <Button 
-                onClick={onMoveClick}
-                variant="outline"
-                className="border-blue-900/30 text-white hover:bg-blue-900/20"
-                disabled={isMoving}
-              >
-                <MoveRight className="mr-2 h-4 w-4" /> Move Document
-              </Button>
+              {workflowStatus.canReturnToPreviousStep && (
+                <Button 
+                  onClick={onMoveClick}
+                  variant="outline"
+                  className="border-blue-900/30 text-white hover:bg-blue-900/20"
+                  disabled={isMoving}
+                >
+                  <MoveRight className="mr-2 h-4 w-4" /> Move Document
+                </Button>
+              )}
             </>
           )}
         </div>
-      </div>
-      
-      <div className="grid grid-cols-1 mb-6">
-        {document && (
-          <div className="w-full max-w-md">
-            <DraggableDocumentCard 
-              document={document} 
-              onDragStart={() => console.log('Dragging document', document.id)} 
-            />
-          </div>
-        )}
       </div>
       
       <div className="overflow-x-auto">
@@ -152,6 +160,7 @@ export const CircuitStepsSection = ({
           {circuitDetails?.map((detail) => {
             const historyForStep = circuitHistory?.filter(h => h.circuitDetailId === detail.id) || [];
             const isOver = draggedOverStepId === detail.id;
+            const isCurrentStep = detail.id === currentStepId;
             
             return (
               <div 
@@ -169,7 +178,16 @@ export const CircuitStepsSection = ({
                   onMoveClick={onMoveClick}
                   onProcessClick={onProcessClick}
                   isDraggedOver={isOver}
-                />
+                >
+                  {isCurrentStep && document && (
+                    <div className="mt-4 mb-2">
+                      <DraggableDocumentCard 
+                        document={document} 
+                        onDragStart={() => console.log('Dragging document', document.id)} 
+                      />
+                    </div>
+                  )}
+                </CircuitStepCard>
               </div>
             );
           })}

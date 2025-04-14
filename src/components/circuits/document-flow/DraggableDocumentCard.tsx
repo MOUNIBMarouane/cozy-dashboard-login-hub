@@ -38,8 +38,8 @@ export const DraggableDocumentCard = ({ document, onDragStart }: DraggableDocume
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <CardHeader className="flex flex-row items-center justify-between border-b border-blue-900/30 bg-[#060927]/50 pb-2">
-        <CardTitle className="text-md flex items-center gap-2">
+      <CardHeader className="flex flex-row items-center justify-between border-b border-blue-900/30 bg-[#060927]/50 p-2">
+        <CardTitle className="text-sm flex items-center gap-2">
           <FileText className="h-4 w-4 text-blue-300" />
           {document?.title || 'Document'}
         </CardTitle>
@@ -47,8 +47,8 @@ export const DraggableDocumentCard = ({ document, onDragStart }: DraggableDocume
           <MoveHorizontal className="h-4 w-4" />
         </div>
       </CardHeader>
-      <CardContent className="p-3">
-        <div className="grid grid-cols-1 gap-2 text-sm">
+      <CardContent className="p-2">
+        <div className="grid grid-cols-2 gap-1 text-xs">
           <div>
             <span className="text-xs text-blue-300">Document Key:</span>
             <p className="font-mono text-xs">{document?.documentKey}</p>
@@ -56,10 +56,6 @@ export const DraggableDocumentCard = ({ document, onDragStart }: DraggableDocume
           <div>
             <span className="text-xs text-blue-300">Type:</span>
             <p>{document?.documentType?.typeName}</p>
-          </div>
-          <div>
-            <span className="text-xs text-blue-300">Created By:</span>
-            <p>{document?.createdBy?.firstName} {document?.createdBy?.lastName}</p>
           </div>
         </div>
       </CardContent>

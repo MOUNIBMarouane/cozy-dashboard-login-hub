@@ -13,6 +13,7 @@ interface CircuitStepCardProps {
   onMoveClick: () => void;
   onProcessClick: () => void;
   isDraggedOver?: boolean;
+  children?: React.ReactNode;
 }
 
 export const CircuitStepCard = ({ 
@@ -22,7 +23,8 @@ export const CircuitStepCard = ({
   isSimpleUser,
   onMoveClick,
   onProcessClick,
-  isDraggedOver = false
+  isDraggedOver = false,
+  children
 }: CircuitStepCardProps) => {
   const isCurrentStep = detail.id === currentStepId;
   
@@ -59,6 +61,9 @@ export const CircuitStepCard = ({
         <p className="text-sm text-gray-400 mb-4">
           {detail.descriptif || 'No description provided for this step'}
         </p>
+
+        {/* Document card if this is the current step */}
+        {children}
 
         {/* History items for this step */}
         <div className="space-y-3">

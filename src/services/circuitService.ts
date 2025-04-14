@@ -1,6 +1,5 @@
-
 import api from './api/index';
-import { DocumentCircuitHistory, ProcessCircuitRequest, MoveDocumentStepRequest, AssignCircuitRequest } from '@/models/documentCircuit';
+import { DocumentCircuitHistory, ProcessCircuitRequest, MoveDocumentStepRequest, AssignCircuitRequest, DocumentWorkflowStatus } from '@/models/documentCircuit';
 
 /**
  * Service for managing circuits
@@ -137,6 +136,19 @@ const circuitService = {
     // There's no specific pending-approvals endpoint, so we'll use pending-documents
     const response = await api.get('/Workflow/pending-documents');
     return response.data;
+  },
+
+  // New method to get document current status
+  getDocumentCurrentStatus: async (documentId: number): Promise<DocumentWorkflowStatus> => {
+    if (!documentId) throw new Error("Document ID is required");
+    const response = await api.get(`/Workflow/document/${documentId}/current-status`);
+    return response.data;
+  },
+
+  // Updated method to perform an action
+  performAction: async (request: ProcessCircuitRequest): Promise<void> => {
+    console.log('Performing action:', request);
+    await api.post('/Workflow/perform-action', request);
   },
 };
 
