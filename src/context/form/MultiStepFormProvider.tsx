@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import authService from '@/services/authService';
 import MultiStepFormContext from './MultiStepFormContext';
 import { FormData, StepValidation, initialFormData } from './types';
+import { validateUsername as validateUsernameUtil, validateEmail as validateEmailUtil } from './utils/validationUtils';
+import { registerUser as registerUserUtil, verifyEmail as verifyEmailUtil } from './utils/registerUtils';
 
 export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -28,152 +28,19 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const validateUsername = async (): Promise<boolean> => {
-    setStepValidation((prev) => ({ ...prev, isLoading: true, errors: {} }));
-    try {
-      const isValid = await authService.validateUsername(formData.username);
-      
-      if (!isValid) {
-        setStepValidation((prev) => ({
-          ...prev,
-          isLoading: false,
-          errors: { username: 'Username validation failed. This username may already be taken.' },
-        }));
-        toast.error('Username validation failed. This username may already be taken.');
-        return false;
-      }
-      
-      setStepValidation((prev) => ({ ...prev, isLoading: false }));
-      return true;
-    } catch (error: any) {
-      console.error('Username validation error:', error);
-      const errorMessage = error.response?.data?.message || 'Username validation failed.';
-      setStepValidation((prev) => ({
-        ...prev,
-        isLoading: false,
-        errors: { username: errorMessage },
-      }));
-      toast.error(errorMessage);
-      return false;
-    }
+    return validateUsernameUtil(formData.username, setStepValidation);
   };
 
   const validateEmail = async (): Promise<boolean> => {
-    setStepValidation((prev) => ({ ...prev, isLoading: true, errors: {} }));
-    try {
-      const isValid = await authService.validateEmail(formData.email);
-      
-      if (!isValid) {
-        setStepValidation((prev) => ({
-          ...prev,
-          isLoading: false,
-          errors: { email: 'Email validation failed. This email may already be registered.' },
-        }));
-        toast.error('Email validation failed. This email may already be registered.');
-        return false;
-      }
-      
-      setStepValidation((prev) => ({ ...prev, isLoading: false }));
-      return true;
-    } catch (error: any) {
-      console.error('Email validation error:', error);
-      const errorMessage = error.response?.data?.message || 'Email validation failed.';
-      setStepValidation((prev) => ({
-        ...prev,
-        isLoading: false,
-        errors: { email: errorMessage },
-      }));
-      toast.error(errorMessage);
-      return false;
-    }
+    return validateEmailUtil(formData.email, setStepValidation);
   };
 
   const registerUser = async (): Promise<boolean> => {
-    setStepValidation((prev) => ({ ...prev, isLoading: true, errors: {} }));
-    try {
-      const userData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        passwordHash: formData.password,
-        confirmPassword: formData.confirmPassword,
-        username: formData.username,
-        adminSecretKey: formData.adminSecretKey,
-        userType: formData.userType,
-        // Include additional fields based on user type
-        ...(formData.userType === 'personal' ? {
-          cin: formData.cin,
-          personalAddress: formData.personalAddress,
-          personalPhone: formData.personalPhone,
-        } : {
-          companyName: formData.companyName,
-          companyIRC: formData.companyIRC,
-          companyAddress: formData.companyAddress,
-          companyPhone: formData.companyPhone,
-          companyEmail: formData.companyEmail,
-          companyWebsite: formData.companyWebsite,
-        })
-      };
-      
-      await authService.register(userData);
-      
-      setStepValidation((prev) => ({ ...prev, isLoading: false }));
-      toast.success('Registration successful! Please check your email for verification.');
-      
-      // Redirect to verification page with email
-      navigate(`/verify/${formData.email}`);
-      
-      return true;
-    } catch (error: any) {
-      console.error('Registration error:', error);
-      const errorMessage = error.response?.data || 'Registration failed.';
-      setStepValidation((prev) => ({
-        ...prev,
-        isLoading: false,
-        errors: { registration: errorMessage },
-      }));
-      toast.error(errorMessage);
-      return false;
-    }
+    return registerUserUtil(formData, setStepValidation, navigate);
   };
 
   const verifyEmail = async (code: string): Promise<boolean> => {
-    setStepValidation((prev) => ({ ...prev, isLoading: true, errors: {} }));
-    try {
-      const isVerified = await authService.verifyEmail(formData.email, code);
-      
-      if (!isVerified) {
-        setStepValidation((prev) => ({
-          ...prev,
-          isLoading: false,
-          errors: { verification: 'Email verification failed. The code may be invalid or expired.' },
-        }));
-        toast.error('Email verification failed. The code may be invalid or expired.');
-        return false;
-      }
-      
-      setStepValidation((prev) => ({ ...prev, isLoading: false }));
-      toast.success('Email verified successfully!');
-      
-      // Redirect to welcome page after successful verification
-      navigate('/welcome', { 
-        state: { 
-          verified: true,
-          email: formData.email
-        }
-      });
-      
-      return true;
-    } catch (error: any) {
-      console.error('Email verification error:', error);
-      const errorMessage = error.response?.data?.message || 'Email verification failed.';
-      setStepValidation((prev) => ({
-        ...prev,
-        isLoading: false,
-        errors: { verification: errorMessage },
-      }));
-      toast.error(errorMessage);
-      return false;
-    }
+    return verifyEmailUtil(formData.email, code, setStepValidation, navigate);
   };
 
   return (
