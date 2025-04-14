@@ -71,8 +71,8 @@ export const CircuitStepsSectionHeader = ({
             {canAdvanceToNextStep && (
               <Button 
                 onClick={onNextStepClick}
-                variant="outline"
-                className="border-blue-500/30 text-white hover:bg-blue-500/20"
+                variant="default"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
                 disabled={isMoving}
               >
                 <ArrowRightCircle className="mr-2 h-4 w-4" /> Move to Next Step

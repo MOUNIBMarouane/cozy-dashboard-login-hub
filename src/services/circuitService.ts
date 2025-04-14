@@ -1,4 +1,3 @@
-
 import api from './api/index';
 import { 
   DocumentCircuitHistory, 
@@ -131,7 +130,7 @@ const circuitService = {
 
   moveDocumentToNextStep: async (request: MoveToNextStepRequest): Promise<void> => {
     console.log('Moving document to next step:', request);
-    await api.post('/Workflow/move', request);
+    await api.post('/Workflow/move-next', request);
   },
 
   getDocumentCircuitHistory: async (documentId: number): Promise<DocumentCircuitHistory[]> => {
