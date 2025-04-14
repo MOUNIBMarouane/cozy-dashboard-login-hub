@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -74,20 +73,27 @@ export const CircuitStepsSection = ({
       if (data.documentId && document?.id === data.documentId) {
         setIsMoving(true);
         
-        // Find available action for moving to this step
-        const moveAction = workflowStatus.availableActions.find(action => 
-          action.actionKey.includes('MOVE') || action.title.toLowerCase().includes('move')
-        );
+        // Get current and target step information
+        const targetStep = circuitDetails.find(step => step.id === stepId);
         
-        if (moveAction) {
-          await circuitService.performAction({
+        // Find next step in ordered flow if it matches target
+        const nextStep = circuitDetails.find(step => 
+          step.id !== currentStepId && 
+          ((workflowStatus.canAdvanceToNextStep && stepId === currentStepId + 1) || 
+           (targetStep && targetStep.orderIndex > 0))
+        );
+
+        // If it's the next step in sequence, use move-next endpoint
+        if (nextStep && nextStep.id === stepId) {
+          await circuitService.moveDocumentToNextStep({
             documentId: document.id,
-            actionId: moveAction.actionId,
-            comments: `Moved document to step #${stepId}`,
-            isApproved: true
+            currentStepId: currentStepId!,
+            nextStepId: stepId,
+            comments: `Moved document to next step #${stepId}`
           });
-          toast.success(`Document moved to step successfully`);
+          toast.success(`Document moved to next step successfully`);
         } else {
+          // Otherwise use the regular move endpoint
           await circuitService.moveDocumentToStep({
             documentId: document.id,
             circuitDetailId: stepId,

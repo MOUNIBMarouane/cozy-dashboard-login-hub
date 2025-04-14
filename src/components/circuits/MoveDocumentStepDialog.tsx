@@ -79,15 +79,34 @@ export default function MoveDocumentStepDialog({
     setError(null);
     
     try {
+      const targetStepId = parseInt(values.circuitDetailId);
       console.log("Moving document to step:", {
         documentId,
-        circuitDetailId: parseInt(values.circuitDetailId)
+        circuitDetailId: targetStepId
       });
       
-      await circuitService.moveDocumentToStep({
-        documentId,
-        circuitDetailId: parseInt(values.circuitDetailId),
-      });
+      // Determine if this is a move to next step or a different kind of move
+      const isNextStep = circuitDetails?.some(detail => 
+        detail.id === targetStepId && 
+        detail.orderIndex === (currentStepId ? 
+          circuitDetails.find(d => d.id === currentStepId)?.orderIndex + 1 : 0)
+      );
+      
+      if (isNextStep && currentStepId) {
+        // Use the move-next endpoint for sequential moves
+        await circuitService.moveDocumentToNextStep({
+          documentId,
+          currentStepId,
+          nextStepId: targetStepId,
+          comments: `Moved document from dialog to next step #${targetStepId}`
+        });
+      } else {
+        // Use the return-to-previous endpoint for non-sequential moves
+        await circuitService.moveDocumentToStep({
+          documentId,
+          circuitDetailId: targetStepId,
+        });
+      }
       
       toast.success('Document moved to new step successfully');
       onOpenChange(false);
