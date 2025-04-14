@@ -3,7 +3,6 @@ import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import circuitService from '@/services/circuitService';
 import { Document } from '@/models/document';
-import { Circuit } from '@/models/circuit';
 import {
   Card,
   CardHeader,
