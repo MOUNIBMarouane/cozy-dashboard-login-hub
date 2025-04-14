@@ -46,11 +46,13 @@ export interface AssignCircuitRequest {
 
 export interface DocumentStatus {
   statusId: number;
+  statusKey?: string;
   title: string;
   isRequired: boolean;
   isComplete: boolean;
   completedBy?: string;
   completedAt?: string;
+  stepId?: number;
 }
 
 export interface ActionDto {

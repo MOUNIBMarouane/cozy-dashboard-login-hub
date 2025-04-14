@@ -5,7 +5,8 @@ import {
   MoveDocumentStepRequest, 
   AssignCircuitRequest, 
   DocumentWorkflowStatus,
-  MoveToNextStepRequest
+  MoveToNextStepRequest,
+  DocumentStatus
 } from '@/models/documentCircuit';
 
 /**
@@ -161,6 +162,13 @@ const circuitService = {
   performAction: async (request: ProcessCircuitRequest): Promise<void> => {
     console.log('Performing action:', request);
     await api.post('/Workflow/perform-action', request);
+  },
+  
+  // Method to get status for a specific step
+  getStepStatuses: async (stepId: number): Promise<DocumentStatus[]> => {
+    if (!stepId) return [];
+    const response = await api.get(`/Status/step/${stepId}`);
+    return response.data;
   },
 };
 
