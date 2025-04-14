@@ -1,9 +1,9 @@
 
-import { Check, X, MoveRight, CheckCircle } from 'lucide-react';
-import { Card, CardHeader, CardContent, CardFooter, CardTitle } from '@/components/ui/card';
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { DocumentCircuitHistory } from '@/models/documentCircuit';
+import { CircuitStepHistory } from './CircuitStepHistory';
+import { CircuitStepFooter } from './CircuitStepFooter';
 
 interface CircuitStepCardProps {
   detail: any;
@@ -66,68 +66,16 @@ export const CircuitStepCard = ({
         {children}
 
         {/* History items for this step */}
-        <div className="space-y-3">
-          {historyForStep.length > 0 ? (
-            historyForStep.map(history => (
-              <Card key={history.id} className="bg-[#070b28] border border-blue-900/30">
-                <CardContent className="p-3">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="font-medium text-sm">
-                      Processed by: {history.userName || history.processedBy || 'Unknown'}
-                    </span>
-                    <Badge variant={history.isApproved ? "success" : "destructive"}>
-                      {history.isApproved ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-gray-400">
-                    {new Date(history.processedAt).toLocaleString()}
-                  </p>
-                  {history.comments && (
-                    <div className="mt-2 p-2 bg-[#111633]/40 rounded text-xs border border-blue-900/30">
-                      "{history.comments}"
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <div className="text-center text-gray-500 text-sm p-2">
-              No history for this step yet
-            </div>
-          )}
-        </div>
+        <CircuitStepHistory historyForStep={historyForStep} />
       </CardContent>
       
-      <CardFooter className="p-3 border-t border-blue-900/30 bg-[#060927] flex justify-between">
-        {detail.responsibleRoleId ? (
-          <Badge variant="outline" className="text-xs">
-            Responsible: Role #{detail.responsibleRoleId}
-          </Badge>
-        ) : (
-          <span className="text-xs text-gray-500">No responsible role</span>
-        )}
-        
-        {isCurrentStep && !isSimpleUser && (
-          <div className="flex space-x-2">
-            <Button 
-              size="sm" 
-              variant="outline"
-              className="text-xs bg-green-900/10 border-green-900/30 hover:bg-green-900/20"
-              onClick={onProcessClick}
-            >
-              <CheckCircle className="h-3 w-3 mr-1" /> Process
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline"
-              className="text-xs"
-              onClick={onMoveClick}
-            >
-              <MoveRight className="h-3 w-3 mr-1" /> Move
-            </Button>
-          </div>
-        )}
-      </CardFooter>
+      <CircuitStepFooter 
+        responsibleRoleId={detail.responsibleRoleId}
+        isCurrentStep={isCurrentStep}
+        isSimpleUser={isSimpleUser}
+        onProcessClick={onProcessClick}
+        onMoveClick={onMoveClick}
+      />
     </Card>
   );
 };
