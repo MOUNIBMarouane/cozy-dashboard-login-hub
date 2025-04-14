@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import authService from '@/services/authService';
 import MultiStepFormContext from './MultiStepFormContext';
 import { FormData, StepValidation, initialFormData } from './types';
@@ -12,6 +13,7 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
     isLoading: false,
     errors: {},
   });
+  const navigate = useNavigate();
 
   const setFormData = (data: Partial<FormData>) => {
     setFormDataState((prev) => ({ ...prev, ...data }));
@@ -150,6 +152,9 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
       setStepValidation((prev) => ({ ...prev, isLoading: false }));
       toast.success('Registration successful! Please check your email for verification.');
       
+      // Redirect to verification page with email
+      navigate(`/verify/${formData.email}`);
+      
       // Return true to indicate successful registration
       return true;
     } catch (error: any) {
@@ -183,6 +188,15 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
       
       setStepValidation((prev) => ({ ...prev, isLoading: false }));
       toast.success('Email verified successfully!');
+      
+      // Redirect to welcome page after successful verification
+      navigate('/welcome', { 
+        state: { 
+          verified: true,
+          email: formData.email
+        }
+      });
+      
       return true;
     } catch (error: any) {
       console.error('Email verification error:', error);
