@@ -29,17 +29,17 @@ export function useDocumentMovement({ onMoveSuccess }: UseDocumentMovementProps 
     
     try {
       // Determine direction based on step order index
-      const isNextStep = targetStep.orderIndex > currentStep.orderIndex;
-      const isPreviousStep = targetStep.orderIndex < currentStep.orderIndex;
+      const isMovingForward = targetStep.orderIndex > currentStep.orderIndex;
+      const isMovingBackward = targetStep.orderIndex < currentStep.orderIndex;
       
       console.log("Moving document:", {
         documentId,
         currentStepId,
         targetStepId,
-        direction: isNextStep ? "forward" : (isPreviousStep ? "backward" : "unknown")
+        direction: isMovingForward ? "forward" : (isMovingBackward ? "backward" : "unknown")
       });
       
-      if (isNextStep) {
+      if (isMovingForward) {
         // Moving forward - use move-next endpoint
         await circuitService.moveDocumentToNextStep({
           documentId,
@@ -48,7 +48,7 @@ export function useDocumentMovement({ onMoveSuccess }: UseDocumentMovementProps 
           comments: comments || `Moved document to next step #${targetStepId}`
         });
         toast.success('Document moved to next step successfully');
-      } else if (isPreviousStep) {
+      } else if (isMovingBackward) {
         // Moving backward - use return-to-previous endpoint
         await circuitService.moveDocumentToStep({
           documentId,

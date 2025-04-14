@@ -12,9 +12,9 @@ interface DocumentDialogsProps {
   moveDialogOpen: boolean;
   processDialogOpen: boolean;
   nextStepDialogOpen: boolean;
-  setMoveDialogOpen: Dispatch<SetStateAction<boolean>>;
-  setProcessDialogOpen: Dispatch<SetStateAction<boolean>>;
-  setNextStepDialogOpen: Dispatch<SetStateAction<boolean>>;
+  setMoveDialogOpen: (open: boolean) => void;
+  setProcessDialogOpen: (open: boolean) => void;
+  setNextStepDialogOpen: (open: boolean) => void;
   handleMoveSuccess: () => void;
   handleProcessSuccess: () => void;
   handleNextStepSuccess: () => void;
