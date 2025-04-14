@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Loader2, Plus, Lock } from 'lucide-react';
+import { Loader2, Plus, Lock, AlertTriangle } from 'lucide-react';
 import circuitService from '@/services/circuitService';
 import {
   Dialog,
@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import CircuitDetailsList from './CircuitDetailsList';
 import CreateCircuitDetailDialog from './CreateCircuitDetailDialog';
 import { useAuth } from '@/context/AuthContext';
@@ -34,11 +35,15 @@ export default function CircuitDetailsDialog({
     data: circuitDetails,
     isLoading,
     isError,
+    error,
     refetch
   } = useQuery({
     queryKey: ['circuit-details', circuit.id],
     queryFn: () => circuitService.getCircuitDetailsByCircuitId(circuit.id),
-    enabled: open
+    enabled: open,
+    onError: (err) => {
+      console.error('Failed to load circuit details:', err);
+    }
   });
 
   useEffect(() => {
@@ -54,6 +59,11 @@ export default function CircuitDetailsDialog({
       return;
     }
     setCreateDetailDialogOpen(true);
+  };
+
+  const handleRetryLoad = () => {
+    refetch();
+    toast.info('Retrying to load circuit details...');
   };
 
   return (
@@ -79,8 +89,24 @@ export default function CircuitDetailsDialog({
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         ) : isError ? (
-          <div className="text-red-500 p-4">
-            Error loading circuit details
+          <div className="py-4">
+            <Alert variant="destructive" className="mb-4 border-red-800 bg-red-950/50 text-red-300">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription className="flex flex-col space-y-2">
+                <span>Error loading circuit details</span>
+                <span className="text-xs opacity-80">
+                  {error instanceof Error ? error.message : 'An unexpected error occurred'}
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-2 w-full border-red-700 hover:bg-red-900/20"
+                  onClick={handleRetryLoad}
+                >
+                  Retry
+                </Button>
+              </AlertDescription>
+            </Alert>
           </div>
         ) : (
           <CircuitDetailsList 
