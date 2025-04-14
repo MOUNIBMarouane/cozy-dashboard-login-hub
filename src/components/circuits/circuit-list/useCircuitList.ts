@@ -25,12 +25,14 @@ export function useCircuitList({ onApiError, searchQuery }: UseCircuitListProps)
     queryKey: ['circuits'],
     queryFn: circuitService.getAllCircuits,
     meta: {
-      onError: (err: any) => {
-        const errorMessage = err instanceof Error 
-          ? err.message 
-          : 'Failed to load circuits. Please try again later.';
-        console.error('Circuit list error:', err);
-        if (onApiError) onApiError(errorMessage);
+      onSettled: (data, err) => {
+        if (err) {
+          const errorMessage = err instanceof Error 
+            ? err.message 
+            : 'Failed to load circuits. Please try again later.';
+          console.error('Circuit list error:', err);
+          if (onApiError) onApiError(errorMessage);
+        }
       }
     }
   });

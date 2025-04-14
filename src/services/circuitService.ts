@@ -30,26 +30,35 @@ const circuitService = {
     await api.delete(`/Circuit/${id}`);
   },
 
-  // Circuit Steps endpoints - these were renamed from CircuitDetail to Steps in the API
+  // Circuit Steps endpoints - these are part of the Circuit response now
   getCircuitDetailsByCircuitId: async (circuitId: number): Promise<CircuitDetail[]> => {
     if (circuitId === 0 || !circuitId) return [];
     
-    // Changed from GET to POST since the API is returning 405 for GET
-    const response = await api.post(`/Circuit/${circuitId}/steps`);
-    
-    // Map the response to match the CircuitDetail interface
-    return response.data.map((step: any) => ({
-      id: step.id,
-      circuitDetailKey: step.stepKey,
-      circuitId: step.circuitId,
-      title: step.title,
-      descriptif: step.descriptif || '',
-      orderIndex: step.orderIndex,
-      responsibleRoleId: step.responsibleRoleId,
-      responsibleRole: step.responsibleRole,
-      createdAt: step.createdAt || new Date().toISOString(),
-      updatedAt: step.updatedAt || new Date().toISOString(),
-    }));
+    try {
+      // Get circuit with included steps directly from the circuit endpoint
+      const response = await api.get(`/Circuit/${circuitId}`);
+      
+      // Map the steps array to match the CircuitDetail interface
+      if (response.data && Array.isArray(response.data.steps)) {
+        return response.data.steps.map((step: any) => ({
+          id: step.id,
+          circuitDetailKey: step.stepKey,
+          circuitId: step.circuitId,
+          title: step.title,
+          descriptif: step.descriptif || '',
+          orderIndex: step.orderIndex,
+          responsibleRoleId: step.responsibleRoleId,
+          responsibleRole: step.responsibleRole,
+          isFinalStep: step.isFinalStep,
+          createdAt: step.createdAt || new Date().toISOString(),
+          updatedAt: step.updatedAt || new Date().toISOString(),
+        }));
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching circuit details:', error);
+      throw error;
+    }
   },
 
   createCircuitDetail: async (detail: Omit<CircuitDetail, 'id' | 'circuitDetailKey'>): Promise<CircuitDetail> => {

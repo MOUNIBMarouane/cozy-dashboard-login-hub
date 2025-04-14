@@ -10,6 +10,7 @@ interface Circuit {
   allowBacktrack?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  steps?: CircuitDetail[];
 }
 
 interface CircuitDetail {
@@ -25,6 +26,7 @@ interface CircuitDetail {
     name: string;
     isAdmin?: boolean;
   };
+  isFinalStep?: boolean;
   createdAt: string;
   updatedAt: string;
 }
