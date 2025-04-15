@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Lock, Eye, EyeOff } from 'lucide-react';
+import { Lock, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import PasswordStrengthIndicator from '../password/PasswordStrengthIndicator';
@@ -22,6 +22,16 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  // Determine if fields are valid, have errors, or are empty
+  const hasPasswordError = !!localErrors.password;
+  const hasConfirmError = !!localErrors.confirmPassword;
+  
+  const isPasswordValid = password && !hasPasswordError && passwordStrength >= 3;
+  const isConfirmValid = confirmPassword && password === confirmPassword && !hasConfirmError;
+  
+  const isPasswordEmpty = !password;
+  const isConfirmEmpty = !confirmPassword;
 
   return (
     <>
@@ -34,7 +44,10 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
             name="password"
             type={showPassword ? 'text' : 'password'}
             placeholder="Create new password"
-            className={`pl-10 pr-12 ${localErrors.password ? 'border-red-500' : ''}`}
+            className={`pl-10 pr-12 ${
+              hasPasswordError && !isPasswordEmpty ? 'border-red-500' : 
+              isPasswordValid ? 'border-green-500' : ''
+            }`}
             value={password}
             onChange={onChange}
           />
@@ -45,6 +58,9 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
+          {isPasswordValid && (
+            <CheckCircle2 className="absolute right-10 top-3 h-4 w-4 text-green-500" />
+          )}
         </div>
         {localErrors.password && (
           <p className="text-xs text-red-500">{localErrors.password}</p>
@@ -61,7 +77,10 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
             name="confirmPassword"
             type={showConfirmPassword ? 'text' : 'password'}
             placeholder="Confirm password"
-            className={`pl-10 pr-12 ${localErrors.confirmPassword ? 'border-red-500' : ''}`}
+            className={`pl-10 pr-12 ${
+              hasConfirmError && !isConfirmEmpty ? 'border-red-500' : 
+              isConfirmValid ? 'border-green-500' : ''
+            }`}
             value={confirmPassword}
             onChange={onChange}
           />
@@ -72,6 +91,9 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
           >
             {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
+          {isConfirmValid && (
+            <CheckCircle2 className="absolute right-10 top-3 h-4 w-4 text-green-500" />
+          )}
         </div>
         {localErrors.confirmPassword && (
           <p className="text-xs text-red-500">{localErrors.confirmPassword}</p>

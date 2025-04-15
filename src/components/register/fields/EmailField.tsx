@@ -2,7 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Mail } from 'lucide-react';
+import { Mail, CheckCircle2 } from 'lucide-react';
 
 interface EmailFieldProps {
   value: string;
@@ -17,6 +17,11 @@ const EmailField: React.FC<EmailFieldProps> = ({
   localErrors,
   validationErrors
 }) => {
+  // Determine if the field is valid, has an error, or is empty
+  const hasError = !!(localErrors.email || validationErrors.email);
+  const isValid = value && !hasError;
+  const isEmpty = !value;
+  
   return (
     <div className="space-y-1">
       <Label htmlFor="email">Email</Label>
@@ -27,12 +32,16 @@ const EmailField: React.FC<EmailFieldProps> = ({
           name="email"
           type="email"
           placeholder="name@example.com"
-          className={`pl-10 ${
-            localErrors.email || validationErrors.email ? 'border-red-500' : ''
+          className={`pl-10 pr-10 ${
+            hasError && !isEmpty ? 'border-red-500' : 
+            isValid ? 'border-green-500' : ''
           }`}
           value={value}
           onChange={onChange}
         />
+        {isValid && (
+          <CheckCircle2 className="absolute right-3 top-3 h-4 w-4 text-green-500" />
+        )}
       </div>
       {localErrors.email && (
         <p className="text-xs text-red-500">{localErrors.email}</p>

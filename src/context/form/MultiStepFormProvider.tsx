@@ -1,9 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MultiStepFormContext from './MultiStepFormContext';
 import { FormData, StepValidation, initialFormData } from './types';
-import { validateUsername as validateUsernameUtil, validateEmail as validateEmailUtil } from './utils/validationUtils';
+import { 
+  validateUsername as validateUsernameUtil, 
+  validateEmail as validateEmailUtil,
+  debounceUsernameValidation,
+  debounceEmailValidation
+} from './utils/validationUtils';
 import { registerUser as registerUserUtil, verifyEmail as verifyEmailUtil } from './utils/registerUtils';
 
 export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -14,6 +19,20 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
     errors: {},
   });
   const navigate = useNavigate();
+
+  // Use debounced validation for username and email as they change
+  useEffect(() => {
+    if (formData.username && formData.username.length >= 4) {
+      debounceUsernameValidation(formData.username, setStepValidation);
+    }
+  }, [formData.username]);
+
+  useEffect(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && emailRegex.test(formData.email)) {
+      debounceEmailValidation(formData.email, setStepValidation);
+    }
+  }, [formData.email]);
 
   const setFormData = (data: Partial<FormData>) => {
     setFormDataState((prev) => ({ ...prev, ...data }));
