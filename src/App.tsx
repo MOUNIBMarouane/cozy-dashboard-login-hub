@@ -71,8 +71,8 @@ const App = () => (
                 <Route path="/documents" element={<DocumentsPageWrapper />} />
                 
                 {/* Document Types Management routes */}
-                <Route path="/document-types" element={<ProtectedRoute requiresManagement><DocumentTypes /></ProtectedRoute>} />
-                <Route path="/document-types-management" element={<ProtectedRoute requiresManagement><DocumentTypesManagement /></ProtectedRoute>} />
+                <Route path="/document-types" element={<DocumentTypes />} />
+                <Route path="/document-types-management" element={<ProtectedRoute requiresManagement requiredRole={["Admin", "FullUser"]}><DocumentTypesManagement /></ProtectedRoute>} />
                 <Route path="/documents/create" element={<ProtectedRoute requiresManagement requiredRole={["Admin", "FullUser"]}><CreateDocument /></ProtectedRoute>} />
                 <Route path="/documents/:id" element={<ViewDocument />} />
                 <Route path="/documents/:id/edit" element={<ProtectedRoute requiresManagement requiredRole={["Admin", "FullUser"]}><EditDocument /></ProtectedRoute>} />
@@ -94,7 +94,6 @@ const App = () => (
             </Route>
             
             {/* Catch-all route */}
-            {/* coment */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
