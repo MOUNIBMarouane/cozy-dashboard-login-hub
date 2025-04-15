@@ -116,17 +116,19 @@ export const DocumentTypeForm = ({ documentType, isEditMode = false, onSuccess, 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 w-full max-w-md mx-auto">
+      {/* Progress Indicator */}
       {!isEditMode && (
-        <div className="flex justify-center mb-6">
-          <div className="flex items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center 
+        <div className="flex justify-center mb-8">
+          <div className="flex items-center space-x-4">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200
               ${step === 1 ? "bg-blue-600 text-white" : "bg-green-500 text-white"}`}>
-              {step === 1 ? "1" : <Check className="h-4 w-4"/>}
+              {step === 1 ? "1" : <Check className="h-5 w-5"/>}
             </div>
-            <div className={`h-0.5 w-12 ${step > 1 ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"}`}></div>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center 
-              ${step === 2 ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400"}`}>
+            <div className={`h-0.5 w-16 transition-colors duration-200 
+              ${step > 1 ? "bg-green-500" : "bg-gray-600/30"}`}></div>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200
+              ${step === 2 ? "bg-blue-600 text-white" : "bg-gray-800/50 text-gray-400"}`}>
               2
             </div>
           </div>
@@ -134,7 +136,7 @@ export const DocumentTypeForm = ({ documentType, isEditMode = false, onSuccess, 
       )}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {step === 1 && (
             <FormField
               control={form.control}
@@ -146,7 +148,7 @@ export const DocumentTypeForm = ({ documentType, isEditMode = false, onSuccess, 
                     <Input 
                       {...field} 
                       placeholder="Enter document type name" 
-                      className="h-10 text-base bg-[#0A0E2E] border-blue-900/40"
+                      className="h-11 text-base bg-[#0A0E2E] border-blue-900/40 focus:border-blue-500"
                       onChange={(e) => {
                         field.onChange(e);
                         setIsTypeNameValid(null);
@@ -157,14 +159,14 @@ export const DocumentTypeForm = ({ documentType, isEditMode = false, onSuccess, 
                     This name must be unique and at least 2 characters long
                   </FormDescription>
                   {isTypeNameValid === false && (
-                    <p className="text-sm text-red-500 flex items-center mt-1">
-                      <span className="inline-block w-4 h-4 rounded-full bg-red-100 text-red-600 text-center mr-1.5 text-xs font-bold">!</span>
+                    <p className="text-sm text-red-500 flex items-center mt-2">
+                      <span className="inline-block w-5 h-5 rounded-full bg-red-500/20 text-red-400 text-center mr-2 flex items-center justify-center text-xs">!</span>
                       This type name already exists
                     </p>
                   )}
                   {isTypeNameValid === true && (
-                    <p className="text-sm text-green-500 flex items-center mt-1">
-                      <span className="inline-block w-4 h-4 rounded-full bg-green-100 text-green-600 text-center mr-1.5 text-xs">✓</span>
+                    <p className="text-sm text-green-500 flex items-center mt-2">
+                      <span className="inline-block w-5 h-5 rounded-full bg-green-500/20 text-green-400 text-center mr-2 flex items-center justify-center text-xs">✓</span>
                       Type name is available
                     </p>
                   )}
@@ -186,12 +188,9 @@ export const DocumentTypeForm = ({ documentType, isEditMode = false, onSuccess, 
                       <Input 
                         {...field} 
                         placeholder="Enter document type name" 
-                        className="h-10 text-base bg-[#0A0E2E] border-blue-900/40"
+                        className="h-11 text-base bg-[#0A0E2E] border-blue-900/40 focus:border-blue-500"
                       />
                     </FormControl>
-                    <FormDescription className="text-blue-300/70">
-                      This name must be unique and at least 2 characters long
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -207,7 +206,7 @@ export const DocumentTypeForm = ({ documentType, isEditMode = false, onSuccess, 
                       <Input 
                         {...field} 
                         placeholder="Enter attributes (optional)" 
-                        className="h-10 text-base bg-[#0A0E2E] border-blue-900/40"
+                        className="h-11 text-base bg-[#0A0E2E] border-blue-900/40 focus:border-blue-500"
                       />
                     </FormControl>
                     <FormDescription className="text-blue-300/70">
@@ -222,32 +221,45 @@ export const DocumentTypeForm = ({ documentType, isEditMode = false, onSuccess, 
         </form>
       </Form>
 
-      <div className="mt-6">
+      <div className="pt-4">
         {step === 1 && !isEditMode ? (
           <Button 
             onClick={nextStep}
             disabled={!form.getValues("typeName") || form.getValues("typeName").length < 2 || isValidating}
-            className="w-full h-10 text-base"
+            className="w-full h-11 text-base bg-blue-600 hover:bg-blue-700 transition-colors"
           >
-            Next <ChevronRight className="ml-1 h-4 w-4" />
+            Next <ChevronRight className="ml-2 h-5 w-5" />
           </Button>
         ) : (
-          <div className="flex flex-col gap-3 w-full">
-            <Button onClick={form.handleSubmit(onSubmit)} className="w-full h-10 text-base bg-green-600 hover:bg-green-700">
+          <div className="flex flex-col gap-3">
+            <Button 
+              onClick={form.handleSubmit(onSubmit)} 
+              className="w-full h-11 text-base bg-green-600 hover:bg-green-700 transition-colors"
+            >
               {isEditMode ? 'Update Type' : 'Create Type'}
             </Button>
             {!isEditMode && (
-              <Button variant="outline" onClick={prevStep} className="w-full h-10 text-base border-blue-800/50 bg-blue-900/10">
+              <Button 
+                variant="outline" 
+                onClick={prevStep} 
+                className="w-full h-11 text-base border-blue-800/50 bg-blue-900/10 hover:bg-blue-900/20"
+              >
                 Back
               </Button>
             )}
           </div>
         )}
-        <Button variant="outline" onClick={() => {
-          setStep(1);
-          form.reset();
-          onCancel();
-        }} className="w-full h-9 text-sm mt-2 border-blue-800/50 bg-blue-900/10">Cancel</Button>
+        <Button 
+          variant="outline" 
+          onClick={() => {
+            setStep(1);
+            form.reset();
+            onCancel();
+          }} 
+          className="w-full h-10 text-sm mt-3 border-blue-800/50 bg-blue-900/10 hover:bg-blue-900/20"
+        >
+          Cancel
+        </Button>
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
@@ -217,9 +216,9 @@ const DocumentTypesManagement = () => {
                   <Plus className="mr-2 h-4 w-4" /> New Type
                 </Button>
               </DrawerTrigger>
-              <DrawerContent className="mx-auto max-w-md bg-[#111633]">
-                <DrawerHeader className="text-center">
-                  <DrawerTitle className="text-xl font-bold text-white">
+              <DrawerContent className="bg-[#111633] p-6 max-w-lg mx-auto">
+                <DrawerHeader className="text-center pb-6">
+                  <DrawerTitle className="text-2xl font-bold text-white">
                     {isEditMode ? 'Edit Document Type' : 'Create Document Type'}
                   </DrawerTitle>
                   <DrawerDescription className="mt-2 text-blue-300">
@@ -228,8 +227,8 @@ const DocumentTypesManagement = () => {
                       : 'Create a new document type for your organization'}
                   </DrawerDescription>
                 </DrawerHeader>
-                
-                <div className="px-6 pb-6">
+            
+                <div className="px-1">
                   <DocumentTypeForm
                     documentType={currentType}
                     isEditMode={isEditMode}
