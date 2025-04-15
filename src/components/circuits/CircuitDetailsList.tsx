@@ -87,22 +87,33 @@ export default function CircuitDetailsList({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Step</TableHead>
             <TableHead>Key</TableHead>
             <TableHead>Title</TableHead>
             <TableHead>Description</TableHead>
+            <TableHead>Responsible Role</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedDetails.map((detail) => (
             <TableRow key={detail.id}>
-
+              <TableCell className="font-medium text-center">
+                <Badge variant="outline">{detail.orderIndex + 1}</Badge>
+              </TableCell>
               <TableCell className="font-mono text-xs">
                 {detail.circuitDetailKey}
               </TableCell>
               <TableCell>{detail.title}</TableCell>
               <TableCell className="max-w-xs truncate">
                 {detail.descriptif || 'No description'}
+              </TableCell>
+              <TableCell>
+                {detail.responsibleRole ? (
+                  <Badge>{detail.responsibleRole.name}</Badge>
+                ) : (
+                  <span className="text-gray-400">None</span>
+                )}
               </TableCell>
               <TableCell className="text-right space-x-2">
                 {isSimpleUser ? (
