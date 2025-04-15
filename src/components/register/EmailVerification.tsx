@@ -87,7 +87,7 @@ const EmailVerification = () => {
       }
     } catch (error: any) {
       console.error("Email verification error:", error);
-      setError(error.message || "Invalid verification code.");
+      setError( "Invalid verification code.");
     } finally {
       setIsLoading(false);
     }
