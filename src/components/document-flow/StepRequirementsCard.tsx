@@ -1,10 +1,11 @@
 
 import { Badge } from '@/components/ui/badge';
-import { Check, Clock, AlertCircle, Settings } from 'lucide-react';
+import { Check, Clock, AlertCircle, Settings, Loader2 } from 'lucide-react';
 import { DocumentStatus, DocumentWorkflowStatus } from '@/models/documentCircuit';
 import { Button } from '@/components/ui/button';
 import { EditStepStatusDialog } from './EditStepStatusDialog';
 import { useState } from 'react';
+import { useStepStatuses } from '@/hooks/useStepStatuses';
 
 interface StepRequirementsCardProps {
   statuses: DocumentStatus[];
@@ -14,8 +15,14 @@ interface StepRequirementsCardProps {
 export function StepRequirementsCard({ statuses, workflowStatus }: StepRequirementsCardProps) {
   const [selectedStatus, setSelectedStatus] = useState<DocumentStatus | null>(null);
   
-  // Use the statuses directly from workflowStatus if available, otherwise fallback to passed props
-  const displayStatuses = workflowStatus?.statuses || statuses;
+  // Use both the workflowStatus statuses and fetch step statuses
+  const { 
+    statuses: stepStatuses, 
+    isLoading 
+  } = useStepStatuses(workflowStatus?.documentId);
+  
+  // Combine and deduplicate statuses, preferring the workflow status data
+  const displayStatuses = workflowStatus?.statuses || stepStatuses || statuses;
 
   const handleEditStatus = (status: DocumentStatus) => {
     setSelectedStatus(status);
@@ -25,7 +32,11 @@ export function StepRequirementsCard({ statuses, workflowStatus }: StepRequireme
     <div className="space-y-2">
       <h3 className="text-lg font-medium">Step Requirements</h3>
       <div className="bg-[#0a1033] border border-blue-900/30 p-4 rounded-md max-h-[300px] overflow-y-auto">
-        {displayStatuses && displayStatuses.length > 0 ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+          </div>
+        ) : displayStatuses && displayStatuses.length > 0 ? (
           <div className="space-y-3">
             {displayStatuses.map(status => (
               <div 

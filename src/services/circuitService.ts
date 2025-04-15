@@ -164,10 +164,9 @@ const circuitService = {
     await api.post('/Workflow/perform-action', request);
   },
   
-  // Method to get status for a specific step
-  getStepStatuses: async (stepId: number): Promise<DocumentStatus[]> => {
-    if (!stepId) return [];
-    const response = await api.get(`/Status/step/${stepId}`);
+  getStepStatuses: async (documentId: number): Promise<DocumentStatus[]> => {
+    if (!documentId) return [];
+    const response = await api.get(`/Status/step/${documentId}`);
     return response.data;
   },
 
