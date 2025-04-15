@@ -1,20 +1,10 @@
+
 import { Badge } from '@/components/ui/badge';
 import { Check, Clock, AlertCircle, Settings } from 'lucide-react';
 import { DocumentStatus, DocumentWorkflowStatus } from '@/models/documentCircuit';
-import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import api from '@/services/api/core';
 import { Button } from '@/components/ui/button';
 import { EditStepStatusDialog } from './EditStepStatusDialog';
-
-interface StatusItem {
-  statusId: number;
-  statusKey: string;
-  title: string;
-  isRequired: boolean;
-  isComplete: boolean;
-  stepId: number;
-}
+import { useState } from 'react';
 
 interface StepRequirementsCardProps {
   statuses: DocumentStatus[];
@@ -23,26 +13,9 @@ interface StepRequirementsCardProps {
 
 export function StepRequirementsCard({ statuses, workflowStatus }: StepRequirementsCardProps) {
   const [selectedStatus, setSelectedStatus] = useState<DocumentStatus | null>(null);
-  const currentStepId = workflowStatus?.currentStepId;
   
-  // Fetch status for the current step directly from API
-  const { 
-    data: stepStatuses, 
-    isLoading, 
-    error,
-    refetch 
-  } = useQuery({
-    queryKey: ['step-statuses', currentStepId],
-    queryFn: async () => {
-      if (!currentStepId) return [];
-      const response = await api.get(`/Status/step/${currentStepId}`);
-      return response.data;
-    },
-    enabled: !!currentStepId,
-  });
-
-  // Decide which statuses to display - use API data if available, otherwise fallback to passed props
-  const displayStatuses = stepStatuses || statuses;
+  // Use the statuses directly from workflowStatus if available, otherwise fallback to passed props
+  const displayStatuses = workflowStatus?.statuses || statuses;
 
   const handleEditStatus = (status: DocumentStatus) => {
     setSelectedStatus(status);
@@ -52,16 +25,7 @@ export function StepRequirementsCard({ statuses, workflowStatus }: StepRequireme
     <div className="space-y-2">
       <h3 className="text-lg font-medium">Step Requirements</h3>
       <div className="bg-[#0a1033] border border-blue-900/30 p-4 rounded-md max-h-[300px] overflow-y-auto">
-        {isLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <Clock className="h-8 w-8 animate-pulse text-blue-400" />
-          </div>
-        ) : error ? (
-          <div className="text-center text-red-400 py-4">
-            <AlertCircle className="h-6 w-6 mx-auto mb-2" />
-            Failed to load step requirements
-          </div>
-        ) : displayStatuses && displayStatuses.length > 0 ? (
+        {displayStatuses && displayStatuses.length > 0 ? (
           <div className="space-y-3">
             {displayStatuses.map(status => (
               <div 
@@ -137,10 +101,7 @@ export function StepRequirementsCard({ statuses, workflowStatus }: StepRequireme
           onOpenChange={(open) => !open && setSelectedStatus(null)}
           status={selectedStatus}
           documentId={workflowStatus?.documentId}
-          onSuccess={() => {
-            setSelectedStatus(null);
-            refetch();
-          }}
+          onSuccess={() => setSelectedStatus(null)}
         />
       )}
     </div>
