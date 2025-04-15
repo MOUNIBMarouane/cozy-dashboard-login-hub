@@ -1,13 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { ShieldCheck, ChevronLeft } from 'lucide-react';
 import DocuVerseLogo from '@/components/DocuVerseLogo';
 import authService from '@/services/authService';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 
 const EmailVerification = () => {
   const [verificationCode, setVerificationCode] = useState('');
@@ -63,11 +64,11 @@ const EmailVerification = () => {
       return;
     }
 
-    if (!verificationCode || verificationCode.length !== 6) {
+    if (!verificationCode) {
       toast({
         variant: "destructive",
-        title: "Invalid Code",
-        description: "Please enter the complete 6-digit verification code.",
+        title: "Error",
+        description: "Please enter the verification code.",
       });
       setIsLoading(false);
       return;
@@ -89,16 +90,16 @@ const EmailVerification = () => {
       } else {
         toast({
           variant: "destructive",
-          title: "Verification Failed",
-          description: "The verification code you entered is incorrect. Please check and try again.",
+          title: "Error",
+          description: "Email verification failed. Please check the code and try again.",
         });
       }
     } catch (error: any) {
       console.error("Email verification error:", error);
       toast({
         variant: "destructive",
-        title: "Verification Error",
-        description: "The verification code is invalid or has expired. Please request a new code.",
+        title: "Error",
+        description: error.message || "An error occurred during email verification.",
       });
     } finally {
       setIsLoading(false);
@@ -115,7 +116,6 @@ const EmailVerification = () => {
             Enter the verification code sent to your email
           </CardDescription>
         </CardHeader>
-
         <CardContent className="grid gap-6 pt-6">
           <div className="mx-auto bg-blue-900/20 rounded-full p-3 w-16 h-16 flex items-center justify-center">
             <ShieldCheck className="h-8 w-8 text-blue-400" />
@@ -128,22 +128,13 @@ const EmailVerification = () => {
 
           <div className="grid gap-2">
             <Label htmlFor="code" className="text-gray-300">Verification Code</Label>
-            <InputOTP
-              maxLength={6}
+            <Input
+              id="code"
+              placeholder="Enter verification code"
+              type="text"
               value={verificationCode}
-              onChange={setVerificationCode}
-              className="gap-2"
-              render={({ slots }) => (
-                <InputOTPGroup>
-                  {slots.map((slot, index) => (
-                    <InputOTPSlot
-                      key={index}
-                      {...slot}
-                      className="w-10 h-12 text-lg border-gray-700 bg-[#1c2333] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  ))}
-                </InputOTPGroup>
-              )}
+              onChange={(e) => setVerificationCode(e.target.value)}
+              className="bg-[#1c2333] border-gray-700 text-white focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           
