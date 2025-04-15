@@ -166,7 +166,7 @@ const circuitService = {
   
   getStepStatuses: async (documentId: number): Promise<DocumentStatus[]> => {
     if (!documentId) return [];
-    const response = await api.get(`/Status/step/${documentId}`);
+    const response = await api.get(`/api/Workflow/document/${documentId}/step-statuses`);
     return response.data;
   },
 

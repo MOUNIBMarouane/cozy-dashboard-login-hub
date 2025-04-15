@@ -1,4 +1,3 @@
-
 import { Badge } from '@/components/ui/badge';
 import { Check, Clock, AlertCircle, Settings, Loader2 } from 'lucide-react';
 import { DocumentStatus, DocumentWorkflowStatus } from '@/models/documentCircuit';
@@ -15,14 +14,13 @@ interface StepRequirementsCardProps {
 export function StepRequirementsCard({ statuses, workflowStatus }: StepRequirementsCardProps) {
   const [selectedStatus, setSelectedStatus] = useState<DocumentStatus | null>(null);
   
-  // Use both the workflowStatus statuses and fetch step statuses
   const { 
     statuses: stepStatuses, 
     isLoading 
   } = useStepStatuses(workflowStatus?.documentId);
   
-  // Combine and deduplicate statuses, preferring the workflow status data
-  const displayStatuses = workflowStatus?.statuses || stepStatuses || statuses;
+  // Prefer step statuses over workflow status
+  const displayStatuses = stepStatuses || workflowStatus?.statuses || statuses;
 
   const handleEditStatus = (status: DocumentStatus) => {
     setSelectedStatus(status);
