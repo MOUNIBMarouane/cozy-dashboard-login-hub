@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useMultiStepForm } from '@/context/form';
 import { Button } from '@/components/ui/button';
@@ -32,7 +31,13 @@ const StepOneUserInfo = () => {
     let errors: Record<string, string> = {};
     
     if (formData.userType === 'personal') {
-      errors = validatePersonalUserInfo(formData);
+      // Only validate required fields
+      if (!formData.firstName.trim()) {
+        errors.firstName = 'First name is required';
+      }
+      if (!formData.lastName.trim()) {
+        errors.lastName = 'Last name is required';
+      }
     } else {
       errors = validateCompanyInfo(formData);
     }
@@ -40,7 +45,7 @@ const StepOneUserInfo = () => {
     setLocalErrors(errors);
     
     if (showToast && Object.keys(errors).length > 0) {
-      toast.error("Please correct all errors before proceeding");
+      toast.error("Please fill all required fields");
     }
     
     return Object.keys(errors).length === 0;
