@@ -102,7 +102,7 @@ export function UserTableRow({
                 value={currentRole} 
                 className="text-blue-400 bg-blue-900/20 border-l-2 border-blue-500"
               >
-                Current: {currentRole}
+                {currentRole}
               </SelectItem>
               <SelectSeparator className="bg-blue-900/30" />
               {getAvailableRoles(currentRole).map(role => (
