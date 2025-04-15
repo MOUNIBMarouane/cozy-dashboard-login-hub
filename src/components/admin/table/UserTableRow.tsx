@@ -1,29 +1,14 @@
+
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectSeparator
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { UserDto } from "@/services/adminService";
-import { Edit, Eye, Mail, MoreVertical, Trash } from "lucide-react";
+import { UserActionsDropdown } from './row/UserActionsDropdown';
+import { UserRoleSelect } from './row/UserRoleSelect';
+import { BlockUserDialog } from './row/BlockUserDialog';
 
 interface UserTableRowProps {
   user: UserDto;
@@ -35,6 +20,18 @@ interface UserTableRowProps {
   onEditEmail: (user: UserDto) => void;
   onViewLogs: (userId: number) => void;
   onDelete: (userId: number) => void;
+}
+
+function getRoleString(role: string | { roleId?: number; roleName?: string }): string {
+  if (typeof role === 'string') {
+    return role;
+  }
+  
+  if (role && typeof role === 'object' && 'roleName' in role) {
+    return role.roleName || 'Unknown';
+  }
+  
+  return 'Unknown';
 }
 
 export function UserTableRow({
@@ -89,33 +86,10 @@ export function UserTableRow({
         </TableCell>
         
         <TableCell>
-          <Select 
-            value={currentRole}
-            onValueChange={(value) => onRoleChange(user.id, value)}
-          >
-            <SelectTrigger className="w-[130px] bg-[#0a1033] border-blue-900/30 text-white">
-              <SelectValue placeholder={currentRole} />
-            </SelectTrigger>
-            <SelectContent className="bg-[#0a1033] border-blue-900/30 text-white">
-              <SelectItem 
-                key={currentRole} 
-                value={currentRole} 
-                className="text-blue-400 bg-blue-900/20 border-l-2 border-blue-500"
-              >
-                {currentRole}
-              </SelectItem>
-              <SelectSeparator className="bg-blue-900/30" />
-              {getAvailableRoles(currentRole).map(role => (
-                <SelectItem 
-                  key={role} 
-                  value={role} 
-                  className="text-white hover:bg-blue-900/20"
-                >
-                  {role}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <UserRoleSelect 
+            currentRole={currentRole}
+            onRoleChange={(role) => onRoleChange(user.id, role)}
+          />
         </TableCell>
         
         <TableCell>
@@ -137,84 +111,23 @@ export function UserTableRow({
         </TableCell>
         
         <TableCell>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-[#161b22] border-gray-700 text-white">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-gray-700" />
-              <DropdownMenuItem onClick={() => onEdit(user)} className="hover:bg-gray-800">
-                <Edit className="mr-2 h-4 w-4" />
-                Edit User
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEditEmail(user)} className="hover:bg-gray-800">
-                <Mail className="mr-2 h-4 w-4" />
-                Update Email
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onViewLogs(user.id)} className="hover:bg-gray-800">
-                <Eye className="mr-2 h-4 w-4" />
-                View Logs
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-gray-700" />
-              <DropdownMenuItem 
-                className="text-red-400 hover:bg-red-900/20 hover:text-red-300" 
-                onClick={() => onDelete(user.id)}
-              >
-                <Trash className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <UserActionsDropdown 
+            user={user}
+            onEdit={onEdit}
+            onEditEmail={onEditEmail}
+            onViewLogs={onViewLogs}
+            onDelete={onDelete}
+          />
         </TableCell>
       </TableRow>
 
-      <AlertDialog open={showBlockDialog} onOpenChange={setShowBlockDialog}>
-        <AlertDialogContent className="bg-[#0a1033] border-blue-900/30 text-white">
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {user.isActive ? "Block User" : "Unblock User"}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-blue-300">
-              Are you sure you want to {user.isActive ? "block" : "unblock"} {user.firstName} {user.lastName}? 
-              {user.isActive && " This will prevent them from accessing the system."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-transparent border-blue-800/40 text-blue-300 hover:bg-blue-800/20 hover:text-blue-200">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmStatusToggle}
-              className={user.isActive 
-                ? "bg-red-900/20 text-red-400 hover:bg-red-900/30 hover:text-red-300 border border-red-900/30"
-                : "bg-green-900/20 text-green-400 hover:bg-green-900/30 hover:text-green-300 border border-green-900/30"
-              }
-            >
-              {user.isActive ? "Block User" : "Unblock User"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <BlockUserDialog 
+        isOpen={showBlockDialog}
+        onOpenChange={setShowBlockDialog}
+        onConfirm={confirmStatusToggle}
+        userName={`${user.firstName} ${user.lastName}`}
+        isBlocked={user.isActive}
+      />
     </>
   );
-}
-
-function getRoleString(role: string | { roleId?: number; roleName?: string }): string {
-  if (typeof role === 'string') {
-    return role;
-  }
-  
-  if (role && typeof role === 'object' && 'roleName' in role) {
-    return role.roleName || 'Unknown';
-  }
-  
-  return 'Unknown';
-}
-
-function getAvailableRoles(currentRole: string): string[] {
-  const allRoles = ["Admin", "FullUser", "SimpleUser"];
-  return allRoles.filter(role => role !== currentRole);
 }
