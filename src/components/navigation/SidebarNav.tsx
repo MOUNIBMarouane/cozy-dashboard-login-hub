@@ -1,15 +1,7 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import {
-  LayoutDashboard,
-  FileText,
-  GitBranch,
-  CircleCheck,
-  Settings,
-  Users,
-  Layers
-} from "lucide-react";
+import { LayoutDashboard, FileText, GitBranch } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 
 export function SidebarNav() {
@@ -20,14 +12,12 @@ export function SidebarNav() {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
-  // Determine if user is a simple user for conditional rendering
-  const isSimpleUser = user?.role === 'SimpleUser';
-
   return (
     <div className="w-64 h-full bg-[#0a1033]/95 backdrop-blur-lg border-r border-blue-900/30 overflow-y-auto">
       <div className="px-4 py-2">
         <p className="text-xs font-medium text-blue-400/80 px-2 py-2">MAIN NAVIGATION</p>
         <ul className="space-y-1">
+          {/* Dashboard */}
           <li>
             <Link 
               to="/dashboard"
@@ -42,7 +32,8 @@ export function SidebarNav() {
             </Link>
           </li>
           
-          <li className="space-y-1">
+          {/* Documents */}
+          <li>
             <Link 
               to="/documents"
               className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -54,33 +45,9 @@ export function SidebarNav() {
               <FileText className="h-5 w-5" />
               <span>Documents</span>
             </Link>
-            
-            <div className="pl-3 ml-4 border-l border-blue-800/50 space-y-1">
-              <Link 
-                to="/document-types"
-                className={`block px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                  isActive('/document-types') 
-                    ? 'bg-blue-600/30 text-blue-200' 
-                    : 'text-blue-300 hover:bg-blue-800/20 hover:text-blue-100'
-                }`}
-              >
-                Types Overview
-              </Link>
-              {!isSimpleUser && (
-                <Link 
-                  to="/document-types-management"
-                  className={`block px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                    isActive('/document-types-management') 
-                      ? 'bg-blue-600/30 text-blue-200' 
-                      : 'text-blue-300 hover:bg-blue-800/20 hover:text-blue-100'
-                  }`}
-                >
-                  Types Management
-                </Link>
-              )}
-            </div>
           </li>
           
+          {/* Circuits */}
           <li>
             <Link 
               to="/circuits"
@@ -95,41 +62,6 @@ export function SidebarNav() {
             </Link>
           </li>
         </ul>
-      </div>
-      
-      {user?.role === 'Admin' && (
-        <div className="px-4 py-2 mt-4">
-          <p className="text-xs font-medium text-blue-400/80 px-2 py-2">ADMIN</p>
-          <ul className="space-y-1">
-            <li>
-              <Link 
-                to="/user-management"
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive('/user-management') 
-                    ? 'bg-blue-600/40 text-blue-200' 
-                    : 'text-blue-100 hover:bg-blue-800/30 hover:text-blue-50'
-                }`}
-              >
-                <Users className="h-5 w-5" />
-                <span>User Management</span>
-              </Link>
-            </li>
-          </ul>
-        </div>
-      )}
-      
-      <div className="px-4 py-2 mt-4 absolute bottom-0 w-full pb-4">
-        <Link 
-          to="/profile"
-          className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors border border-blue-800/40 ${
-            isActive('/profile') 
-              ? 'bg-blue-600/40 text-blue-200' 
-              : 'text-blue-100 hover:bg-blue-800/30 hover:text-blue-50'
-          }`}
-        >
-          <Settings className="h-5 w-5" />
-          <span>Settings</span>
-        </Link>
       </div>
     </div>
   );
