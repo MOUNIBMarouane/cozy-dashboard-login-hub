@@ -1,7 +1,8 @@
+
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Loader2, Plus, Lock, X } from 'lucide-react';
+import { Loader2, Plus, Lock, X, AlertTriangle } from 'lucide-react';
 import circuitService from '@/services/circuitService';
 import {
   Dialog,
