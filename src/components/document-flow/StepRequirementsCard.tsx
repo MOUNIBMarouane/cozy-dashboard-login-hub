@@ -136,9 +136,9 @@ export function StepRequirementsCard({ statuses, workflowStatus }: StepRequireme
           open={!!selectedStatus}
           onOpenChange={(open) => !open && setSelectedStatus(null)}
           status={selectedStatus}
+          documentId={workflowStatus?.documentId}
           onSuccess={() => {
             setSelectedStatus(null);
-            // Refetch the statuses
             refetch();
           }}
         />

@@ -179,6 +179,16 @@ const circuitService = {
   }): Promise<void> => {
     await api.put(`/Status/${statusId}`, data);
   },
+
+  // Add new method to handle status completion
+  completeStatus: async (data: { 
+    documentId: number;
+    statusId: number;
+    isComplete: boolean;
+    comments: string;
+  }): Promise<void> => {
+    await api.post('/Workflow/complete-status', data);
+  },
 };
 
 export default circuitService;
