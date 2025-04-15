@@ -6,16 +6,29 @@ export const validatePersonalUserInfo = (formData: {
 }) => {
   const errors: Record<string, string> = {};
   
-  // Personal user validation - only required fields
+  // Personal user validation
   if (!formData.firstName.trim()) {
-    errors.firstName = '';
+    errors.firstName = 'First name is required';
+  } else if (formData.firstName.trim().length < 2) {
+    errors.firstName = 'First name must be at least 2 characters';
   }
   
   if (!formData.lastName.trim()) {
-    errors.lastName = '';
+    errors.lastName = 'Last name is required';
+  } else if (formData.lastName.trim().length < 2) {
+    errors.lastName = 'Last name must be at least 2 characters';
   }
   
-  // CIN and phone are optional - no validation needed
+  // CIN and phone are now optional
+  // Only validate if they are provided
+  if (formData.cin && formData.cin.trim().length === 0) {
+    errors.cin = 'CIN cannot be empty if provided';
+  }
+  
+  if (formData.personalPhone && formData.personalPhone.trim().length === 0) {
+    errors.personalPhone = 'Phone number cannot be empty if provided';
+  }
+  
   return errors;
 };
 
