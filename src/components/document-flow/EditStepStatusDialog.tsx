@@ -19,6 +19,7 @@ interface EditStepStatusDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   status: DocumentStatus;
+  documentId?: number; // Add documentId prop
   onSuccess: () => void;
 }
 
@@ -26,6 +27,7 @@ export function EditStepStatusDialog({
   open,
   onOpenChange,
   status,
+  documentId,
   onSuccess
 }: EditStepStatusDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,13 +36,28 @@ export function EditStepStatusDialog({
   const [isComplete, setIsComplete] = useState(status.isComplete);
 
   const handleSubmit = async () => {
+    if (!documentId) {
+      toast.error('Document ID is required');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
+      // First update the status completion using the new endpoint
+      await circuitService.completeStatus({
+        documentId,
+        statusId: status.statusId,
+        isComplete,
+        comments: `Status '${title}' marked as ${isComplete ? 'complete' : 'incomplete'}`
+      });
+
+      // Then update other status properties if needed
       await circuitService.updateStepStatus(status.statusId, {
         title,
         isRequired,
         isComplete
       });
+
       toast.success('Status updated successfully');
       onSuccess();
       onOpenChange(false);
