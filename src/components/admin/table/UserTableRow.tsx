@@ -77,16 +77,20 @@ export function UserTableRow({
       </TableCell>
       <TableCell>
         <Select 
-          defaultValue={currentRole}
+          value={currentRole}
           onValueChange={(value) => onRoleChange(user.id, value)}
         >
           <SelectTrigger className="w-[130px] bg-[#0a1033] border-blue-900/30 text-white">
-            <SelectValue placeholder="Select role" />
+            <SelectValue placeholder={currentRole} />
           </SelectTrigger>
-          <SelectContent className="bg-[#0a1033] border-blue-900/30">
-            <div className="px-2 py-1.5 text-sm font-medium text-blue-400 bg-blue-900/20 border-l-2 border-blue-500">
+          <SelectContent className="bg-[#0a1033] border-blue-900/30 text-white">
+            <SelectItem 
+              key={currentRole} 
+              value={currentRole} 
+              className="text-blue-400 bg-blue-900/20 border-l-2 border-blue-500"
+            >
               Current: {currentRole}
-            </div>
+            </SelectItem>
             <SelectSeparator className="bg-blue-900/30" />
             {getAvailableRoles(currentRole).map(role => (
               <SelectItem 
