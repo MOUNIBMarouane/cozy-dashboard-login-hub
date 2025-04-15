@@ -83,6 +83,7 @@ export function useUserManagement() {
     users: filteredUsers,
     isLoading,
     isError,
+    refetch, // Add the refetch function to the returned object
     setEditingUser,
     setEditEmailUser,
     setViewingUserLogs,

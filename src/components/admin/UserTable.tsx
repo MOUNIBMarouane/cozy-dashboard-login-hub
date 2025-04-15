@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { toast } from 'sonner';
 import adminService from '@/services/adminService';
@@ -26,6 +27,7 @@ export function UserTable() {
     users: filteredUsers,
     isLoading,
     isError,
+    refetch, // Now properly destructured from the hook
     setEditingUser,
     setEditEmailUser,
     setViewingUserLogs,
@@ -40,7 +42,6 @@ export function UserTable() {
     handleUserEmailEdited,
     handleUserDeleted,
     handleMultipleDeleted,
-    refetch,
   } = useUserManagement();
 
   const handleToggleUserStatus = async (userId: number, currentStatus: boolean) => {
