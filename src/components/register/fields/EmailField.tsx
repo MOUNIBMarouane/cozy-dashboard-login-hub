@@ -17,10 +17,8 @@ const EmailField: React.FC<EmailFieldProps> = ({
   localErrors,
   validationErrors
 }) => {
-  // Determine if the field is valid, has an error, or is empty
   const hasError = !!(localErrors.email || validationErrors.email);
   const isValid = value && !hasError;
-  const isEmpty = !value;
   
   return (
     <div className="space-y-1">
@@ -33,7 +31,7 @@ const EmailField: React.FC<EmailFieldProps> = ({
           type="email"
           placeholder="name@example.com"
           className={`pl-10 pr-10 ${
-            hasError && !isEmpty ? 'border-red-500' : 
+            value && hasError ? 'border-red-500' : 
             isValid ? 'border-green-500' : ''
           }`}
           value={value}
