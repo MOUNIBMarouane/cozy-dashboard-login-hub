@@ -17,7 +17,7 @@ const UsernameField: React.FC<UsernameFieldProps> = ({
   localErrors,
   validationErrors
 }) => {
-  const hasError = !!(validationErrors.username);
+  const hasError = !!(localErrors.username || validationErrors.username);
   const isValid = value && !hasError;
   
   return (
@@ -30,8 +30,8 @@ const UsernameField: React.FC<UsernameFieldProps> = ({
           name="username"
           placeholder="Choose a unique username"
           className={`pl-10 pr-10 ${
-            hasError ? 'border-red-500' : 
-            isValid ? 'bg-green-50 border-green-200 focus:border-green-300' : 'bg-white'
+            value && hasError ? 'border-red-500' : 
+            isValid ? 'border-green-500' : ''
           }`}
           value={value}
           onChange={onChange}
@@ -40,6 +40,9 @@ const UsernameField: React.FC<UsernameFieldProps> = ({
           <CheckCircle2 className="absolute right-3 top-3 h-4 w-4 text-green-500" />
         )}
       </div>
+      {localErrors.username && (
+        <p className="text-xs text-red-500">{localErrors.username}</p>
+      )}
       {validationErrors.username && (
         <p className="text-xs text-red-500">{validationErrors.username}</p>
       )}
