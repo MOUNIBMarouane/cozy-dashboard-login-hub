@@ -23,15 +23,11 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
-  // Determine if fields are valid, have errors, or are empty
   const hasPasswordError = !!localErrors.password;
   const hasConfirmError = !!localErrors.confirmPassword;
   
   const isPasswordValid = password && !hasPasswordError && passwordStrength >= 3;
   const isConfirmValid = confirmPassword && password === confirmPassword && !hasConfirmError;
-  
-  const isPasswordEmpty = !password;
-  const isConfirmEmpty = !confirmPassword;
 
   return (
     <>
@@ -45,25 +41,24 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
             type={showPassword ? 'text' : 'password'}
             placeholder="Create new password"
             className={`pl-10 pr-12 ${
-              hasPasswordError && !isPasswordEmpty ? 'border-red-500' : 
-              isPasswordValid ? 'border-green-500' : ''
+              isPasswordValid ? 'bg-green-50 border-green-200 focus:border-green-300' : 'bg-white'
             }`}
             value={password}
             onChange={onChange}
           />
           <button
             type="button"
-            className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+            className="absolute right-12 top-3 text-gray-400 hover:text-gray-600"
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
           {isPasswordValid && (
-            <CheckCircle2 className="absolute right-10 top-3 h-4 w-4 text-green-500" />
+            <CheckCircle2 className="absolute right-3 top-3 h-4 w-4 text-green-500" />
           )}
         </div>
         {localErrors.password && (
-          <p className="text-xs text-red-500">{localErrors.password}</p>
+          <p className="text-xs text-gray-500">{localErrors.password}</p>
         )}
         <PasswordStrengthIndicator strength={passwordStrength} password={password} />
       </div>
@@ -78,25 +73,24 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
             type={showConfirmPassword ? 'text' : 'password'}
             placeholder="Confirm password"
             className={`pl-10 pr-12 ${
-              hasConfirmError && !isConfirmEmpty ? 'border-red-500' : 
-              isConfirmValid ? 'border-green-500' : ''
+              isConfirmValid ? 'bg-green-50 border-green-200 focus:border-green-300' : 'bg-white'
             }`}
             value={confirmPassword}
             onChange={onChange}
           />
           <button
             type="button"
-            className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+            className="absolute right-12 top-3 text-gray-400 hover:text-gray-600"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
           >
             {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
           {isConfirmValid && (
-            <CheckCircle2 className="absolute right-10 top-3 h-4 w-4 text-green-500" />
+            <CheckCircle2 className="absolute right-3 top-3 h-4 w-4 text-green-500" />
           )}
         </div>
         {localErrors.confirmPassword && (
-          <p className="text-xs text-red-500">{localErrors.confirmPassword}</p>
+          <p className="text-xs text-gray-500">{localErrors.confirmPassword}</p>
         )}
       </div>
     </>

@@ -20,7 +20,6 @@ const PersonalUserFields: React.FC<PersonalUserFieldsProps> = ({
   localErrors,
   handleChange
 }) => {
-  // Helper function to determine if a field is valid
   const isFieldValid = (fieldName: string, value?: string) => {
     return value && value.trim().length > 0 && !localErrors[fieldName];
   };
@@ -37,8 +36,9 @@ const PersonalUserFields: React.FC<PersonalUserFieldsProps> = ({
             name="firstName"
             placeholder="First Name"
             className={`pl-10 pr-10 ${
-              formData.firstName && localErrors.firstName ? 'border-red-500' : 
-              isFieldValid('firstName', formData.firstName) ? 'border-green-500' : ''
+              isFieldValid('firstName', formData.firstName) 
+                ? 'bg-green-50 border-green-200 focus:border-green-300' 
+                : 'bg-white'
             }`}
             value={formData.firstName}
             onChange={handleChange}
@@ -48,7 +48,7 @@ const PersonalUserFields: React.FC<PersonalUserFieldsProps> = ({
           )}
         </div>
         {localErrors.firstName && (
-          <p className="text-xs text-red-500">{localErrors.firstName}</p>
+          <p className="text-xs text-gray-500">{localErrors.firstName}</p>
         )}
       </div>
       
@@ -62,8 +62,9 @@ const PersonalUserFields: React.FC<PersonalUserFieldsProps> = ({
             name="lastName"
             placeholder="Last Name"
             className={`pl-10 pr-10 ${
-              formData.lastName && localErrors.lastName ? 'border-red-500' : 
-              isFieldValid('lastName', formData.lastName) ? 'border-green-500' : ''
+              isFieldValid('lastName', formData.lastName) 
+                ? 'bg-green-50 border-green-200 focus:border-green-300' 
+                : 'bg-white'
             }`}
             value={formData.lastName}
             onChange={handleChange}
@@ -73,7 +74,7 @@ const PersonalUserFields: React.FC<PersonalUserFieldsProps> = ({
           )}
         </div>
         {localErrors.lastName && (
-          <p className="text-xs text-red-500">{localErrors.lastName}</p>
+          <p className="text-xs text-gray-500">{localErrors.lastName}</p>
         )}
       </div>
       
@@ -87,8 +88,9 @@ const PersonalUserFields: React.FC<PersonalUserFieldsProps> = ({
             name="cin"
             placeholder="National ID Number (Optional)"
             className={`pl-10 pr-10 ${
-              formData.cin && localErrors.cin ? 'border-red-500' : 
-              isFieldValid('cin', formData.cin) ? 'border-green-500' : ''
+              isFieldValid('cin', formData.cin) 
+                ? 'bg-green-50 border-green-200 focus:border-green-300' 
+                : 'bg-white'
             }`}
             value={formData.cin || ''}
             onChange={handleChange}
@@ -98,7 +100,7 @@ const PersonalUserFields: React.FC<PersonalUserFieldsProps> = ({
           )}
         </div>
         {localErrors.cin && (
-          <p className="text-xs text-red-500">{localErrors.cin}</p>
+          <p className="text-xs text-gray-500">{localErrors.cin}</p>
         )}
       </div>
       
@@ -112,8 +114,9 @@ const PersonalUserFields: React.FC<PersonalUserFieldsProps> = ({
             name="personalPhone"
             placeholder="Your Phone Number (Optional)"
             className={`pl-10 pr-10 ${
-              formData.personalPhone && localErrors.personalPhone ? 'border-red-500' : 
-              isFieldValid('personalPhone', formData.personalPhone) ? 'border-green-500' : ''
+              isFieldValid('personalPhone', formData.personalPhone) 
+                ? 'bg-green-50 border-green-200 focus:border-green-300' 
+                : 'bg-white'
             }`}
             value={formData.personalPhone || ''}
             onChange={handleChange}
@@ -123,7 +126,7 @@ const PersonalUserFields: React.FC<PersonalUserFieldsProps> = ({
           )}
         </div>
         {localErrors.personalPhone && (
-          <p className="text-xs text-red-500">{localErrors.personalPhone}</p>
+          <p className="text-xs text-gray-500">{localErrors.personalPhone}</p>
         )}
       </div>
     </div>

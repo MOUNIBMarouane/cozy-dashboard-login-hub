@@ -17,7 +17,7 @@ const EmailField: React.FC<EmailFieldProps> = ({
   localErrors,
   validationErrors
 }) => {
-  const hasError = !!(localErrors.email || validationErrors.email);
+  const hasError = !!(validationErrors.email);
   const isValid = value && !hasError;
   
   return (
@@ -31,8 +31,8 @@ const EmailField: React.FC<EmailFieldProps> = ({
           type="email"
           placeholder="name@example.com"
           className={`pl-10 pr-10 ${
-            value && hasError ? 'border-red-500' : 
-            isValid ? 'border-green-500' : ''
+            hasError ? 'border-red-500' : 
+            isValid ? 'bg-green-50 border-green-200 focus:border-green-300' : 'bg-white'
           }`}
           value={value}
           onChange={onChange}
@@ -41,9 +41,6 @@ const EmailField: React.FC<EmailFieldProps> = ({
           <CheckCircle2 className="absolute right-3 top-3 h-4 w-4 text-green-500" />
         )}
       </div>
-      {localErrors.email && (
-        <p className="text-xs text-red-500">{localErrors.email}</p>
-      )}
       {validationErrors.email && (
         <p className="text-xs text-red-500">{validationErrors.email}</p>
       )}
