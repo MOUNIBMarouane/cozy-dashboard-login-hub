@@ -37,8 +37,9 @@ export const CircuitStepsSectionHeader = ({
           <path d="M7 6v12"></path>
         </svg> Circuit Flow Steps
       </h2>
-      
+      hna
       <div className="flex items-center space-x-2">
+        hna
         {showHelp && (
           <div className="text-sm text-gray-400 bg-blue-900/20 p-2 rounded border border-blue-900/30">
             {isSimpleUser ? 
@@ -59,6 +60,7 @@ export const CircuitStepsSectionHeader = ({
         
         {!isSimpleUser && availableActions?.length > 0 && (
           <>
+          
             <Button 
               onClick={onProcessClick}
               variant="outline"

@@ -47,7 +47,7 @@ export const CircuitStepCard = ({
               variant={isCurrentStep ? "success" : "outline"} 
               className="mr-2"
             >
-              {detail.orderIndex + 1}
+              {((detail.orderIndex + 10) / 10 )  }
             </Badge>
             {detail.title}
           </CardTitle>

@@ -21,14 +21,14 @@ export function SidebarNav() {
 
   return (
     <div className="w-64 h-full bg-[#0a1033]/95 backdrop-blur-lg border-r border-blue-900/30 overflow-y-auto">
-      <div className="p-4">
+      {/* <div className="p-4">
         <div className="flex items-center space-x-2 px-2">
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 w-8 h-8 rounded flex items-center justify-center text-white font-bold">
             D
           </div>
           <span className="text-xl font-semibold bg-gradient-to-r from-blue-200 to-blue-400 text-transparent bg-clip-text">DocuVerse</span>
         </div>
-      </div>
+      </div> */}
       
       <div className="px-4 py-2">
         <p className="text-xs font-medium text-blue-400/80 px-2 py-2">MAIN NAVIGATION</p>
@@ -98,7 +98,7 @@ export function SidebarNav() {
             </Link>
           </li>
           
-          <li>
+          {/* <li>
             <Link 
               to="/pending-approvals"
               className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -110,7 +110,7 @@ export function SidebarNav() {
               <CircleCheck className="h-5 w-5" />
               <span>Approvals</span>
             </Link>
-          </li>
+          </li> */}
         </ul>
       </div>
       
