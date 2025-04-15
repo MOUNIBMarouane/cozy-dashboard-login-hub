@@ -28,7 +28,8 @@ export interface ProcessCircuitRequest {
 
 export interface MoveDocumentStepRequest {
   documentId: number;
-  circuitDetailId: number;
+  circuitDetailId?: number;
+  comments?: string;  // Adding the comments property to match the API expectations
 }
 
 export interface MoveToNextStepRequest {

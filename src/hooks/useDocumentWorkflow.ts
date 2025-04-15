@@ -62,6 +62,7 @@ export function useDocumentWorkflow(documentId: number) {
     
     setIsActionLoading(true);
     try {
+      // Now we can include the comments property in the request
       await circuitService.moveDocumentToStep({
         documentId,
         comments
