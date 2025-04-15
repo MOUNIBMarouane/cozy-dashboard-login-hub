@@ -1,12 +1,13 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { LayoutDashboard, FileText, GitBranch, Layers } from "lucide-react";
+import { LayoutDashboard, FileText, GitBranch, Layers, Users } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 
 export function SidebarNav() {
   const { user } = useAuth();
   const location = useLocation();
+  const isAdmin = user?.role === 'Admin';
   const isSimpleUser = user?.role === 'SimpleUser';
   
   const isActive = (path: string) => {
@@ -32,6 +33,23 @@ export function SidebarNav() {
               <span>Dashboard</span>
             </Link>
           </li>
+          
+          {/* User Management - Only for Admin */}
+          {isAdmin && (
+            <li>
+              <Link 
+                to="/user-management"
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive('/user-management') 
+                    ? 'bg-blue-600/40 text-blue-200' 
+                    : 'text-blue-100 hover:bg-blue-800/30 hover:text-blue-50'
+                }`}
+              >
+                <Users className="h-5 w-5" />
+                <span>User Management</span>
+              </Link>
+            </li>
+          )}
           
           {/* Documents */}
           <li>
