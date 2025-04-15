@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -84,11 +83,11 @@ const EmailVerification = () => {
           }
         });
       } else {
-        setError("Invalid verification code. Please check your email and try again.");
+        setError("Invalid verification code.");
       }
     } catch (error: any) {
       console.error("Email verification error:", error);
-      setError(error.message || "An error occurred during email verification. Please try again.");
+      setError(error.message || "Invalid verification code.");
     } finally {
       setIsLoading(false);
     }
