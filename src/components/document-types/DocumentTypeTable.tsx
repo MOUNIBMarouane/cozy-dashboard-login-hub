@@ -1,5 +1,5 @@
 
-import { Table, TableBody } from '@/components/ui/table';
+import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table';
 import { DocumentType } from '@/models/document';
 import { DocumentTypeTableHeader } from './table/DocumentTypeTableHeader';
 import { DocumentTypeTableRow } from './table/DocumentTypeTableRow';
