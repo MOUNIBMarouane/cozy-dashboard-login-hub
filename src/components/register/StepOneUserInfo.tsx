@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMultiStepForm } from '@/context/form';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -11,6 +11,11 @@ import { validatePersonalUserInfo, validateCompanyInfo } from './utils/validatio
 const StepOneUserInfo = () => {
   const { formData, setFormData, nextStep } = useMultiStepForm();
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+  
+  // Clear errors when inputs change
+  useEffect(() => {
+    validateStep(false);
+  }, [formData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -23,7 +28,7 @@ const StepOneUserInfo = () => {
     setLocalErrors({});
   };
 
-  const validateStep = () => {
+  const validateStep = (showToast = true) => {
     let errors: Record<string, string> = {};
     
     if (formData.userType === 'personal') {
@@ -33,12 +38,16 @@ const StepOneUserInfo = () => {
     }
     
     setLocalErrors(errors);
+    
+    if (showToast && Object.keys(errors).length > 0) {
+      toast.error("Please correct all errors before proceeding");
+    }
+    
     return Object.keys(errors).length === 0;
   };
 
   const handleNext = () => {
-    if (!validateStep()) {
-      toast.error("Please correct all errors before proceeding");
+    if (!validateStep(true)) {
       return;
     }
     
@@ -53,7 +62,7 @@ const StepOneUserInfo = () => {
         onChange={handleUserTypeChange} 
       />
       
-      <div className="max-h-[350px] overflow-y-auto pr-1 py-1">
+      <div>
         {/* Personal User Fields */}
         {formData.userType === 'personal' && (
           <PersonalUserFields

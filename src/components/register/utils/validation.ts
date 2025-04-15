@@ -3,7 +3,6 @@ export const validatePersonalUserInfo = (formData: {
   firstName: string;
   lastName: string;
   cin?: string;
-  personalAddress?: string;
   personalPhone?: string;
 }) => {
   const errors: Record<string, string> = {};
@@ -23,10 +22,6 @@ export const validatePersonalUserInfo = (formData: {
   
   if (!formData.cin?.trim()) {
     errors.cin = 'CIN is required';
-  }
-  
-  if (!formData.personalAddress?.trim()) {
-    errors.personalAddress = 'Address is required';
   }
   
   if (!formData.personalPhone?.trim()) {

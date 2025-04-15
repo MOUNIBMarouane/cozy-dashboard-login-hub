@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useMultiStepForm } from '@/context/form';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -12,6 +12,14 @@ import { validateEmailPasswordStep } from './utils/validation';
 const StepTwoEmailPassword = () => {
   const { formData, setFormData, prevStep, nextStep, validateEmail, validateUsername, stepValidation } = useMultiStepForm();
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+  
+  // Clear errors when inputs change
+  useEffect(() => {
+    // Only validate if we have a value to avoid showing errors on initial render
+    if (formData.username || formData.email || formData.password || formData.confirmPassword) {
+      validateStep(false);
+    }
+  }, [formData]);
   
   // Calculate password strength
   const calculatePasswordStrength = useCallback((password: string): number => {
@@ -42,26 +50,21 @@ const StepTwoEmailPassword = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ [name]: value });
-    
-    // Clear error when field is edited
-    if (localErrors[name]) {
-      setLocalErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
   };
 
-  const validateStep = () => {
+  const validateStep = (showToast = true) => {
     const errors = validateEmailPasswordStep(formData);
     setLocalErrors(errors);
+    
+    if (showToast && Object.keys(errors).length > 0) {
+      toast.error("Please correct all errors before proceeding");
+    }
+    
     return Object.keys(errors).length === 0;
   };
 
   const handleNext = async () => {
     if (!validateStep()) {
-      toast.error("Please correct all errors before proceeding");
       return;
     }
 
