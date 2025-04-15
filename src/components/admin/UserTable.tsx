@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import adminService from '@/services/adminService';
@@ -41,6 +40,7 @@ export function UserTable() {
     handleUserEmailEdited,
     handleUserDeleted,
     handleMultipleDeleted,
+    refetch,
   } = useUserManagement();
 
   const handleToggleUserStatus = async (userId: number, currentStatus: boolean) => {
