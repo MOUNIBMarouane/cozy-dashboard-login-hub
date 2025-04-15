@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -138,6 +139,7 @@ const EmailVerification = () => {
                   {slots.map((slot, index) => (
                     <InputOTPSlot
                       key={index}
+                      index={index}  {/* Add the index prop here to fix the error */}
                       {...slot}
                       className="w-10 h-12 text-lg border-gray-700 bg-[#1c2333] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
