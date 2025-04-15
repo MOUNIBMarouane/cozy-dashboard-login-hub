@@ -2,13 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from "@/components/ui/use-toast";
 import { ShieldCheck, ChevronLeft } from 'lucide-react';
 import DocuVerseLogo from '@/components/DocuVerseLogo';
 import authService from '@/services/authService';
+import { Input } from '@/components/ui/input';
 
 const EmailVerification = () => {
   const [verificationCode, setVerificationCode] = useState('');
@@ -16,6 +16,7 @@ const EmailVerification = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!email) {
@@ -34,6 +35,7 @@ const EmailVerification = () => {
     }
 
     setIsLoading(true);
+    setError(null);
     try {
       await authService.resendVerificationCode(email);
       toast({
@@ -54,22 +56,16 @@ const EmailVerification = () => {
 
   const handleVerifyEmail = async () => {
     setIsLoading(true);
+    setError(null);
+    
     if (!email) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Email is missing. Please ensure you have a valid email in the URL.",
-      });
+      setError("Email is missing. Please ensure you have a valid email in the URL.");
       setIsLoading(false);
       return;
     }
 
     if (!verificationCode) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter the verification code.",
-      });
+      setError("Please enter the verification code sent to your email.");
       setIsLoading(false);
       return;
     }
@@ -88,19 +84,11 @@ const EmailVerification = () => {
           }
         });
       } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Email verification failed. Please check the code and try again.",
-        });
+        setError("Invalid verification code. Please check your email and try again.");
       }
     } catch (error: any) {
       console.error("Email verification error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "An error occurred during email verification.",
-      });
+      setError(error.message || "An error occurred during email verification. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -111,8 +99,8 @@ const EmailVerification = () => {
       <Card className="w-full max-w-md p-8 border-gray-800 bg-gradient-to-b from-[#161b22] to-[#0d1117] shadow-2xl">
         <CardHeader className="space-y-1 flex flex-col items-center pb-2 px-8 pt-6 border-b border-gray-800">
           <DocuVerseLogo className="mx-auto h-10 w-auto text-docuBlue" />
-          <CardTitle className="text-2xl font-semibold text-white mt-4">Email Verification</CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardTitle className="text-2xl font-semibold text-white mt-4 text-center">Email Verification</CardTitle>
+          <CardDescription className="text-gray-400 text-center">
             Enter the verification code sent to your email
           </CardDescription>
         </CardHeader>
@@ -121,22 +109,32 @@ const EmailVerification = () => {
             <ShieldCheck className="h-8 w-8 text-blue-400" />
           </div>
           
-          <div className="text-center text-gray-400 text-sm">
-            We've sent a verification code to:
+          <div className="text-center">
+            <p className="text-gray-400 text-sm">We've sent a verification code to:</p>
             <p className="font-medium text-blue-400 mt-1">{email}</p>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="code" className="text-gray-300">Verification Code</Label>
+            <Label htmlFor="code" className="text-gray-300 text-center block">Verification Code</Label>
             <Input
               id="code"
               placeholder="Enter verification code"
               type="text"
               value={verificationCode}
-              onChange={(e) => setVerificationCode(e.target.value)}
-              className="bg-[#1c2333] border-gray-700 text-white focus:ring-blue-500 focus:border-blue-500"
+              onChange={(e) => {
+                const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
+                setVerificationCode(onlyNumbers);
+              }}
+              className="bg-[#1c2333] border-gray-700 text-white focus:ring-blue-500 focus:border-blue-500 text-center"
+              maxLength={6}
             />
           </div>
+
+          {error && (
+            <div className="bg-red-900/20 border border-red-800 rounded-md p-3">
+              <p className="text-red-400 text-sm text-center">{error}</p>
+            </div>
+          )}
           
           <div className="space-y-4">
             <Button 
