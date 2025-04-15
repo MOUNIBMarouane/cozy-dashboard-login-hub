@@ -30,7 +30,7 @@ export const CircuitStepCard = ({
   
   return (
     <Card 
-      className={`h-full ${
+      className={`h-full rounded-lg ${
         isDraggedOver 
           ? 'bg-[#0a1033] border-green-500 shadow-lg shadow-green-500/20 transition-all duration-300' 
           : isCurrentStep 
@@ -38,7 +38,7 @@ export const CircuitStepCard = ({
             : 'bg-[#0a1033] border-blue-900/30'
       }`}
     >
-      <CardHeader className={`pb-3 ${
+      <CardHeader className={`pb-3 rounded-lg ${
         isCurrentStep ? 'border-b border-green-500/30 bg-[#060927]' : 'border-b border-blue-900/30'
       }`}>
         <div className="flex items-center justify-between">
@@ -59,14 +59,14 @@ export const CircuitStepCard = ({
       
       <CardContent className="p-4">
         <p className="text-sm text-gray-400 mb-4">
-          {detail.descriptif || 'No description provided for this step'}
+          {/* {detail.descriptif || 'No description provided for this step'} */}
         </p>
 
         {/* Document card if this is the current step */}
         {children}
 
         {/* History items for this step */}
-        <CircuitStepHistory historyForStep={historyForStep} />
+        {/* <CircuitStepHistory historyForStep={historyForStep} /> */}
       </CardContent>
       
       <CircuitStepFooter 

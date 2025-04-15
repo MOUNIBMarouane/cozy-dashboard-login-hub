@@ -73,7 +73,10 @@ export default function CircuitDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-hideden">
+        <div className='w-full flex justify-between items-center mb-4'>
+      <br />
+        </div>
         <DialogHeader>
           <DialogTitle className="flex justify-between items-center">
             <span>Circuit Details: {circuit.title}</span>
@@ -87,14 +90,7 @@ export default function CircuitDetailsDialog({
                   <Lock className="h-4 w-4 mr-2" /> 
                   <span>View-only access</span>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => onOpenChange(false)}
-                  className="hover:bg-blue-900/30"
-                >
-                  <X className="h-5 w-5 text-white" />
-                </Button>
+
               </div>
             )}
           </DialogTitle>

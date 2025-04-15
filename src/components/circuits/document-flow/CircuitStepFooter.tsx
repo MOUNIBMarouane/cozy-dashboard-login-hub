@@ -20,17 +20,17 @@ export const CircuitStepFooter = ({
   onMoveClick
 }: CircuitStepFooterProps) => {
   return (
-    <CardFooter className="p-3 border-t border-blue-900/30 bg-[#060927] flex justify-between">
-      {responsibleRoleId ? (
+    <CardFooter className="p-3 rounded-lg border-t border-blue-900/30 bg-[#060927] flex justify-between">
+      {/* {responsibleRoleId ? (
         <Badge variant="outline" className="text-xs">
           Responsible: Role #{responsibleRoleId}
         </Badge>
       ) : (
         <span className="text-xs text-gray-500">No responsible role</span>
-      )}
+      )} */}
       
       {isCurrentStep && !isSimpleUser && (
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 w-full justify-between">
           <Button 
             size="sm" 
             variant="outline"
