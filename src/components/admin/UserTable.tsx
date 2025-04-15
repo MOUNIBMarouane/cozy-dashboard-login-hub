@@ -1,87 +1,52 @@
+
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import adminService, { UserDto } from '@/services/adminService';
-import { 
-  Table, 
-  TableBody, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
-import { AlertTriangle } from 'lucide-react';
+import adminService from '@/services/adminService';
 import { UserTableHeader } from './table/UserTableHeader';
-import { UserTableRow } from './table/UserTableRow';
-import { UserTableEmpty } from './table/UserTableEmpty';
+import { UserTableContent } from './table/UserTableContent';
 import { BulkActionsBar } from './table/BulkActionsBar';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { EditUserDialog } from './EditUserDialog';
 import { EditUserEmailDialog } from './EditUserEmailDialog';
 import { ViewUserLogsDialog } from './ViewUserLogsDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useUserManagement } from './hooks/useUserManagement';
+import { AlertTriangle } from 'lucide-react';
 
 export function UserTable() {
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
-  const [editingUser, setEditingUser] = useState<UserDto | null>(null);
-  const [editEmailUser, setEditEmailUser] = useState<UserDto | null>(null);
-  const [viewingUserLogs, setViewingUserLogs] = useState<number | null>(null);
-  const [deletingUser, setDeletingUser] = useState<number | null>(null);
-  const [deleteMultipleOpen, setDeleteMultipleOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleChangeOpen, setRoleChangeOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<string>('');
-
-  const { data: users, isLoading, isError, refetch } = useQuery({
-    queryKey: ['admin-users'],
-    queryFn: adminService.getAllUsers,
-  });
-
-  const handleUserEdited = () => {
-    refetch();
-    setEditingUser(null);
-  };
-
-  const handleUserEmailEdited = () => {
-    refetch();
-    setEditEmailUser(null);
-  };
-
-  const handleUserDeleted = () => {
-    refetch();
-    setDeletingUser(null);
-    setSelectedUsers([]);
-  };
-
-  const handleMultipleDeleted = () => {
-    refetch();
-    setSelectedUsers([]);
-    setDeleteMultipleOpen(false);
-  };
-
-  const handleSelectUser = (userId: number) => {
-    setSelectedUsers(prev => 
-      prev.includes(userId) 
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
-    );
-  };
-
-  const handleSelectAll = () => {
-    if (selectedUsers.length === filteredUsers?.length) {
-      setSelectedUsers([]);
-    } else {
-      setSelectedUsers(filteredUsers?.map(user => user.id) || []);
-    }
-  };
+  const {
+    selectedUsers,
+    editingUser,
+    editEmailUser,
+    viewingUserLogs,
+    deletingUser,
+    deleteMultipleOpen,
+    searchQuery,
+    roleChangeOpen,
+    selectedRole,
+    users: filteredUsers,
+    isLoading,
+    isError,
+    setEditingUser,
+    setEditEmailUser,
+    setViewingUserLogs,
+    setDeletingUser,
+    setDeleteMultipleOpen,
+    setSearchQuery,
+    setRoleChangeOpen,
+    setSelectedRole,
+    handleSelectUser,
+    handleSelectAll,
+    handleUserEdited,
+    handleUserEmailEdited,
+    handleUserDeleted,
+    handleMultipleDeleted,
+  } = useUserManagement();
 
   const handleToggleUserStatus = async (userId: number, currentStatus: boolean) => {
     try {
       const newStatus = !currentStatus;
-      await adminService.updateUser(userId, { 
-        isActive: newStatus 
-      });
-      
+      await adminService.updateUser(userId, { isActive: newStatus });
       toast.success(`User ${newStatus ? 'activated' : 'blocked'} successfully`);
       refetch();
     } catch (error) {
@@ -92,9 +57,7 @@ export function UserTable() {
 
   const handleUserRoleChange = async (userId: number, roleName: string) => {
     try {
-      await adminService.updateUser(userId, { 
-        roleName
-      });
+      await adminService.updateUser(userId, { roleName });
       toast.success(`User role changed to ${roleName}`);
       refetch();
     } catch (error) {
@@ -125,77 +88,39 @@ export function UserTable() {
     }
   };
 
-  const filteredUsers = users?.filter(user => {
-    if (!searchQuery) return true;
-    
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      user.username.toLowerCase().includes(searchLower) ||
-      user.firstName.toLowerCase().includes(searchLower) ||
-      user.lastName.toLowerCase().includes(searchLower) ||
-      user.email.toLowerCase().includes(searchLower)
-    );
-  });
-
   if (isLoading) {
-    return <div className="flex justify-center py-10">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>;
+    return (
+      <div className="flex justify-center py-10">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   if (isError) {
-    return <div className="text-red-500 py-10 text-center">
-      <AlertTriangle className="h-10 w-10 mx-auto mb-2" />
-      Error loading users. Please try again.
-    </div>;
+    return (
+      <div className="text-red-500 py-10 text-center">
+        <AlertTriangle className="h-10 w-10 mx-auto mb-2" />
+        Error loading users. Please try again.
+      </div>
+    );
   }
 
   return (
     <div>
       <UserTableHeader searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-      <div className="rounded-md border border-gray-700 overflow-hidden">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader className="bg-[#0d1424]">
-              <TableRow className="border-gray-700 hover:bg-transparent">
-                <TableHead className="w-12 text-gray-300">
-                  <Checkbox 
-                    checked={selectedUsers.length > 0 && selectedUsers.length === filteredUsers?.length}
-                    onCheckedChange={handleSelectAll}
-                    aria-label="Select all"
-                  />
-                </TableHead>
-                <TableHead className="w-12"></TableHead>
-                <TableHead className="text-gray-300">User</TableHead>
-                <TableHead className="text-gray-300">Email</TableHead>
-                <TableHead className="text-gray-300">Role</TableHead>
-                <TableHead className="text-gray-300">Status</TableHead>
-                <TableHead className="text-gray-300">Block</TableHead>
-                <TableHead className="w-16 text-gray-300">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers?.map((user) => (
-                <UserTableRow
-                  key={user.id}
-                  user={user}
-                  isSelected={selectedUsers.includes(user.id)}
-                  onSelect={handleSelectUser}
-                  onToggleStatus={handleToggleUserStatus}
-                  onRoleChange={handleUserRoleChange}
-                  onEdit={setEditingUser}
-                  onEditEmail={setEditEmailUser}
-                  onViewLogs={setViewingUserLogs}
-                  onDelete={setDeletingUser}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        
-        {filteredUsers?.length === 0 && <UserTableEmpty />}
-      </div>
+      <UserTableContent 
+        users={filteredUsers}
+        selectedUsers={selectedUsers}
+        onSelectAll={() => handleSelectAll(filteredUsers || [])}
+        onSelectUser={handleSelectUser}
+        onToggleStatus={handleToggleUserStatus}
+        onRoleChange={handleUserRoleChange}
+        onEdit={setEditingUser}
+        onEditEmail={setEditEmailUser}
+        onViewLogs={setViewingUserLogs}
+        onDelete={setDeletingUser}
+      />
 
       {selectedUsers.length > 0 && (
         <BulkActionsBar
@@ -288,7 +213,7 @@ export function UserTable() {
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent className="bg-[#0a1033] border-blue-900/30">
-                {getAllRoles().map(role => (
+                {["Admin", "FullUser", "SimpleUser"].map(role => (
                   <SelectItem 
                     key={role} 
                     value={role} 
@@ -304,8 +229,4 @@ export function UserTable() {
       )}
     </div>
   );
-}
-
-function getAllRoles(): string[] {
-  return ["Admin", "FullUser", "SimpleUser"];
 }
