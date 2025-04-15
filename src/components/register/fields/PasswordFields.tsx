@@ -49,7 +49,7 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
         {localErrors.password && (
           <p className="text-xs text-red-500">{localErrors.password}</p>
         )}
-        <PasswordStrengthIndicator strength={passwordStrength} />
+        <PasswordStrengthIndicator strength={passwordStrength} password={password} />
       </div>
       
       <div className="space-y-1">
