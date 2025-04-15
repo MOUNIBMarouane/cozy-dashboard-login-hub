@@ -93,6 +93,8 @@ export default function CircuitsList({ onApiError, searchQuery = '' }: CircuitsL
                 open={deleteDialogOpen}
                 onOpenChange={setDeleteDialogOpen}
                 onConfirm={confirmDelete}
+                confirmText="Delete"
+                destructive={true}
               />
             </>
           )}

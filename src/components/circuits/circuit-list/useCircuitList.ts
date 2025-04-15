@@ -70,7 +70,10 @@ export function useCircuitList({ onApiError, searchQuery }: UseCircuitListProps)
     
     try {
       await circuitService.deleteCircuit(selectedCircuit.id);
+      // Close the dialog first before showing the success toast
+      setDeleteDialogOpen(false);
       toast.success("Circuit deleted successfully");
+      // Then refetch the updated list
       refetch();
     } catch (error) {
       const errorMessage = error instanceof Error 
