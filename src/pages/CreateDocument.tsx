@@ -19,6 +19,7 @@ import DocuVerseLogo from '@/components/DocuVerseLogo';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import documentService from '@/services/documentService';
 import { DocumentType, CreateDocumentRequest } from '@/models/document';
+import { DatePickerInput } from '@/components/document/DatePickerInput';
 
 export default function CreateDocument() {
   const { user, logout } = useAuth();
@@ -131,6 +132,12 @@ export default function CreateDocument() {
     }
   };
 
+  const handleDateChange = (newDate: Date | undefined) => {
+    if (newDate) {
+      setDocDate(newDate.toISOString().split('T')[0]);
+    }
+  };
+
   const renderStepContent = () => {
     switch (step) {
       case 1:
@@ -210,12 +217,9 @@ export default function CreateDocument() {
           <div className="space-y-6">
             <div className="space-y-3">
               <Label htmlFor="docDate" className="text-sm font-medium text-gray-200">Document Date*</Label>
-              <Input 
-                id="docDate" 
-                type="date" 
-                value={docDate} 
-                onChange={e => setDocDate(e.target.value)}
-                className="h-12 text-base bg-gray-900 border-gray-800 text-white placeholder:text-gray-500"
+              <DatePickerInput 
+                date={new Date(docDate)} 
+                onDateChange={handleDateChange}
               />
             </div>
             <div className="flex justify-between pt-6">
