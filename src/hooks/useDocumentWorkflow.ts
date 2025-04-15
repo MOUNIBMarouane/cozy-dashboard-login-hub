@@ -51,7 +51,7 @@ export function useDocumentWorkflow(documentId: number) {
         ? error.message 
         : 'Failed to perform action';
       toast.error(errorMessage);
-      console.error(error);
+      console.error('Error performing action:', error);
     } finally {
       setIsActionLoading(false);
     }
@@ -62,7 +62,6 @@ export function useDocumentWorkflow(documentId: number) {
     
     setIsActionLoading(true);
     try {
-      // Now we can include the comments property in the request
       await circuitService.moveDocumentToStep({
         documentId,
         comments
@@ -74,7 +73,7 @@ export function useDocumentWorkflow(documentId: number) {
         ? error.message 
         : 'Failed to return document to previous step';
       toast.error(errorMessage);
-      console.error(error);
+      console.error('Error returning to previous step:', error);
     } finally {
       setIsActionLoading(false);
     }
