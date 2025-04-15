@@ -61,8 +61,8 @@ const RegisterForm: React.FC = () => {
               </CardContent>
             </ScrollArea>
             
-            <CardFooter className="flex flex-col space-y-4 pt-6 pb-6 px-8 border-t border-gray-800">
-              <div className="text-center text-sm text-gray-400">
+            <CardFooter className="flex justify-end pt-6 pb-6 px-8 border-t border-gray-800">
+              <div className="text-sm text-gray-400">
                 Already have an account?{' '}
                 <Link
                   to="/login"
