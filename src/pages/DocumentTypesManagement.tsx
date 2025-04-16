@@ -1,9 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useAuth } from '@/context/AuthContext';
+
+import { useState } from 'react';
 import { toast } from 'sonner';
-import { Filter, Plus, ArrowLeft, LayoutGrid, LayoutList } from 'lucide-react';
 import { DocumentType } from '@/models/document';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Drawer,
@@ -13,12 +11,10 @@ import {
   DrawerDescription,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Link } from 'react-router-dom';
-import documentService from '@/services/documentService';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import documentService from '@/services/documentService';
 
-// Import our components
+// Import components
 import DocumentTypeTable from '@/components/document-types/DocumentTypeTable';
 import DocumentTypeGrid from '@/components/document-types/DocumentTypeGrid';
 import DocumentTypeForm from '@/components/document-types/DocumentTypeForm';
@@ -26,43 +22,38 @@ import BottomActionBar from '@/components/document-types/BottomActionBar';
 import EmptyState from '@/components/document-types/EmptyState';
 import DeleteConfirmDialog from '@/components/document-types/DeleteConfirmDialog';
 import LoadingState from '@/components/document-types/LoadingState';
+import DocumentTypesHeader from '@/components/document-types/DocumentTypesHeader';
+import DocumentTypesPagination from '@/components/document-types/DocumentTypesPagination';
+import { useDocumentTypes } from '@/hooks/useDocumentTypes';
 
 type ViewMode = 'table' | 'grid';
 
 const DocumentTypesManagement = () => {
-  const { user } = useAuth();
-  const [types, setTypes] = useState<DocumentType[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [typeToDelete, setTypeToDelete] = useState<number | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentType, setCurrentType] = useState<DocumentType | null>(null);
-  const [selectedTypes, setSelectedTypes] = useState<number[]>([]);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
-  const [sortField, setSortField] = useState<string | null>('typeName');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
   const [viewMode, setViewMode] = useState<ViewMode>('table');
 
-  useEffect(() => {
-    fetchTypes();
-  }, [currentPage]);
-
-  const fetchTypes = async () => {
-    try {
-      setIsLoading(true);
-      const data = await documentService.getAllDocumentTypes();
-      setTypes(data);
-    } catch (error) {
-      console.error('Failed to fetch document types:', error);
-      toast.error('Failed to load document types');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    types,
+    isLoading,
+    searchQuery,
+    setSearchQuery,
+    sortField,
+    sortDirection,
+    handleSort,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    selectedTypes,
+    handleSelectType,
+    handleSelectAll,
+    fetchTypes,
+    filteredAndSortedTypes
+  } = useDocumentTypes();
 
   const openDeleteDialog = (id: number) => {
     setTypeToDelete(id);
@@ -91,32 +82,10 @@ const DocumentTypesManagement = () => {
     setIsDrawerOpen(true);
   };
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      // Only select types that can be deleted (document count is 0)
-      const selectableTypeIds = filteredAndSortedTypes
-        .filter(type => type.documentCounter === 0)
-        .map(type => type.id!)
-        .filter(id => id !== undefined);
-      setSelectedTypes(selectableTypeIds);
-    } else {
-      setSelectedTypes([]);
-    }
-  };
-
-  const handleSelectType = (id: number, checked: boolean) => {
-    if (checked) {
-      setSelectedTypes(prev => [...prev, id]);
-    } else {
-      setSelectedTypes(prev => prev.filter(typeId => typeId !== id));
-    }
-  };
-
   const handleBulkDelete = async () => {
     try {
       await documentService.deleteMultipleDocumentTypes(selectedTypes);
       toast.success(`Successfully deleted ${selectedTypes.length} document types`);
-      setSelectedTypes([]);
       fetchTypes();
     } catch (error) {
       console.error('Failed to delete document types in bulk:', error);
@@ -125,69 +94,6 @@ const DocumentTypesManagement = () => {
       setBulkDeleteDialogOpen(false);
     }
   };
-
-  const handleSort = (field: string) => {
-    // If already sorting by this field, reverse direction
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-
-  const filteredAndSortedTypes = useMemo(() => {
-    // First, filter by search query
-    let filtered = [...types];
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(type => 
-        (type.typeKey?.toLowerCase().includes(query) || '') ||
-        (type.typeName?.toLowerCase().includes(query) || '') ||
-        (type.typeAttr?.toLowerCase().includes(query) || '')
-      );
-    }
-    
-    // Then sort
-    return [...filtered].sort((a, b) => {
-      if (!sortField) return 0;
-      
-      let valueA: any, valueB: any;
-      
-      switch(sortField) {
-        case 'typeKey':
-          valueA = a.typeKey || '';
-          valueB = b.typeKey || '';
-          break;
-        case 'typeName':
-          valueA = a.typeName || '';
-          valueB = b.typeName || '';
-          break;
-        case 'typeAttr':
-          valueA = a.typeAttr || '';
-          valueB = b.typeAttr || '';
-          break;
-        case 'documentCounter':
-          valueA = a.documentCounter || 0;
-          valueB = b.documentCounter || 0;
-          break;
-        default:
-          return 0;
-      }
-      
-      if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
-      if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }, [types, sortField, sortDirection, searchQuery]);
-
-  // Get current items for pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredAndSortedTypes.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredAndSortedTypes.length / itemsPerPage);
-
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
@@ -201,72 +107,12 @@ const DocumentTypesManagement = () => {
 
   return (
     <div className="h-full flex flex-col bg-[#070b28]">
-      {/* Header Section */}
-      <div className="bg-[#0f1642] p-4 md:p-6 border-b border-blue-900/30 flex-shrink-0">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Link to="/documents" className="inline-flex items-center text-blue-400 hover:text-blue-300">
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              <span>Back</span>
-            </Link>
-            <div className="h-4 w-px bg-blue-800/50"></div>
-            <div>
-              <h1 className="text-2xl font-bold text-white">Document Types</h1>
-              <p className="text-sm text-blue-300 mt-1">
-                Manage document classification system
-              </p>
-            </div>
-          </div>
+      <DocumentTypesHeader 
+        viewMode={viewMode}
+        onViewModeChange={handleViewModeChange}
+        onNewTypeClick={() => setIsDrawerOpen(true)}
+      />
 
-          <div className="flex flex-wrap items-center gap-2 md:gap-3">
-            <ToggleGroup type="single" value={viewMode} onValueChange={handleViewModeChange}>
-              <ToggleGroupItem value="table" aria-label="Table view">
-                <LayoutList className="h-4 w-4" />
-              </ToggleGroupItem>
-              <ToggleGroupItem value="grid" aria-label="Grid view">
-                <LayoutGrid className="h-4 w-4" />
-              </ToggleGroupItem>
-            </ToggleGroup>
-
-            <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-              <DrawerTrigger asChild>
-                <Button className="h-9 bg-blue-600 hover:bg-blue-700">
-                  <Plus className="mr-2 h-4 w-4" /> New Type
-                </Button>
-              </DrawerTrigger>
-              <DrawerContent className="bg-[#111633] p-6 max-w-lg mx-auto">
-                <DrawerHeader className="text-center pb-6">
-                  <DrawerTitle className="text-2xl font-bold text-white">
-                    {isEditMode ? 'Edit Document Type' : 'Create Document Type'}
-                  </DrawerTitle>
-                  <DrawerDescription className="mt-2 text-blue-300">
-                    {isEditMode 
-                      ? 'Modify an existing document type' 
-                      : 'Create a new document type for your organization'}
-                  </DrawerDescription>
-                </DrawerHeader>
-            
-                <div className="px-1">
-                  <DocumentTypeForm
-                    documentType={currentType}
-                    isEditMode={isEditMode}
-                    onSuccess={() => {
-                      handleCloseDrawer();
-                      fetchTypes();
-                      toast.success(isEditMode 
-                        ? 'Document type updated successfully' 
-                        : 'Document type created successfully');
-                    }}
-                    onCancel={handleCloseDrawer}
-                  />
-                </div>
-              </DrawerContent>
-            </Drawer>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
       <div className="flex-1 overflow-hidden px-4 md:px-6 py-4">
         {isLoading ? (
           <LoadingState />
@@ -286,7 +132,7 @@ const DocumentTypesManagement = () => {
               <ScrollArea className="h-[calc(100vh-260px)]">
                 {viewMode === 'table' ? (
                   <DocumentTypeTable 
-                    types={currentItems}
+                    types={types}
                     selectedTypes={selectedTypes}
                     onSelectType={handleSelectType}
                     onSelectAll={handleSelectAll}
@@ -300,7 +146,7 @@ const DocumentTypesManagement = () => {
                   />
                 ) : (
                   <DocumentTypeGrid
-                    types={currentItems}
+                    types={types}
                     onDeleteType={openDeleteDialog}
                     onEditType={handleEditType}
                     searchQuery={searchQuery}
@@ -309,52 +155,11 @@ const DocumentTypesManagement = () => {
                 )}
               </ScrollArea>
               
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex justify-center py-3 border-t border-blue-900/20">
-                  <nav aria-label="Page navigation">
-                    <ul className="flex items-center gap-1">
-                      <li>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="h-8 px-2 bg-blue-900/20 border-blue-800/40 text-blue-200 hover:bg-blue-800/30" 
-                          onClick={() => paginate(currentPage - 1)}
-                          disabled={currentPage === 1}
-                        >
-                          Previous
-                        </Button>
-                      </li>
-                      {Array.from({ length: totalPages }).map((_, index) => (
-                        <li key={index}>
-                          <Button 
-                            variant={currentPage === index + 1 ? "default" : "outline"}
-                            size="sm"
-                            className={`h-8 w-8 ${currentPage === index + 1 
-                              ? "bg-blue-600 hover:bg-blue-700" 
-                              : "bg-blue-900/20 border-blue-800/40 text-blue-200 hover:bg-blue-800/30"
-                            }`}
-                            onClick={() => paginate(index + 1)}
-                          >
-                            {index + 1}
-                          </Button>
-                        </li>
-                      ))}
-                      <li>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="h-8 px-2 bg-blue-900/20 border-blue-800/40 text-blue-200 hover:bg-blue-800/30" 
-                          onClick={() => paginate(currentPage + 1)}
-                          disabled={currentPage === totalPages}
-                        >
-                          Next
-                        </Button>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-              )}
+              <DocumentTypesPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
             </CardContent>
           </Card>
         ) : (
@@ -362,14 +167,42 @@ const DocumentTypesManagement = () => {
         )}
       </div>
 
-      {/* Delete Confirmation Dialog */}
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <DrawerContent className="bg-[#111633] p-6 max-w-lg mx-auto">
+          <DrawerHeader className="text-center pb-6">
+            <DrawerTitle className="text-2xl font-bold text-white">
+              {isEditMode ? 'Edit Document Type' : 'Create Document Type'}
+            </DrawerTitle>
+            <DrawerDescription className="mt-2 text-blue-300">
+              {isEditMode 
+                ? 'Modify an existing document type' 
+                : 'Create a new document type for your organization'}
+            </DrawerDescription>
+          </DrawerHeader>
+      
+          <div className="px-1">
+            <DocumentTypeForm
+              documentType={currentType}
+              isEditMode={isEditMode}
+              onSuccess={() => {
+                handleCloseDrawer();
+                fetchTypes();
+                toast.success(isEditMode 
+                  ? 'Document type updated successfully' 
+                  : 'Document type created successfully');
+              }}
+              onCancel={handleCloseDrawer}
+            />
+          </div>
+        </DrawerContent>
+      </Drawer>
+
       <DeleteConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDelete}
       />
 
-      {/* Bulk Delete Confirmation Dialog */}
       <DeleteConfirmDialog
         open={bulkDeleteDialogOpen}
         onOpenChange={setBulkDeleteDialogOpen}
@@ -378,7 +211,6 @@ const DocumentTypesManagement = () => {
         count={selectedTypes.length}
       />
 
-      {/* Bottom action bar */}
       <BottomActionBar
         selectedCount={selectedTypes.length}
         onBulkDelete={() => setBulkDeleteDialogOpen(true)}
