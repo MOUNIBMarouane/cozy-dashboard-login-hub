@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -25,7 +24,8 @@ import {
   Ban,
   Calendar,
   Clock,
-  User
+  User,
+  GitBranch  // Add this import
 } from 'lucide-react';
 import DocuVerseLogo from '@/components/DocuVerseLogo';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -164,6 +164,13 @@ const ViewDocument = () => {
     return null;
   }
 
+  // Add a new method to handle navigation to document flow
+  const handleDocumentFlow = () => {
+    if (document) {
+      navigate(`/documents/${document.id}/flow`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-900/20 to-blue-950/30">
       {/* Header */}
@@ -201,6 +208,17 @@ const ViewDocument = () => {
           
           {document && canManageDocuments && (
             <div className="flex space-x-3">
+              {/* Add Document Flow button */}
+              {document.circuitId && (
+                <Button 
+                  variant="outline" 
+                  className="border-blue-400/30 text-blue-300 hover:text-white hover:bg-blue-700/50 flex items-center gap-2"
+                  onClick={handleDocumentFlow}
+                >
+                  <GitBranch className="h-4 w-4 mr-2" /> Document Flow
+                </Button>
+              )}
+              
               <Button variant="outline" className="border-blue-400/30 text-blue-300 hover:text-white hover:bg-blue-700/50 flex items-center gap-2" asChild>
                 <Link to={`/documents/${document.id}/edit`}>
                   <Edit className="h-4 w-4 mr-2" /> Edit
