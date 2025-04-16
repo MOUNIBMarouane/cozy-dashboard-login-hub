@@ -15,22 +15,48 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
+    // Check localStorage first
     const savedTheme = localStorage.getItem('theme');
-    return (savedTheme as Theme) || 'dark';
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      return savedTheme;
+    }
+    
+    // If no saved theme, check system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    
+    // Default to dark mode
+    return 'dark';
   });
   
   const [language, setLanguage] = useState<Language>(() => {
     const savedLang = localStorage.getItem('language');
-    return (savedLang as Language) || 'en';
+    if (savedLang === 'en' || savedLang === 'fr' || savedLang === 'es') {
+      return savedLang;
+    }
+    
+    // Try to detect browser language
+    const browserLang = navigator.language.split('-')[0];
+    if (browserLang === 'fr' || browserLang === 'es') {
+      return browserLang as Language;
+    }
+    
+    return 'en';
   });
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
+    
+    // Apply theme class to document element
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
+    
+    // Also set a data attribute for potential CSS selectors
+    document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
   useEffect(() => {
