@@ -68,34 +68,19 @@ export function SidebarNav() {
           
           {/* Document Types - Only for non-simple users */}
           {!isSimpleUser && (
-            <>
-              <li>
-                <Link 
-                  to="/document-types"
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive('/document-types') 
-                      ? 'bg-blue-600/40 text-blue-200' 
-                      : 'text-blue-100 hover:bg-blue-800/30 hover:text-blue-50'
-                  }`}
-                >
-                  <Layers className="h-5 w-5" />
-                  <span>Types Overview</span>
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/document-types-management"
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive('/document-types-management') 
-                      ? 'bg-blue-600/40 text-blue-200' 
-                      : 'text-blue-100 hover:bg-blue-800/30 hover:text-blue-50'
-                  }`}
-                >
-                  <Layers className="h-5 w-5" />
-                  <span>Types Management</span>
-                </Link>
-              </li>
-            </>
+            <li>
+              <Link 
+                to="/document-types-management"
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive('/document-types-management') 
+                    ? 'bg-blue-600/40 text-blue-200' 
+                    : 'text-blue-100 hover:bg-blue-800/30 hover:text-blue-50'
+                }`}
+              >
+                <Layers className="h-5 w-5" />
+                <span>Types Management</span>
+              </Link>
+            </li>
           )}
           
           {/* Circuits */}

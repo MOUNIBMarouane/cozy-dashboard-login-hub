@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
-import { Filter, Plus, ArrowLeft, Edit } from 'lucide-react';
+import { Filter, Plus, ArrowLeft, LayoutGrid, LayoutList } from 'lucide-react';
 import { DocumentType } from '@/models/document';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -16,14 +16,18 @@ import {
 import { Link } from 'react-router-dom';
 import documentService from '@/services/documentService';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 // Import our components
 import DocumentTypeTable from '@/components/document-types/DocumentTypeTable';
+import DocumentTypeGrid from '@/components/document-types/DocumentTypeGrid';
 import DocumentTypeForm from '@/components/document-types/DocumentTypeForm';
 import BottomActionBar from '@/components/document-types/BottomActionBar';
 import EmptyState from '@/components/document-types/EmptyState';
 import DeleteConfirmDialog from '@/components/document-types/DeleteConfirmDialog';
 import LoadingState from '@/components/document-types/LoadingState';
+
+type ViewMode = 'table' | 'grid';
 
 const DocumentTypesManagement = () => {
   const { user } = useAuth();
@@ -41,6 +45,7 @@ const DocumentTypesManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [viewMode, setViewMode] = useState<ViewMode>('table');
 
   useEffect(() => {
     fetchTypes();
@@ -190,9 +195,13 @@ const DocumentTypesManagement = () => {
     setIsEditMode(false);
   };
 
+  const handleViewModeChange = (value: ViewMode) => {
+    if (value) setViewMode(value);
+  };
+
   return (
     <div className="h-full flex flex-col bg-[#070b28]">
-      {/* Header Section - Fixed at top */}
+      {/* Header Section */}
       <div className="bg-[#0f1642] p-4 md:p-6 border-b border-blue-900/30 flex-shrink-0">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -209,7 +218,16 @@ const DocumentTypesManagement = () => {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 md:gap-3">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3">
+            <ToggleGroup type="single" value={viewMode} onValueChange={handleViewModeChange}>
+              <ToggleGroupItem value="table" aria-label="Table view">
+                <LayoutList className="h-4 w-4" />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="grid" aria-label="Grid view">
+                <LayoutGrid className="h-4 w-4" />
+              </ToggleGroupItem>
+            </ToggleGroup>
+
             <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
               <DrawerTrigger asChild>
                 <Button className="h-9 bg-blue-600 hover:bg-blue-700">
@@ -248,7 +266,7 @@ const DocumentTypesManagement = () => {
         </div>
       </div>
 
-      {/* Main Content - Scrollable */}
+      {/* Main Content */}
       <div className="flex-1 overflow-hidden px-4 md:px-6 py-4">
         {isLoading ? (
           <LoadingState />
@@ -266,19 +284,29 @@ const DocumentTypesManagement = () => {
             </CardHeader>
             <CardContent className="p-0 mt-4 flex-1 overflow-hidden">
               <ScrollArea className="h-[calc(100vh-260px)]">
-                <DocumentTypeTable 
-                  types={currentItems}
-                  selectedTypes={selectedTypes}
-                  onSelectType={handleSelectType}
-                  onSelectAll={handleSelectAll}
-                  onDeleteType={openDeleteDialog}
-                  onEditType={handleEditType}
-                  onSort={handleSort}
-                  sortField={sortField}
-                  sortDirection={sortDirection}
-                  searchQuery={searchQuery}
-                  onSearchChange={setSearchQuery}
-                />
+                {viewMode === 'table' ? (
+                  <DocumentTypeTable 
+                    types={currentItems}
+                    selectedTypes={selectedTypes}
+                    onSelectType={handleSelectType}
+                    onSelectAll={handleSelectAll}
+                    onDeleteType={openDeleteDialog}
+                    onEditType={handleEditType}
+                    onSort={handleSort}
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                  />
+                ) : (
+                  <DocumentTypeGrid
+                    types={currentItems}
+                    onDeleteType={openDeleteDialog}
+                    onEditType={handleEditType}
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                  />
+                )}
               </ScrollArea>
               
               {/* Pagination */}
