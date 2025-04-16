@@ -7,21 +7,22 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { useSettings } from '@/context/SettingsContext';
+import { translations } from '@/translations';
 
 const Settings = () => {
-  const [theme, setTheme] = useState('dark');
-  const [language, setLanguage] = useState('en');
+  const { theme, setTheme, language, setLanguage } = useSettings();
   const [useCustomBg, setUseCustomBg] = useState(false);
   const [bgImage, setBgImage] = useState('');
+  
+  const t = translations[language].settings;
 
-  const handleThemeChange = (value: string) => {
+  const handleThemeChange = (value: 'light' | 'dark') => {
     setTheme(value);
-    // TODO: Implement theme change logic
   };
 
-  const handleLanguageChange = (value: string) => {
+  const handleLanguageChange = (value: 'en' | 'fr' | 'es') => {
     setLanguage(value);
-    // TODO: Implement language change logic
   };
 
   const handleBgImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,7 +31,7 @@ const Settings = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setBgImage(reader.result as string);
-        // TODO: Implement background image change logic
+        localStorage.setItem('backgroundImage', reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -58,7 +59,7 @@ const Settings = () => {
               <CardHeader className="border-b border-white/5 bg-gradient-to-r from-blue-800/30 to-purple-800/20">
                 <CardTitle className="flex items-center gap-2">
                   <Palette className="h-5 w-5 text-blue-400" />
-                  Theme Settings
+                  {t.theme}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
@@ -71,14 +72,14 @@ const Settings = () => {
                     <RadioGroupItem value="light" id="light" className="border-blue-400" />
                     <Label htmlFor="light" className="flex items-center gap-2 cursor-pointer">
                       <Sun className="h-4 w-4 text-blue-400" />
-                      Light Mode
+                      {t.lightMode}
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="dark" id="dark" className="border-blue-400" />
                     <Label htmlFor="dark" className="flex items-center gap-2 cursor-pointer">
                       <Moon className="h-4 w-4 text-blue-400" />
-                      Dark Mode
+                      {t.darkMode}
                     </Label>
                   </div>
                 </RadioGroup>
@@ -96,13 +97,13 @@ const Settings = () => {
               <CardHeader className="border-b border-white/5 bg-gradient-to-r from-blue-800/30 to-purple-800/20">
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="h-5 w-5 text-blue-400" />
-                  Language Settings
+                  {t.language}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
                 <Select value={language} onValueChange={handleLanguageChange}>
                   <SelectTrigger className="bg-blue-950/40 border-blue-400/20 text-white">
-                    <SelectValue placeholder="Select Language" />
+                    <SelectValue placeholder={t.selectLanguage} />
                   </SelectTrigger>
                   <SelectContent className="bg-[#0a1033] border-blue-900/30">
                     <SelectItem value="en" className="text-white hover:bg-blue-900/20">English</SelectItem>
