@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -31,6 +30,7 @@ import PendingApprovalsPage from "./pages/PendingApprovals";
 import UserManagement from "./pages/UserManagement";
 import DocumentFlowPage from "./pages/DocumentFlowPage";
 import { Layout } from './components/layout/Layout';
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -90,6 +90,9 @@ const App = () => (
                 <Route path="/circuits" element={<CircuitsPage />} />
                 <Route path="/create-circuit" element={<ProtectedRoute requiresManagement requiredRole={["Admin", "FullUser"]}><CreateCircuit /></ProtectedRoute>} />
                 <Route path="/pending-approvals" element={<PendingApprovalsPage />} />
+                
+                {/* Settings route */}
+                <Route path="/settings" element={<Settings />} />
               </Route>
             </Route>
             
