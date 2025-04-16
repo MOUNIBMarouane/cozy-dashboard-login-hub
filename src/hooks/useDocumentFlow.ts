@@ -60,11 +60,11 @@ export function useDocumentFlow(documentId: string | undefined) {
   });
 
   // Fetch document circuit history
-  const { 
-    data: circuitHistory, 
-    isLoading: isLoadingHistory, 
-    refetch: refetchHistory, 
-    error: historyError 
+  const {
+    data: circuitHistory,
+    isLoading: isLoadingHistory,
+    refetch: refetchHistory,
+    error: historyError
   } = useQuery({
     queryKey: ['document-circuit-history', documentId],
     queryFn: () => circuitService.getDocumentCircuitHistory(Number(documentId)),

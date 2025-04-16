@@ -167,62 +167,6 @@ const ViewDocument = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-900/20 to-blue-950/30">
       {/* Header */}
-      {/* <header className="bg-gradient-to-r from-gray-900/95 to-blue-900/95 border-b border-white/10 backdrop-blur-md shadow-md sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Link to="/dashboard" className="flex items-center">
-              <DocuVerseLogo className="h-10 w-auto" />
-            </Link>
-            <div className="hidden md:block h-6 w-px bg-gray-700"></div>
-            <h1 className="ml-2 text-xl font-semibold text-white hidden md:block">DocApp</h1>
-          </div>
-          <div className="flex items-center space-x-4">
-            {user && user.role === 'Admin' && (
-              <Link to="/admin">
-                <Button variant="outline" size="sm" className="border-blue-400/30 text-blue-300 hover:text-white hover:bg-blue-700/50 flex items-center gap-2">
-                  <UserCog className="h-4 w-4" />
-                  <span className="hidden sm:inline">Admin Panel</span>
-                </Button>
-              </Link>
-            )}
-            <Link to="/profile">
-              <div className="flex items-center space-x-3 cursor-pointer">
-                <Avatar className="h-9 w-9 border border-white/20">
-                  {user?.profilePicture ? (
-                    <AvatarImage src={user.profilePicture} alt="Profile" />
-                  ) : (
-                    <AvatarFallback className="text-sm bg-gradient-to-br from-blue-600 to-indigo-600 text-white">
-                      {getInitials()}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-                <div className="text-right hidden md:block">
-                  <p className="text-sm font-medium text-white">
-                    {user?.firstName} {user?.lastName}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs text-blue-300">{user?.email}</p>
-                    {user?.role && (
-                      <Badge className={user.role === "Admin" 
-                        ? "bg-green-500/20 text-green-200 border-green-500/30" 
-                        : user.role === "FullUser" 
-                          ? "bg-blue-500/20 text-blue-200 border-blue-500/30"
-                          : "bg-gray-500/20 text-gray-200 border-gray-500/30"
-                      }>
-                        {user.role}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </Link>
-            <Button variant="ghost" size="icon" onClick={handleLogout} className="text-blue-300 hover:text-white hover:bg-blue-800/50">
-              <LogOut className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </header> */}
-
       {/* Main Content */}
       <motion.main 
         className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
