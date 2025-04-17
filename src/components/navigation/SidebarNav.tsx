@@ -1,7 +1,7 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { LayoutDashboard, FileText, GitBranch, Layers, Users } from "lucide-react";
+import { LayoutDashboard, FileText, GitBranch, Layers, Users, ListOrdered } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 
 export function SidebarNav() {
@@ -97,6 +97,23 @@ export function SidebarNav() {
               <span>Circuits</span>
             </Link>
           </li>
+          
+          {/* Steps Management - Only for non-simple users */}
+          {!isSimpleUser && (
+            <li>
+              <Link 
+                to="/steps"
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive('/steps') 
+                    ? 'bg-blue-600/40 text-blue-200' 
+                    : 'text-blue-100 hover:bg-blue-800/30 hover:text-blue-50'
+                }`}
+              >
+                <ListOrdered className="h-5 w-5" />
+                <span>Steps Management</span>
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
     </div>
