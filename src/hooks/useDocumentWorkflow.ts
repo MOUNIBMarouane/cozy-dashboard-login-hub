@@ -1,89 +1,33 @@
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import circuitService from '@/services/circuitService';
-import { DocumentWorkflowStatus, ProcessCircuitRequest } from '@/models/documentCircuit';
+import { useWorkflowStatus } from './document-workflow/useWorkflowStatus';
+import { useWorkflowActions } from './document-workflow/useWorkflowActions';
+import { useWorkflowNavigation } from './document-workflow/useWorkflowNavigation';
 
 export function useDocumentWorkflow(documentId: number) {
-  const [isActionLoading, setIsActionLoading] = useState(false);
-
+  // Get document workflow status
   const { 
-    data: workflowStatus, 
+    workflowStatus, 
     isLoading, 
     isError, 
     error,
     refetch 
-  } = useQuery({
-    queryKey: ['document-workflow', documentId],
-    queryFn: () => circuitService.getDocumentCurrentStatus(documentId),
-    enabled: !!documentId,
-    meta: {
-      onSettled: (data, err) => {
-        if (err) {
-          const errorMessage = err instanceof Error 
-            ? err.message 
-            : 'Failed to load document workflow status.';
-          console.error('Document workflow error:', err);
-          toast.error(errorMessage);
-        }
-      }
-    }
-  });
+  } = useWorkflowStatus(documentId);
 
-  const performAction = async (actionId: number, comments: string = '', isApproved: boolean = true) => {
-    if (!documentId) return;
-    
-    setIsActionLoading(true);
-    try {
-      const request: ProcessCircuitRequest = {
-        documentId,
-        actionId,
-        comments,
-        isApproved
-      };
-      
-      await circuitService.performAction(request);
-      toast.success(`Action ${isApproved ? 'approved' : 'rejected'} successfully`);
-      refetch();
-    } catch (error) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : 'Failed to perform action';
-      toast.error(errorMessage);
-      console.error('Error performing action:', error);
-    } finally {
-      setIsActionLoading(false);
-    }
-  };
+  // Get workflow action handlers
+  const { isActionLoading, performAction } = useWorkflowActions(documentId, refetch);
 
-  const returnToPreviousStep = async (comments: string = '') => {
-    if (!documentId) return;
-    
-    setIsActionLoading(true);
-    try {
-      await circuitService.moveDocumentToStep({
-        documentId,
-        comments
-      });
-      toast.success('Document returned to previous step');
-      refetch();
-    } catch (error) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : 'Failed to return document to previous step';
-      toast.error(errorMessage);
-      console.error('Error returning to previous step:', error);
-    } finally {
-      setIsActionLoading(false);
-    }
-  };
+  // Get workflow navigation handlers
+  const { isNavigating, returnToPreviousStep } = useWorkflowNavigation(documentId, refetch);
 
   return {
+    // Status and data
     workflowStatus,
     isLoading,
     isError,
-    isActionLoading,
+    error,
+    
+    // Actions
+    isActionLoading: isActionLoading || isNavigating,
     performAction,
     returnToPreviousStep,
     refetch
