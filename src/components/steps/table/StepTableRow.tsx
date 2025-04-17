@@ -11,14 +11,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Edit, MoreHorizontal, Trash } from 'lucide-react';
+import { Edit, MoreHorizontal, Trash, Eye } from 'lucide-react';
 
 interface StepTableRowProps {
   step: Step;
   isSelected: boolean;
   onSelectStep: (id: number, checked: boolean) => void;
-  onDeleteStep: (step: Step) => void;
-  onEditStep: (step: Step) => void;
+  onDeleteStep?: (step: Step) => void;
+  onEditStep?: (step: Step) => void;
+  onViewDetails?: (step: Step) => void;
   circuitName?: string;
 }
 
@@ -28,6 +29,7 @@ export const StepTableRow = ({
   onSelectStep,
   onDeleteStep,
   onEditStep,
+  onViewDetails,
   circuitName
 }: StepTableRowProps) => {
   return (
@@ -61,18 +63,28 @@ export const StepTableRow = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-background border-blue-900/30">
-            <DropdownMenuItem onClick={() => onEditStep(step)}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={() => onDeleteStep(step)}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash className="mr-2 h-4 w-4" />
-              Delete
-            </DropdownMenuItem>
+            {onEditStep && (
+              <DropdownMenuItem onClick={() => onEditStep(step)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+            )}
+            {onViewDetails && (
+              <DropdownMenuItem onClick={() => onViewDetails(step)}>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
+              </DropdownMenuItem>
+            )}
+            {(onEditStep || onViewDetails) && onDeleteStep && <DropdownMenuSeparator />}
+            {onDeleteStep && (
+              <DropdownMenuItem 
+                onClick={() => onDeleteStep(step)}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>

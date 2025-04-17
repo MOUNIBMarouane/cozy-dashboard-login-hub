@@ -81,6 +81,18 @@ export default function CircuitStepsPage() {
     step.descriptif?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Convert CircuitDetail to Step
+  const convertedSteps: Step[] = filteredSteps.map(detail => ({
+    id: detail.id,
+    stepKey: detail.circuitDetailKey,
+    circuitId: detail.circuitId,
+    title: detail.title,
+    descriptif: detail.descriptif || '',
+    orderIndex: detail.orderIndex,
+    responsibleRoleId: detail.responsibleRoleId,
+    isFinalStep: detail.isFinalStep || false
+  }));
+
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
@@ -90,37 +102,13 @@ export default function CircuitStepsPage() {
     setFormDialogOpen(true);
   };
 
-  const handleEditStep = (step: CircuitDetail) => {
-    // Convert CircuitDetail to Step for the form
-    const stepData: Step = {
-      id: step.id,
-      stepKey: step.circuitDetailKey,
-      circuitId: step.circuitId,
-      title: step.title,
-      descriptif: step.descriptif || '',
-      orderIndex: step.orderIndex,
-      responsibleRoleId: step.responsibleRoleId,
-      isFinalStep: step.isFinalStep || false
-    };
-    
-    setSelectedStep(stepData);
+  const handleEditStep = (step: Step) => {
+    setSelectedStep(step);
     setFormDialogOpen(true);
   };
 
-  const handleDeleteStep = (step: CircuitDetail) => {
-    // Convert CircuitDetail to Step for the dialog
-    const stepData: Step = {
-      id: step.id,
-      stepKey: step.circuitDetailKey,
-      circuitId: step.circuitId,
-      title: step.title,
-      descriptif: step.descriptif || '',
-      orderIndex: step.orderIndex,
-      responsibleRoleId: step.responsibleRoleId,
-      isFinalStep: step.isFinalStep || false
-    };
-    
-    setSelectedStep(stepData);
+  const handleDeleteStep = (step: Step) => {
+    setSelectedStep(step);
     setDeleteDialogOpen(true);
   };
 
@@ -140,7 +128,7 @@ export default function CircuitStepsPage() {
 
   const handleSelectAll = (selected: boolean) => {
     if (selected) {
-      const allIds = filteredSteps.map(step => step.id);
+      const allIds = convertedSteps.map(step => step.id);
       setSelectedSteps(allIds);
     } else {
       setSelectedSteps([]);
@@ -255,19 +243,10 @@ export default function CircuitStepsPage() {
           />
         </CardHeader>
         <CardContent className="p-0">
-          {filteredSteps.length > 0 ? (
+          {convertedSteps.length > 0 ? (
             viewMode === 'table' ? (
               <StepTable 
-                steps={filteredSteps.map(detail => ({
-                  id: detail.id,
-                  stepKey: detail.circuitDetailKey,
-                  circuitId: detail.circuitId,
-                  title: detail.title,
-                  descriptif: detail.descriptif || '',
-                  orderIndex: detail.orderIndex,
-                  responsibleRoleId: detail.responsibleRoleId,
-                  isFinalStep: detail.isFinalStep || false
-                }))}
+                steps={convertedSteps}
                 selectedSteps={selectedSteps}
                 onSelectStep={handleStepSelection}
                 onSelectAll={handleSelectAll}
@@ -277,7 +256,7 @@ export default function CircuitStepsPage() {
               />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-                {filteredSteps.map(step => (
+                {convertedSteps.map(step => (
                   <div 
                     key={step.id}
                     className="bg-blue-900/20 border border-blue-800/30 rounded-lg p-4 hover:bg-blue-900/30 transition-colors"
@@ -285,7 +264,7 @@ export default function CircuitStepsPage() {
                   >
                     <h3 className="text-lg font-medium text-blue-200">{step.title}</h3>
                     <p className="text-blue-300/70 text-sm mt-1 line-clamp-2">{step.descriptif || 'No description'}</p>
-                    <div className="text-xs font-mono text-blue-400 mt-2">{step.circuitDetailKey}</div>
+                    <div className="text-xs font-mono text-blue-400 mt-2">{step.stepKey}</div>
                     <div className="flex justify-between items-center mt-3">
                       <div>Step {step.orderIndex + 1}</div>
                       <div className="flex gap-2">

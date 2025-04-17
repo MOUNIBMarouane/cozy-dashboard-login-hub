@@ -130,8 +130,8 @@ const StepsManagement = () => {
                       selectedSteps={selectedSteps}
                       onSelectStep={handleSelectStep}
                       onSelectAll={handleSelectAll}
-                      onDeleteStep={openDeleteDialog}
-                      onEditStep={handleEditStep}
+                      onDelete={openDeleteDialog}
+                      onEdit={handleEditStep}
                       onSort={handleSort}
                       sortField={sortField}
                       sortDirection={sortDirection}
@@ -174,6 +174,8 @@ const StepsManagement = () => {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDelete}
+        step={stepToDelete}
+        onSuccess={refetch}
       />
 
       <DeleteStepDialog
@@ -182,6 +184,7 @@ const StepsManagement = () => {
         onConfirm={handleBulkDelete}
         isBulk={true}
         count={selectedSteps.length}
+        onSuccess={refetch}
       />
 
       <BulkActionBar
