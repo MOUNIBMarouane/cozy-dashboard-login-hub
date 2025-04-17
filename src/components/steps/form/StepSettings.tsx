@@ -44,8 +44,8 @@ export const StepSettings = () => {
 
   // Update the parent form data when form values change
   const handleRoleChange = (value: string) => {
-    const roleId = value === '' ? undefined : parseInt(value, 10);
-    form.setValue('responsibleRoleId', roleId || null);
+    const roleId = value === "null" ? null : parseInt(value, 10);
+    form.setValue('responsibleRoleId', roleId);
     setFormData({ responsibleRoleId: roleId });
   };
 
@@ -72,7 +72,7 @@ export const StepSettings = () => {
             <FormItem>
               <FormLabel>Responsible Role</FormLabel>
               <Select
-                value={field.value?.toString() || ''}
+                value={field.value?.toString() || "null"}
                 onValueChange={handleRoleChange}
               >
                 <FormControl>
@@ -81,7 +81,8 @@ export const StepSettings = () => {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="">No specific role</SelectItem>
+                  {/* Key fix: Use "null" instead of empty string for clearing the selection */}
+                  <SelectItem value="null">No specific role</SelectItem>
                   {roles.map((role) => (
                     <SelectItem key={role.id} value={role.id.toString()}>
                       {role.roleName}
