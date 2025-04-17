@@ -24,10 +24,10 @@ export const MultiStepStepForm = ({ onCancel }: MultiStepStepFormProps) => {
   };
   
   return (
-    <div className="w-full max-w-full mx-auto px-4 sm:px-6">
+    <div className="w-full max-w-full mx-auto px-3 sm:px-4">
       <StepFormProgress currentStep={currentStep} totalSteps={totalSteps} />
       
-      <div className="py-4">
+      <div className="py-3">
         {renderStepContent()}
       </div>
       

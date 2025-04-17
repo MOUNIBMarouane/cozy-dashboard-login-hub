@@ -11,33 +11,33 @@ export const StepFormProgress = ({ currentStep, totalSteps }: StepFormProgressPr
   const steps = Array.from({ length: totalSteps }, (_, i) => i + 1);
 
   return (
-    <div className="mb-8">
+    <div className="mb-5">
       {/* Step indicators */}
-      <div className="flex justify-center items-center mb-4">
+      <div className="flex justify-center items-center mb-3">
         {steps.map((step) => (
           <div
             key={step}
             className="flex items-center"
           >
             <div
-              className={`flex items-center justify-center h-10 w-10 rounded-full transition-all duration-300
+              className={`flex items-center justify-center h-8 w-8 rounded-full transition-all duration-300
                 ${step === currentStep
-                  ? 'bg-blue-600 text-white ring-4 ring-blue-600/20 shadow-lg'
+                  ? 'bg-blue-600 text-white ring-2 ring-blue-600/20 shadow-md'
                   : step < currentStep
-                  ? 'bg-blue-600 text-white border-2 border-blue-500'
+                  ? 'bg-blue-600 text-white border border-blue-500'
                   : 'bg-gray-800/70 text-gray-400 border border-gray-700'
                 }`}
             >
               {step < currentStep ? (
-                <CheckCircle className="h-5 w-5 text-white" />
+                <CheckCircle className="h-4 w-4 text-white" />
               ) : (
-                <span className="text-sm font-medium">{step}</span>
+                <span className="text-xs font-medium">{step}</span>
               )}
             </div>
             
             {step !== steps.length && (
               <div
-                className={`h-[2px] w-8 sm:w-12 md:w-16 transition-all duration-300
+                className={`h-[2px] w-6 sm:w-8 md:w-12 transition-all duration-300
                   ${step < currentStep ? 'bg-blue-600' : 'bg-gray-700'}`}
               />
             )}
@@ -46,10 +46,10 @@ export const StepFormProgress = ({ currentStep, totalSteps }: StepFormProgressPr
       </div>
       
       {/* Step title */}
-      <p className="text-center text-lg font-medium text-blue-300 mb-2">
+      <p className="text-center text-base font-medium text-blue-300 mb-1">
         {currentStep === 1 ? "Step Details" : "Review Step"}
       </p>
-      <p className="text-center text-sm text-gray-400">
+      <p className="text-center text-xs text-gray-400">
         {currentStep === 1 
           ? "Enter the basic information for your step" 
           : "Review your step before creating it"}

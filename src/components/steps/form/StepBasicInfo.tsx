@@ -38,25 +38,25 @@ export const StepBasicInfo = () => {
   };
 
   return (
-    <Card className="border border-blue-900/30 bg-gradient-to-b from-[#0a1033] to-[#0d1541] shadow-xl rounded-xl">
-      <CardContent className="pt-6">
+    <Card className="border border-blue-900/30 bg-gradient-to-b from-[#0a1033] to-[#0d1541] shadow-md rounded-lg">
+      <CardContent className="p-4">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-300 font-medium">Step Title</FormLabel>
+                <FormItem className="space-y-1.5">
+                  <FormLabel className="text-gray-300 text-sm font-medium">Step Title</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="Enter step title" 
                       {...field} 
                       onChange={(e) => handleChange('title', e.target.value)}
-                      className="bg-[#0d1541]/70 border-blue-900/50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-white rounded-md"
+                      className="bg-[#0d1541]/70 border-blue-900/50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-white rounded-md h-9 text-sm"
                     />
                   </FormControl>
-                  <FormMessage className="text-red-400" />
+                  <FormMessage className="text-red-400 text-xs" />
                 </FormItem>
               )}
             />
@@ -65,18 +65,18 @@ export const StepBasicInfo = () => {
               control={form.control}
               name="descriptif"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-300 font-medium">Description</FormLabel>
+                <FormItem className="space-y-1.5">
+                  <FormLabel className="text-gray-300 text-sm font-medium">Description</FormLabel>
                   <FormControl>
                     <Textarea 
                       placeholder="Enter step description" 
                       {...field} 
-                      rows={5}
+                      rows={4}
                       onChange={(e) => handleChange('descriptif', e.target.value)}
-                      className="bg-[#0d1541]/70 border-blue-900/50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-white rounded-md resize-none"
+                      className="bg-[#0d1541]/70 border-blue-900/50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-white rounded-md resize-none text-sm min-h-[80px]"
                     />
                   </FormControl>
-                  <FormMessage className="text-red-400" />
+                  <FormMessage className="text-red-400 text-xs" />
                 </FormItem>
               )}
             />
