@@ -38,12 +38,12 @@ export const StepFormDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] bg-background">
+      <DialogContent className="sm:max-w-[800px] bg-[#070b28] border-blue-900/30 backdrop-blur-md">
         <DialogHeader>
-          <DialogTitle className="text-xl">
+          <DialogTitle className="text-xl text-white">
             {editStep ? 'Edit Step' : 'Create New Step'}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-blue-300">
             {editStep
               ? "Update this step's details"
               : contextCircuitId 

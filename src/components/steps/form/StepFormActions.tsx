@@ -43,6 +43,7 @@ export const StepFormActions = ({ onCancel }: StepFormActionsProps) => {
         type="button"
         variant="outline"
         onClick={isFirstStep ? onCancel : handlePrev}
+        className="bg-transparent border-blue-800 hover:bg-blue-900/30 text-gray-300"
       >
         {isFirstStep ? 'Cancel' : (
           <>
@@ -56,6 +57,7 @@ export const StepFormActions = ({ onCancel }: StepFormActionsProps) => {
         type="button"
         onClick={handleSubmit}
         disabled={isSubmitting}
+        className="bg-blue-600 hover:bg-blue-700 text-white"
       >
         {isSubmitting ? (
           <>

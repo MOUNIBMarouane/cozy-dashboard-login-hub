@@ -1,5 +1,5 @@
 
-import { CircleCheck, CircleDashed } from 'lucide-react';
+import { CheckCircle, Circle } from 'lucide-react';
 import { useStepForm } from './StepFormProvider';
 
 interface StepFormProgressProps {
@@ -8,81 +8,47 @@ interface StepFormProgressProps {
 }
 
 export const StepFormProgress = ({ currentStep, totalSteps }: StepFormProgressProps) => {
-  const { isWithinCircuitContext } = useStepForm();
   const steps = Array.from({ length: totalSteps }, (_, i) => i + 1);
 
   return (
-    <div className="flex flex-wrap justify-center mt-2 mb-6">
-      <div className="flex justify-center items-center space-x-2">
+    <div className="mb-8">
+      {/* Step indicators */}
+      <div className="flex justify-center items-center mb-4">
         {steps.map((step) => (
           <div
             key={step}
-            className={`flex items-center ${
-              step !== steps.length ? 'mr-6' : ''
-            }`}
+            className="flex items-center"
           >
             <div
-              className={`flex items-center justify-center h-8 w-8 rounded-full border ${
-                step <= currentStep
-                  ? 'bg-blue-600 border-blue-600 text-white'
-                  : 'bg-transparent border-gray-300 text-gray-300'
-              }`}
+              className={`flex items-center justify-center h-10 w-10 rounded-full 
+                ${step <= currentStep
+                  ? 'bg-blue-600 text-white ring-4 ring-blue-600/20'
+                  : step < currentStep
+                  ? 'bg-blue-600/20 text-blue-600 border-2 border-blue-600'
+                  : 'bg-gray-800 text-gray-400 border border-gray-700'
+                }`}
             >
               {step < currentStep ? (
-                <CircleCheck className="h-6 w-6" />
-              ) : step === currentStep ? (
-                <span>{step}</span>
+                <CheckCircle className="h-6 w-6" />
               ) : (
-                <CircleDashed className="h-6 w-6" />
+                <span>{step}</span>
               )}
             </div>
             
             {step !== steps.length && (
               <div
-                className={`hidden sm:block h-px w-12 ml-2 ${
-                  step < currentStep ? 'bg-blue-600' : 'bg-gray-300'
-                }`}
+                className={`h-[2px] w-12 transition-colors
+                  ${step < currentStep ? 'bg-blue-600' : 'bg-gray-700'}`}
               />
             )}
           </div>
         ))}
       </div>
       
-      <div className="w-full flex justify-center text-center mt-2">
-        <p className="text-sm text-muted-foreground">
-          Step {currentStep}: {getStepTitle(currentStep, isWithinCircuitContext)}
-        </p>
-      </div>
+      {/* Step title */}
+      <p className="text-center text-base font-medium text-gray-300">
+        {currentStep === 1 ? "Step Details" : "Review Step"}
+      </p>
     </div>
   );
 };
-
-function getStepTitle(step: number, isWithinCircuitContext: boolean): string {
-  if (isWithinCircuitContext) {
-    // Titles when in circuit context (3 steps)
-    switch (step) {
-      case 1:
-        return 'Basic Information';
-      case 2:
-        return 'Step Settings';
-      case 3:
-        return 'Review';
-      default:
-        return '';
-    }
-  } else {
-    // Titles for standard flow (4 steps)
-    switch (step) {
-      case 1:
-        return 'Basic Information';
-      case 2:
-        return 'Circuit Assignment';
-      case 3:
-        return 'Step Settings';
-      case 4:
-        return 'Review';
-      default:
-        return '';
-    }
-  }
-}

@@ -24,7 +24,6 @@ interface StepFormContextType {
   isSubmitting: boolean;
   isEditMode: boolean;
   stepId?: number;
-  isWithinCircuitContext: boolean;
   totalSteps: number;
 }
 
@@ -51,7 +50,7 @@ interface StepFormProviderProps {
   children: React.ReactNode;
   editStep?: Step;
   onSuccess?: () => void;
-  circuitId?: number; // Add circuitId prop for when form is used within a circuit page
+  circuitId?: number;
 }
 
 export const StepFormProvider: React.FC<StepFormProviderProps> = ({ 
@@ -65,7 +64,6 @@ export const StepFormProvider: React.FC<StepFormProviderProps> = ({
   
   // Determine if we're within a circuit context (either from props or URL params)
   const contextCircuitId = propCircuitId || (urlCircuitId ? parseInt(urlCircuitId, 10) : undefined);
-  const isWithinCircuitContext = !!contextCircuitId;
   
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -92,8 +90,8 @@ export const StepFormProvider: React.FC<StepFormProviderProps> = ({
     return initialFormData;
   });
 
-  // Calculate total steps based on whether we're in a circuit context
-  const totalSteps = isWithinCircuitContext ? 3 : 4; // Skip circuit selection if in circuit context
+  // We now have a simplified 2-step process
+  const totalSteps = 2;
   
   const isEditMode = !!editStep;
 
@@ -164,7 +162,6 @@ export const StepFormProvider: React.FC<StepFormProviderProps> = ({
         isSubmitting,
         isEditMode,
         stepId: editStep?.id,
-        isWithinCircuitContext,
         totalSteps,
       }}
     >
