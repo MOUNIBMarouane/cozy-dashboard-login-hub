@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { DocumentType } from '@/models/document';
@@ -9,7 +8,6 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerDescription,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import documentService from '@/services/documentService';
@@ -113,23 +111,23 @@ const DocumentTypesManagement = () => {
         onNewTypeClick={() => setIsDrawerOpen(true)}
       />
 
-      <div className="flex-1 overflow-hidden px-4 md:px-6 py-4">
+      <div className="flex-1 overflow-hidden px-3 md:px-6 py-3">
         {isLoading ? (
           <LoadingState />
         ) : types.length > 0 ? (
           <Card className="bg-[#0f1642] border-blue-900/30 shadow-xl h-full flex flex-col">
-            <CardHeader className="pb-0">
+            <CardHeader className="py-3 px-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
-                  <CardTitle className="text-xl text-white">Document Types</CardTitle>
-                  <CardDescription className="text-blue-300">
+                  <CardTitle className="text-lg text-white">Document Types</CardTitle>
+                  <CardDescription className="text-sm text-blue-300">
                     {filteredAndSortedTypes.length} {filteredAndSortedTypes.length === 1 ? 'type' : 'types'} {searchQuery ? 'found' : 'available'}
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-0 mt-4 flex-1 overflow-hidden">
-              <ScrollArea className="h-[calc(100vh-260px)]">
+            <CardContent className="p-0 flex-1 overflow-hidden">
+              <ScrollArea className="h-[calc(100vh-230px)]">
                 {viewMode === 'table' ? (
                   <DocumentTypeTable 
                     types={types}
@@ -168,19 +166,19 @@ const DocumentTypesManagement = () => {
       </div>
 
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-        <DrawerContent className="bg-[#111633] p-6 max-w-lg mx-auto">
-          <DrawerHeader className="text-center pb-6">
-            <DrawerTitle className="text-2xl font-bold text-white">
+        <DrawerContent className="bg-[#111633] p-4 sm:p-6 max-w-md mx-auto rounded-t-xl">
+          <DrawerHeader className="text-center pb-4 px-0">
+            <DrawerTitle className="text-xl font-bold text-white">
               {isEditMode ? 'Edit Document Type' : 'Create Document Type'}
             </DrawerTitle>
-            <DrawerDescription className="mt-2 text-blue-300">
+            <DrawerDescription className="text-sm text-blue-300">
               {isEditMode 
                 ? 'Modify an existing document type' 
                 : 'Create a new document type for your organization'}
             </DrawerDescription>
           </DrawerHeader>
       
-          <div className="px-1">
+          <div className="px-0">
             <DocumentTypeForm
               documentType={currentType}
               isEditMode={isEditMode}

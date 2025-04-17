@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { ArrowLeft, Check } from 'lucide-react';
 import { Form } from '@/components/ui/form';
 import documentService from '@/services/documentService';
 import { DocumentType } from '@/models/document';
@@ -124,11 +125,35 @@ export const DocumentTypeForm = ({
   };
 
   return (
-    <div className="space-y-8 w-full max-w-md mx-auto">
+    <div className="space-y-4 w-full max-w-md mx-auto">
+      {step === 1 && !isEditMode && (
+        <div className="flex items-center text-blue-400 text-sm mb-2 cursor-pointer" onClick={handleCancel}>
+          <ArrowLeft className="h-3.5 w-3.5 mr-1" />
+          <span>Back</span>
+        </div>
+      )}
+      
       {!isEditMode && <StepIndicator currentStep={step} />}
 
+      <div className="mb-3">
+        <h3 className="text-lg font-medium text-white">
+          {isEditMode 
+            ? 'Edit Document Type' 
+            : step === 1 
+              ? 'Type Name' 
+              : 'Type Details'}
+        </h3>
+        <p className="text-xs text-blue-300 mt-1">
+          {isEditMode 
+            ? 'Update document type details'
+            : step === 1 
+              ? 'Create a unique name for this document type' 
+              : 'Add additional attributes for this document type'}
+        </p>
+      </div>
+
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           {step === 1 && (
             <TypeNameStep
               control={form.control}

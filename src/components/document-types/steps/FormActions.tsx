@@ -1,6 +1,6 @@
 
-import { ChevronRight } from 'lucide-react';
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Loader2, Save } from 'lucide-react';
 
 interface FormActionsProps {
   step: number;
@@ -9,8 +9,8 @@ interface FormActionsProps {
   onPrev: () => void;
   onSubmit: () => void;
   onCancel: () => void;
-  isNextDisabled?: boolean;
-  isValidating?: boolean;
+  isNextDisabled: boolean;
+  isValidating: boolean;
 }
 
 export const FormActions = ({
@@ -21,43 +21,48 @@ export const FormActions = ({
   onSubmit,
   onCancel,
   isNextDisabled,
-  isValidating
+  isValidating,
 }: FormActionsProps) => {
+  const isFirstStep = step === 1;
+  const isLastStep = step === 2;
+
   return (
-    <div className="pt-4">
-      {step === 1 && !isEditMode ? (
-        <Button 
-          onClick={onNext}
-          disabled={isNextDisabled || isValidating}
-          className="w-full h-11 text-base bg-blue-600 hover:bg-blue-700 transition-colors"
-        >
-          Next <ChevronRight className="ml-2 h-5 w-5" />
-        </Button>
-      ) : (
-        <div className="flex flex-col gap-3">
-          <Button 
-            onClick={onSubmit}
-            className="w-full h-11 text-base bg-green-600 hover:bg-green-700 transition-colors"
-          >
-            {isEditMode ? 'Update Type' : 'Create Type'}
-          </Button>
-          {!isEditMode && (
-            <Button 
-              variant="outline" 
-              onClick={onPrev}
-              className="w-full h-11 text-base border-blue-800/50 bg-blue-900/10 hover:bg-blue-900/20"
-            >
-              Back
-            </Button>
-          )}
-        </div>
-      )}
-      <Button 
-        variant="outline" 
-        onClick={onCancel}
-        className="w-full h-10 text-sm mt-3 border-blue-800/50 bg-blue-900/10 hover:bg-blue-900/20"
+    <div className="flex justify-between gap-2 mt-6">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={isFirstStep ? onCancel : onPrev}
+        className="h-8 text-xs bg-transparent border-blue-800/50 hover:bg-blue-900/30 text-gray-300"
+        size="sm"
       >
-        Cancel
+        {isFirstStep ? 'Cancel' : (
+          <>
+            <ArrowLeft className="mr-1 h-3 w-3" />
+            Back
+          </>
+        )}
+      </Button>
+
+      <Button
+        type="button"
+        onClick={isLastStep || isEditMode ? onSubmit : onNext}
+        disabled={isNextDisabled || isValidating}
+        className="h-8 text-xs bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white"
+        size="sm"
+      >
+        {isValidating ? (
+          <>
+            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+            Validating...
+          </>
+        ) : isLastStep || isEditMode ? (
+          <>
+            <Save className="mr-1 h-3 w-3" />
+            {isEditMode ? 'Update Type' : 'Create Type'}
+          </>
+        ) : (
+          'Continue'
+        )}
       </Button>
     </div>
   );

@@ -14,16 +14,16 @@ export const TypeDetailsStep = ({ control }: TypeDetailsStepProps) => {
         control={control}
         name="typeName"
         render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-base text-blue-100">Type Name*</FormLabel>
+          <FormItem className="mb-3">
+            <FormLabel className="text-sm text-blue-100">Type Name*</FormLabel>
             <FormControl>
               <Input 
                 {...field} 
                 placeholder="Enter document type name" 
-                className="h-11 text-base bg-[#0A0E2E] border-blue-900/40 focus:border-blue-500"
+                className="h-9 text-sm bg-[#0A0E2E] border-blue-900/40 focus:border-blue-500"
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-xs" />
           </FormItem>
         )}
       />
@@ -33,18 +33,18 @@ export const TypeDetailsStep = ({ control }: TypeDetailsStepProps) => {
         name="typeAttr"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-base text-blue-100">Type Attributes (Optional)</FormLabel>
+            <FormLabel className="text-sm text-blue-100">Type Attributes (Optional)</FormLabel>
             <FormControl>
               <Input 
                 {...field} 
                 placeholder="Enter attributes (optional)" 
-                className="h-11 text-base bg-[#0A0E2E] border-blue-900/40 focus:border-blue-500"
+                className="h-9 text-sm bg-[#0A0E2E] border-blue-900/40 focus:border-blue-500"
               />
             </FormControl>
-            <FormDescription className="text-blue-300/70">
+            <FormDescription className="text-xs text-blue-300/70">
               Additional attributes for this document type
             </FormDescription>
-            <FormMessage />
+            <FormMessage className="text-xs" />
           </FormItem>
         )}
       />
