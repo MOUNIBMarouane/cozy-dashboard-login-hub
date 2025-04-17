@@ -13,7 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { DocumentStatus } from '@/models/documentCircuit';
-import circuitService from '@/services/circuitService';
+import statusService from '@/services/statusService';
 
 interface EditStepStatusDialogProps {
   open: boolean;
@@ -43,12 +43,12 @@ export function EditStepStatusDialog({
 
     setIsSubmitting(true);
     try {
-      await circuitService.completeStatus({
+      await statusService.completeStatus(
         documentId,
-        statusId: status.statusId,
+        status.statusId,
         isComplete,
-        comments: `Status '${title}' marked as ${isComplete ? 'complete' : 'incomplete'}`
-      });
+        `Status '${title}' marked as ${isComplete ? 'complete' : 'incomplete'}`
+      );
 
       toast.success('Status updated successfully');
       onSuccess();

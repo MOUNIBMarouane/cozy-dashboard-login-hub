@@ -1,7 +1,24 @@
 
 import { api } from './api';
-import { Circuit, Step, CreateCircuitDto, CreateStepDto, StepOrderUpdateDto } from '@/models/circuit';
+import { 
+  Circuit, 
+  Step, 
+  CreateCircuitDto, 
+  CreateStepDto, 
+  StepOrderUpdateDto,
+  UpdateStepDto 
+} from '@/models/circuit';
 import { Status } from '@/models/status';
+import { 
+  DocumentWorkflowStatus, 
+  DocumentHistoryDto, 
+  AssignCircuitDto, 
+  PerformActionDto,
+  PendingDocumentDto,
+  MoveNextDto,
+  ReturnToPreviousDto,
+  CompleteStatusDto
+} from '@/models/documentCircuit';
 
 class CircuitService {
   async getAllCircuits(): Promise<Circuit[]> {
@@ -43,6 +60,77 @@ class CircuitService {
 
   async getStatusesForStep(stepId: number): Promise<Status[]> {
     const response = await api.get(`/api/Status/step/${stepId}`);
+    return response.data;
+  }
+
+  // Add the missing methods
+  async getCircuitDetailsByCircuitId(circuitId: number): Promise<any[]> {
+    const response = await api.get(`/api/Circuit/${circuitId}`);
+    return response.data.steps || [];
+  }
+
+  async getDocumentCircuitHistory(documentId: number): Promise<DocumentHistoryDto[]> {
+    const response = await api.get(`/api/Workflow/document/${documentId}/history`);
+    return response.data;
+  }
+
+  async getDocumentCurrentStatus(documentId: number): Promise<DocumentWorkflowStatus> {
+    const response = await api.get(`/api/Workflow/document/${documentId}/current-status`);
+    return response.data;
+  }
+
+  async assignDocumentToCircuit(request: AssignCircuitDto): Promise<void> {
+    await api.post('/api/Workflow/assign-circuit', request);
+  }
+
+  async performAction(request: PerformActionDto): Promise<void> {
+    await api.post('/api/Workflow/perform-action', request);
+  }
+
+  async moveDocumentToNextStep(request: MoveNextDto): Promise<void> {
+    await api.post('/api/Workflow/move-next', request);
+  }
+
+  async moveDocumentToStep(request: ReturnToPreviousDto): Promise<void> {
+    await api.post('/api/Workflow/return-to-previous', request);
+  }
+
+  async completeStatus(request: CompleteStatusDto): Promise<void> {
+    await api.post('/api/Workflow/complete-status', request);
+  }
+
+  async getPendingApprovals(): Promise<PendingDocumentDto[]> {
+    const response = await api.get('/api/Workflow/pending-documents');
+    return response.data;
+  }
+
+  async createCircuitDetail(detail: any): Promise<any> {
+    return this.addStepToCircuit(detail.circuitId, {
+      title: detail.title,
+      descriptif: detail.descriptif || '',
+      orderIndex: detail.orderIndex,
+      responsibleRoleId: detail.responsibleRoleId,
+    });
+  }
+
+  async updateCircuitDetail(id: number, detail: any): Promise<void> {
+    // Since we don't have a direct endpoint for updating circuit details,
+    // we'll use the updateStep endpoint
+    await api.put(`/api/Step/${id}`, {
+      title: detail.title,
+      descriptif: detail.descriptif || '',
+      orderIndex: detail.orderIndex,
+      responsibleRoleId: detail.responsibleRoleId,
+    });
+  }
+
+  async deleteCircuitDetail(id: number): Promise<void> {
+    // Since a circuit detail is a step, we'll delete the step
+    await api.delete(`/api/Step/${id}`);
+  }
+
+  async getStepStatuses(documentId: number): Promise<any[]> {
+    const response = await api.get(`/api/Workflow/document/${documentId}/step-statuses`);
     return response.data;
   }
 }

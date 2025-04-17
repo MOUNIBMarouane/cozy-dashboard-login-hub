@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import documentService from '@/services/documentService';
 import circuitService from '@/services/circuitService';
 import { Document } from '@/models/document';
-import { DocumentWorkflowStatus, DocumentCircuitHistory } from '@/models/documentCircuit';
+import { DocumentWorkflowStatus, DocumentHistoryDto } from '@/models/documentCircuit';
 
 type DialogType = 'move' | 'process' | 'nextStep';
 

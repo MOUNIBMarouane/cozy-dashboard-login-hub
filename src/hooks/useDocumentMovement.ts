@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import circuitService from '@/services/circuitService';
+import { MoveNextDto, ReturnToPreviousDto } from '@/models/documentCircuit';
 
 interface UseDocumentMovementProps {
   onMoveSuccess?: () => void;
@@ -41,19 +42,21 @@ export function useDocumentMovement({ onMoveSuccess }: UseDocumentMovementProps 
       
       if (isMovingForward) {
         // Moving forward - use move-next endpoint
-        await circuitService.moveDocumentToNextStep({
+        const moveNextRequest: MoveNextDto = {
           documentId,
           currentStepId,
           nextStepId: targetStepId,
           comments: comments || `Moved document to next step #${targetStepId}`
-        });
+        };
+        await circuitService.moveDocumentToNextStep(moveNextRequest);
         toast.success('Document moved to next step successfully');
       } else if (isMovingBackward) {
         // Moving backward - use return-to-previous endpoint
-        await circuitService.moveDocumentToStep({
+        const moveBackRequest: ReturnToPreviousDto = {
           documentId,
-          circuitDetailId: targetStepId,
-        });
+          comments: comments || `Returned document to previous step #${targetStepId}`
+        };
+        await circuitService.moveDocumentToStep(moveBackRequest);
         toast.success('Document returned to previous step successfully');
       } else {
         throw new Error("Could not determine direction of movement");
