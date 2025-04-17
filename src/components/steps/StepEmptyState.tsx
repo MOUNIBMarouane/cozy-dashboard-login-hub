@@ -4,9 +4,17 @@ import { Plus } from 'lucide-react';
 
 interface StepEmptyStateProps {
   onAddStep: () => void;
+  title?: string;
+  description?: string;
+  showAddButton?: boolean;
 }
 
-export const StepEmptyState = ({ onAddStep }: StepEmptyStateProps) => {
+export const StepEmptyState = ({ 
+  onAddStep, 
+  title = "No Steps Found", 
+  description = "You haven't created any steps yet. Steps are essential parts of circuits that define the workflow process.", 
+  showAddButton = true 
+}: StepEmptyStateProps) => {
   return (
     <div className="flex flex-col items-center justify-center bg-muted/30 border border-dashed border-blue-900/30 rounded-lg p-8 h-96">
       <div className="flex h-20 w-20 items-center justify-center rounded-full bg-background">
@@ -25,18 +33,19 @@ export const StepEmptyState = ({ onAddStep }: StepEmptyStateProps) => {
           />
         </svg>
       </div>
-      <h3 className="mt-4 text-lg font-medium">No Steps Found</h3>
+      <h3 className="mt-4 text-lg font-medium">{title}</h3>
       <p className="mt-1 text-sm text-muted-foreground text-center max-w-sm">
-        You haven't created any steps yet. Steps are essential parts of circuits
-        that define the workflow process.
+        {description}
       </p>
-      <Button
-        onClick={onAddStep}
-        className="mt-6 bg-blue-600 hover:bg-blue-700"
-      >
-        <Plus className="mr-2 h-4 w-4" />
-        Create Step
-      </Button>
+      {showAddButton && (
+        <Button
+          onClick={onAddStep}
+          className="mt-6 bg-blue-600 hover:bg-blue-700"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Create Step
+        </Button>
+      )}
     </div>
   );
 };

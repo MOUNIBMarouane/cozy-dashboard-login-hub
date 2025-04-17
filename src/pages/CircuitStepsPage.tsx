@@ -308,8 +308,6 @@ export default function CircuitStepsPage() {
             )
           ) : (
             <StepEmptyState 
-              title="No steps found"
-              description={searchQuery ? "Try adjusting your search query" : "Add a step to get started"}
               onAddStep={handleAddStep}
               showAddButton={!isSimpleUser}
             />
