@@ -38,17 +38,17 @@ export const StepFormActions = ({ onCancel }: StepFormActionsProps) => {
   };
 
   return (
-    <div className="flex justify-between mt-4 gap-2">
+    <div className="flex justify-between mt-3 gap-2">
       <Button
         type="button"
         variant="outline"
         onClick={isFirstStep ? onCancel : handlePrev}
-        className="flex-1 sm:flex-none px-3 text-sm bg-transparent border-blue-800/50 hover:bg-blue-900/30 text-gray-300 shadow-sm"
+        className="flex-1 sm:flex-none px-2 py-1 text-xs bg-transparent border-blue-800/50 hover:bg-blue-900/30 text-gray-300 shadow-sm h-8"
         size="sm"
       >
         {isFirstStep ? 'Cancel' : (
           <>
-            <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
+            <ArrowLeft className="mr-1 h-3 w-3" />
             Back
           </>
         )}
@@ -58,17 +58,17 @@ export const StepFormActions = ({ onCancel }: StepFormActionsProps) => {
         type="button"
         onClick={handleSubmit}
         disabled={isSubmitting}
-        className="flex-1 sm:flex-none px-4 text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-md"
+        className="flex-1 sm:flex-none px-3 py-1 text-xs bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-md h-8"
         size="sm"
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
             {isLastStep ? 'Saving...' : 'Processing...'}
           </>
         ) : isLastStep ? (
           <>
-            <Save className="mr-1.5 h-3.5 w-3.5" />
+            <Save className="mr-1 h-3 w-3" />
             {isEditMode ? 'Update Step' : 'Create Step'}
           </>
         ) : (
