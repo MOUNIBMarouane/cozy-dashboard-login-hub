@@ -77,7 +77,7 @@ export default function CircuitStepsPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container-fluid responsive-padding space-y-6">
       <CircuitStepsHeader 
         circuit={circuit} 
         onAddStep={handleAddStep} 

@@ -38,9 +38,9 @@ export const StepFormDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] bg-[#070b28] border-blue-900/30 backdrop-blur-md">
-        <DialogHeader>
-          <DialogTitle className="text-xl text-white">
+      <DialogContent className="sm:max-w-[700px] md:max-w-[800px] bg-[#070b28] border-blue-900/30 backdrop-blur-md shadow-xl rounded-xl">
+        <DialogHeader className="pb-2">
+          <DialogTitle className="text-xl text-white font-bold">
             {editStep ? 'Edit Step' : 'Create New Step'}
           </DialogTitle>
           <DialogDescription className="text-blue-300">

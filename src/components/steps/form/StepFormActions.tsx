@@ -1,5 +1,5 @@
 
-import { ArrowLeft, ArrowRight, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, Loader2, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useStepForm } from './StepFormProvider';
 
@@ -38,12 +38,12 @@ export const StepFormActions = ({ onCancel }: StepFormActionsProps) => {
   };
 
   return (
-    <div className="flex justify-between mt-6">
+    <div className="flex justify-between mt-6 gap-3">
       <Button
         type="button"
         variant="outline"
         onClick={isFirstStep ? onCancel : handlePrev}
-        className="bg-transparent border-blue-800 hover:bg-blue-900/30 text-gray-300"
+        className="flex-1 sm:flex-none px-4 bg-transparent border-blue-800/50 hover:bg-blue-900/30 text-gray-300 shadow-sm"
       >
         {isFirstStep ? 'Cancel' : (
           <>
@@ -57,7 +57,7 @@ export const StepFormActions = ({ onCancel }: StepFormActionsProps) => {
         type="button"
         onClick={handleSubmit}
         disabled={isSubmitting}
-        className="bg-blue-600 hover:bg-blue-700 text-white"
+        className="flex-1 sm:flex-none px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-md"
       >
         {isSubmitting ? (
           <>
@@ -67,13 +67,10 @@ export const StepFormActions = ({ onCancel }: StepFormActionsProps) => {
         ) : isLastStep ? (
           <>
             <Save className="mr-2 h-4 w-4" />
-            {isEditMode ? 'Update' : 'Create'}
+            {isEditMode ? 'Update Step' : 'Create Step'}
           </>
         ) : (
-          <>
-            Next
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </>
+          'Continue'
         )}
       </Button>
     </div>

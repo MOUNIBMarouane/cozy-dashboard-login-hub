@@ -41,7 +41,7 @@ export const StepsManagementDialogs = ({
         open={isFormDialogOpen}
         onOpenChange={setIsFormDialogOpen}
         onSuccess={onFormSuccess}
-        editStep={currentStep}
+        editStep={currentStep || undefined}
         circuitId={circuitId}
       />
 
