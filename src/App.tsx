@@ -26,6 +26,8 @@ import ViewDocument from "./pages/ViewDocument";
 import EditDocument from "./pages/EditDocument";
 import DocumentLignesPage from "./pages/DocumentLignesPage";
 import CircuitsPage from "./pages/Circuits";
+import CircuitStepsPage from "./pages/CircuitStepsPage";
+import StepStatusesPage from "./pages/StepStatusesPage";
 import CreateCircuit from "./pages/CreateCircuit";
 import PendingApprovalsPage from "./pages/PendingApprovals";
 import UserManagement from "./pages/UserManagement";
@@ -90,8 +92,10 @@ const App = () => (
                   <Route path="/documents/:id/lignes/:ligneId/souslignes" element={<ProtectedRoute requiresManagement><ViewDocument /></ProtectedRoute>} />
                   <Route path="/documents/:id/lignes/:ligneId/souslignes/:sousLigneId" element={<ViewDocument />} />
                   
-                  {/* Circuit Management routes - SimpleUsers can view circuits but not manage them */}
+                  {/* Circuit Management routes */}
                   <Route path="/circuits" element={<CircuitsPage />} />
+                  <Route path="/circuits/:circuitId/steps" element={<CircuitStepsPage />} />
+                  <Route path="/circuits/:circuitId/steps/:stepId/statuses" element={<StepStatusesPage />} />
                   <Route path="/create-circuit" element={<ProtectedRoute requiresManagement requiredRole={["Admin", "FullUser"]}><CreateCircuit /></ProtectedRoute>} />
                   <Route path="/pending-approvals" element={<PendingApprovalsPage />} />
                   
