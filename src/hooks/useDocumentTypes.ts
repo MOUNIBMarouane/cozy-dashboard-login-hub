@@ -4,14 +4,15 @@ import { toast } from 'sonner';
 import { DocumentType } from '@/models/document';
 import documentService from '@/services/documentService';
 
+// Import our new utilities
+import { useDocumentTypeFiltering } from './document-types/useDocumentTypeFiltering';
+import { useDocumentTypeSorting } from './document-types/useDocumentTypeSorting';
+import { useDocumentTypeSelection } from './document-types/useDocumentTypeSelection';
+import { useDocumentTypePagination } from './document-types/useDocumentTypePagination';
+
 export const useDocumentTypes = () => {
   const [types, setTypes] = useState<DocumentType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortField, setSortField] = useState<string | null>('typeName');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedTypes, setSelectedTypes] = useState<number[]>([]);
   const itemsPerPage = 10;
 
   const fetchTypes = async () => {
@@ -29,87 +30,22 @@ export const useDocumentTypes = () => {
 
   useEffect(() => {
     fetchTypes();
-  }, [currentPage]);
+  }, []);
 
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      const selectableTypeIds = filteredAndSortedTypes
-        .filter(type => type.documentCounter === 0)
-        .map(type => type.id!)
-        .filter(id => id !== undefined);
-      setSelectedTypes(selectableTypeIds);
-    } else {
-      setSelectedTypes([]);
-    }
-  };
-
-  const handleSelectType = (id: number, checked: boolean) => {
-    if (checked) {
-      setSelectedTypes(prev => [...prev, id]);
-    } else {
-      setSelectedTypes(prev => prev.filter(typeId => typeId !== id));
-    }
-  };
-
-  const filteredAndSortedTypes = useMemo(() => {
-    let filtered = [...types];
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(type => 
-        (type.typeKey?.toLowerCase().includes(query) || '') ||
-        (type.typeName?.toLowerCase().includes(query) || '') ||
-        (type.typeAttr?.toLowerCase().includes(query) || '')
-      );
-    }
-    
-    return [...filtered].sort((a, b) => {
-      if (!sortField) return 0;
-      
-      let valueA: any, valueB: any;
-      
-      switch(sortField) {
-        case 'typeKey':
-          valueA = a.typeKey || '';
-          valueB = b.typeKey || '';
-          break;
-        case 'typeName':
-          valueA = a.typeName || '';
-          valueB = b.typeName || '';
-          break;
-        case 'typeAttr':
-          valueA = a.typeAttr || '';
-          valueB = b.typeAttr || '';
-          break;
-        case 'documentCounter':
-          valueA = a.documentCounter || 0;
-          valueB = b.documentCounter || 0;
-          break;
-        default:
-          return 0;
-      }
-      
-      if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
-      if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }, [types, sortField, sortDirection, searchQuery]);
-
-  const paginatedTypes = useMemo(() => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    return filteredAndSortedTypes.slice(indexOfFirstItem, indexOfLastItem);
-  }, [filteredAndSortedTypes, currentPage, itemsPerPage]);
-
-  const totalPages = Math.ceil(filteredAndSortedTypes.length / itemsPerPage);
+  // Use our new utilities
+  const { searchQuery, setSearchQuery, filteredTypes } = useDocumentTypeFiltering(types);
+  const { sortField, sortDirection, handleSort, sortedTypes } = useDocumentTypeSorting(filteredTypes);
+  const { selectedTypes, handleSelectType, handleSelectAll } = useDocumentTypeSelection(sortedTypes);
+  
+  // Store the result of applying filtering and sorting for pagination and other operations
+  const filteredAndSortedTypes = useMemo(() => sortedTypes, [sortedTypes]);
+  
+  const { 
+    currentPage, 
+    setCurrentPage, 
+    paginatedTypes, 
+    totalPages 
+  } = useDocumentTypePagination(filteredAndSortedTypes, itemsPerPage);
 
   return {
     types: paginatedTypes,
