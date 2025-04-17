@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Circuit } from '@/models/circuit';
 import { CircuitListContentProps } from './CircuitListContent.props';
 import { CircuitEmptyState } from './CircuitEmptyState';
 import { CircuitLoadingState } from './CircuitLoadingState';
@@ -42,7 +41,7 @@ const CircuitListContent: React.FC<CircuitListContentProps> = ({
   }
 
   if (!circuits || circuits.length === 0) {
-    return <CircuitEmptyState searchQuery={searchQuery} />;
+    return <CircuitEmptyState searchQuery={searchQuery} isSimpleUser={isSimpleUser} />;
   }
 
   return (

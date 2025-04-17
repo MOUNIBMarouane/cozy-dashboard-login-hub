@@ -23,7 +23,7 @@ export interface DocumentWorkflowStatus {
   currentStepId?: number;
   currentStepTitle?: string;
   status: number;
-  statusText?: string;
+  statusText: string; // Changed from optional to required
   isCircuitCompleted: boolean;
   statuses?: DocumentStatus[];
   availableActions?: ActionDto[];
@@ -40,7 +40,7 @@ export interface DocumentHistoryDto {
   processedAt: string;
   comments: string;
   isApproved: boolean;
-  // Adding missing properties found in CircuitHistoryTimeline
+  // Added missing properties needed by other components
   circuitDetailTitle?: string;
   circuitDetail?: { title?: string };
   userName?: string;
@@ -90,7 +90,7 @@ export interface PendingDocumentDto {
   daysInCurrentStep: number;
 }
 
-// Add the missing DocumentCircuitHistory interface
+// Add the DocumentCircuitHistory interface needed by CircuitHistoryItem
 export interface DocumentCircuitHistory {
   id: number;
   documentId: number;

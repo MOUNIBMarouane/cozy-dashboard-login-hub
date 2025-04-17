@@ -3,12 +3,12 @@ export interface Circuit {
   id: number;
   circuitKey: string;
   title: string;
-  descriptif?: string;
+  descriptif: string;
   isActive: boolean;
   hasOrderedFlow: boolean;
   allowBacktrack?: boolean;
   steps?: Step[];
-  crdCounter?: number; // Add this field to match with circuit.d.ts
+  crdCounter?: number;
 }
 
 export interface Step {

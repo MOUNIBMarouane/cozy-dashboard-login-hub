@@ -1,13 +1,9 @@
 
 import { Badge } from '@/components/ui/badge';
+import { DocumentWorkflowStatus } from '@/models/documentCircuit';
 
 interface DocumentStatusCardProps {
-  workflowStatus: {
-    status: number;
-    statusText: string;
-    circuitTitle?: string;
-    currentStepTitle?: string;
-  };
+  workflowStatus: DocumentWorkflowStatus;
 }
 
 export function DocumentStatusCard({ workflowStatus }: DocumentStatusCardProps) {

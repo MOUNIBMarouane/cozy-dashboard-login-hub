@@ -1,87 +1,27 @@
 
-import { Edit, Trash2, FileText, Info } from 'lucide-react';
-import { toast } from 'sonner';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Link } from 'react-router-dom';
 
 interface CircuitListActionsProps {
-  circuit: Circuit;
-  isSimpleUser: boolean;
-  onEdit: (circuit: Circuit) => void;
-  onDelete: (circuit: Circuit) => void;
-  onViewDetails: (circuit: Circuit) => void;
+  searchQuery: string;
 }
 
-export function CircuitListActions({ 
-  circuit,
-  isSimpleUser,
-  onEdit,
-  onDelete,
-  onViewDetails
-}: CircuitListActionsProps) {
-  const handleEdit = () => {
-    if (isSimpleUser) {
-      toast.error('You do not have permission to edit circuits');
-      return;
-    }
-    onEdit(circuit);
-  };
-
-  const handleDelete = () => {
-    if (isSimpleUser) {
-      toast.error('You do not have permission to delete circuits');
-      return;
-    }
-    onDelete(circuit);
-  };
-
+export function CircuitListActions({ searchQuery }: CircuitListActionsProps) {
   return (
-    <div className="flex justify-end gap-1">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost" 
-            size="icon"
-            className="h-8 w-8 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-900/40"
-            onClick={() => onViewDetails(circuit)}
-          >
-            {isSimpleUser ? <Info className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>View details</TooltipContent>
-      </Tooltip>
-      
-      {!isSimpleUser && (
-        <>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-900/40"
-                onClick={handleEdit}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Edit circuit</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/30"
-                onClick={handleDelete}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Delete circuit</TooltipContent>
-          </Tooltip>
-        </>
+    <div className="flex items-center justify-between mb-4">
+      {searchQuery && (
+        <div className="text-sm text-blue-400">
+          Showing results for: <span className="font-medium">"{searchQuery}"</span>
+        </div>
       )}
+      <div className="ml-auto">
+        <Link to="/create-circuit">
+          <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
+            <Plus className="mr-2 h-4 w-4" /> New Circuit
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }
