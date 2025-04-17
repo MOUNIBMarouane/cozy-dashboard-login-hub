@@ -1,17 +1,8 @@
 
-import axios from 'axios';
+import api from './api/core';
 
-// Create axios instance with default configuration
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://192.168.1.94:5204/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  // Add reasonable timeout to prevent hanging requests
-  timeout: 15000, // 15 seconds timeout
-});
-
-// Add CORS headers to help prevent CORS issues
-api.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+// This file is kept for backward compatibility
+// but services should migrate to using the api/index.ts import
 
 export { api };
+export default api;

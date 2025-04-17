@@ -7,5 +7,5 @@ import { checkApiConnection } from './connectionCheck';
 setupInterceptors();
 
 // Export the api instance and utilities
-export { checkApiConnection };
+export { api, checkApiConnection };
 export default api;
