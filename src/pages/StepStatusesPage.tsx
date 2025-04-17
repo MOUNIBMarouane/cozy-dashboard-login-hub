@@ -11,6 +11,8 @@ import { StatusTable } from '@/components/statuses/StatusTable';
 import { StatusFormDialog } from '@/components/statuses/dialogs/StatusFormDialog';
 import { DeleteStatusDialog } from '@/components/statuses/dialogs/DeleteStatusDialog';
 import { useAuth } from '@/context/AuthContext';
+import { DocumentStatus } from '@/models/documentCircuit';
+import { useStepStatuses } from '@/hooks/useStepStatuses';
 
 export default function StepStatusesPage() {
   const { circuitId, stepId } = useParams<{ circuitId: string; stepId: string }>();
@@ -20,7 +22,7 @@ export default function StepStatusesPage() {
   const [apiError, setApiError] = useState('');
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<any | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<DocumentStatus | null>(null);
   
   // Fetch circuit details
   const { 
@@ -47,39 +49,25 @@ export default function StepStatusesPage() {
   // Find the current step
   const currentStep = steps.find(s => s.id === Number(stepId));
 
-  // Fetch statuses for the step
+  // Fetch statuses for the step using the updated approach
   const {
-    data: statuses = [],
+    statuses = [],
     isLoading: isStatusesLoading,
     isError: isStatusesError,
     refetch: refetchStatuses
-  } = useQuery({
-    queryKey: ['step-statuses', stepId],
-    queryFn: () => fetch(`/api/Status/step/${stepId}`).then(res => res.json()),
-    enabled: !!stepId,
-    meta: {
-      onSettled: (data, err) => {
-        if (err) {
-          const errorMessage = err instanceof Error 
-            ? err.message 
-            : 'Failed to load step statuses';
-          setApiError(errorMessage);
-        }
-      }
-    }
-  });
+  } = useStepStatuses(Number(stepId));
 
   const handleAddStatus = () => {
     setSelectedStatus(null);
     setFormDialogOpen(true);
   };
 
-  const handleEditStatus = (status: any) => {
+  const handleEditStatus = (status: DocumentStatus) => {
     setSelectedStatus(status);
     setFormDialogOpen(true);
   };
 
-  const handleDeleteStatus = (status: any) => {
+  const handleDeleteStatus = (status: DocumentStatus) => {
     setSelectedStatus(status);
     setDeleteDialogOpen(true);
   };

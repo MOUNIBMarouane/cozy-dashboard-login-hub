@@ -1,19 +1,21 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import circuitService from '@/services/circuitService';
+import stepService from '@/services/stepService';
 
 export function useCircuitSteps(circuitId: string) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSteps, setSelectedSteps] = useState<number[]>([]);
-  const [apiError, setApiError] = useState('');
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
-
-  // Fetch circuit details
-  const { 
+  const [apiError, setApiError] = useState('');
+  
+  // Fetch the circuit
+  const {
     data: circuit,
     isLoading: isCircuitLoading,
-    isError: isCircuitError
+    isError: isCircuitError,
+    error: circuitError
   } = useQuery({
     queryKey: ['circuit', circuitId],
     queryFn: () => circuitService.getCircuitById(Number(circuitId)),
@@ -23,93 +25,96 @@ export function useCircuitSteps(circuitId: string) {
         if (err) {
           const errorMessage = err instanceof Error 
             ? err.message 
-            : 'Failed to load circuit details';
+            : 'Failed to load circuit';
           setApiError(errorMessage);
         }
       }
     }
   });
-
-  // Fetch circuit steps
+  
+  // Fetch the steps for this circuit
   const {
-    data: steps = [],
+    data: circuitSteps = [],
     isLoading: isStepsLoading,
     isError: isStepsError,
+    error: stepsError,
     refetch: refetchSteps
   } = useQuery({
     queryKey: ['circuit-steps', circuitId],
-    queryFn: () => circuitService.getCircuitDetailsByCircuitId(Number(circuitId)),
-    enabled: !!circuitId,
+    queryFn: () => {
+      if (circuitId) {
+        return stepService.getStepsByCircuitId(Number(circuitId));
+      }
+      return Promise.resolve([]);
+    },
+    enabled: !!circuitId && !isCircuitError,
     meta: {
       onSettled: (data, err) => {
         if (err) {
           const errorMessage = err instanceof Error 
             ? err.message 
-            : 'Failed to load circuit steps';
+            : 'Failed to load steps';
           setApiError(errorMessage);
         }
       }
     }
   });
-
+  
   // Filter steps based on search query
-  const filteredSteps = steps.filter(step => 
-    step.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    step.circuitDetailKey.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    step.descriptif?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // Convert CircuitDetail to Step
-  const convertedSteps: Step[] = filteredSteps.map(detail => ({
-    id: detail.id,
-    stepKey: detail.circuitDetailKey,
-    circuitId: detail.circuitId,
-    title: detail.title,
-    descriptif: detail.descriptif || '',
-    orderIndex: detail.orderIndex,
-    responsibleRoleId: detail.responsibleRoleId,
-    isFinalStep: detail.isFinalStep || false
-  }));
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
+  const steps = circuitSteps?.filter(step => {
+    if (!searchQuery) return true;
+    
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    return (
+      step.title.toLowerCase().includes(lowerCaseQuery) ||
+      step.descriptif?.toLowerCase().includes(lowerCaseQuery) ||
+      step.stepKey.toLowerCase().includes(lowerCaseQuery)
+    );
+  }) || [];
+  
+  // Reset selections when changing circuits
+  useEffect(() => {
+    setSelectedSteps([]);
+  }, [circuitId]);
+  
+  // Handle step selection
+  const handleStepSelection = (id: number, checked: boolean) => {
+    setSelectedSteps(prev => {
+      if (checked) {
+        return [...prev, id];
+      } else {
+        return prev.filter(stepId => stepId !== id);
+      }
+    });
   };
-
-  const handleStepSelection = (stepId: number, selected: boolean) => {
-    if (selected) {
-      setSelectedSteps(prev => [...prev, stepId]);
-    } else {
-      setSelectedSteps(prev => prev.filter(id => id !== stepId));
-    }
-  };
-
-  const handleSelectAll = (selected: boolean) => {
-    if (selected) {
-      const allIds = convertedSteps.map(step => step.id);
-      setSelectedSteps(allIds);
+  
+  // Handle select all steps
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allStepIds = steps.map(step => step.id);
+      setSelectedSteps(allStepIds);
     } else {
       setSelectedSteps([]);
     }
   };
-
+  
   const isLoading = isCircuitLoading || isStepsLoading;
   const isError = isCircuitError || isStepsError;
-
+  
   return {
     circuit,
-    steps: convertedSteps,
+    steps,
     searchQuery,
     selectedSteps,
     apiError,
     viewMode,
     isLoading,
     isError,
-    setSearchQuery: handleSearch,
-    setSelectedSteps,
+    setSearchQuery,
     handleStepSelection,
     handleSelectAll,
-    setApiError,
     setViewMode,
+    setSelectedSteps,
     refetchSteps
   };
 }

@@ -1,10 +1,10 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import circuitService from '@/services/circuitService';
 import { DocumentStatus } from '@/models/documentCircuit';
+import api from '@/services/api';
 
-export function useStepStatuses(documentId: number | undefined) {
+export function useStepStatuses(stepId: number | undefined) {
   const { 
     data: statuses,
     isLoading,
@@ -12,9 +12,19 @@ export function useStepStatuses(documentId: number | undefined) {
     error,
     refetch
   } = useQuery({
-    queryKey: ['step-statuses', documentId],
-    queryFn: () => circuitService.getStepStatuses(documentId!),
-    enabled: !!documentId,
+    queryKey: ['step-statuses', stepId],
+    queryFn: async () => {
+      if (!stepId) throw new Error("Step ID is required");
+      
+      try {
+        const response = await api.get(`/Status/step/${stepId}`);
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching step statuses:", error);
+        throw new Error("Failed to load step statuses");
+      }
+    },
+    enabled: !!stepId,
     meta: {
       onSettled: (data, err) => {
         if (err) {

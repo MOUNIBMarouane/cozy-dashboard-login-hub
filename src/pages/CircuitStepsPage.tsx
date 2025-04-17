@@ -34,6 +34,7 @@ export default function CircuitStepsPage() {
     handleStepSelection,
     handleSelectAll,
     setViewMode,
+    setSelectedSteps,
     refetchSteps
   } = useCircuitSteps(circuitId);
 
@@ -55,6 +56,7 @@ export default function CircuitStepsPage() {
   const handleBulkDelete = () => {
     // Implement bulk delete functionality here
     // You would call a service method to delete multiple steps
+    setSelectedSteps([]);
   };
 
   if (isLoading) {

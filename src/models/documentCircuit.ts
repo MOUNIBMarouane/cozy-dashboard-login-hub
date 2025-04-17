@@ -1,80 +1,20 @@
 
-export interface DocumentCircuitHistory {
-  id: number;
-  documentId: number;
-  circuitId: number;
-  circuitDetailId: number;
-  userId?: number;
-  userName?: string;
-  processedByUserId?: number;
-  processedBy?: string;
-  comments: string;
-  isApproved: boolean;
-  processedAt: string;
-  circuitDetail?: {
-    title: string;
-    orderIndex: number;
-  };
-  // This field is returned by the backend API
-  circuitDetailTitle?: string;
-}
-
-export interface ProcessCircuitRequest {
-  documentId: number;
-  actionId: number;
-  comments: string;
-  isApproved: boolean;
-}
-
-export interface MoveDocumentStepRequest {
-  documentId: number;
-  circuitDetailId?: number;
-  comments?: string;  // Adding the comments property to match the API expectations
-}
-
-export interface MoveToNextStepRequest {
-  documentId: number;
-  currentStepId: number;
-  nextStepId: number;
-  comments: string;
-}
-
-export interface AssignCircuitRequest {
-  documentId: number;
-  circuitId: number;
-  comments?: string;
-}
-
+// Add the DocumentStatus type if it doesn't exist yet
 export interface DocumentStatus {
   statusId: number;
-  statusKey?: string;
+  statusKey: string;
   title: string;
   isRequired: boolean;
   isComplete: boolean;
+  stepId: number;
   completedBy?: string;
   completedAt?: string;
-  stepId?: number;
 }
 
-export interface ActionDto {
-  actionId: number;
-  actionKey: string;
-  title: string;
-  description: string;
-}
-
-export interface DocumentWorkflowStatus {
+// Status completion/update request
+export interface CompleteStatusDto {
   documentId: number;
-  documentTitle: string;
-  circuitId?: number;
-  circuitTitle?: string;
-  currentStepId?: number;
-  currentStepTitle?: string;
-  status: number;
-  statusText: string;
-  isCircuitCompleted: boolean;
-  statuses: DocumentStatus[];
-  availableActions: ActionDto[];
-  canAdvanceToNextStep: boolean;
-  canReturnToPreviousStep: boolean;
+  statusId: number;
+  isComplete: boolean;
+  comments: string;
 }
