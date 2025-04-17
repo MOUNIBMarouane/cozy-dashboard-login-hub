@@ -16,6 +16,7 @@ interface StepsManagementDialogsProps {
   onBulkDeleteConfirm: () => void;
   selectedStepsCount: number;
   onRefetch: () => void;
+  circuitId?: number;
 }
 
 export const StepsManagementDialogs = ({
@@ -31,7 +32,8 @@ export const StepsManagementDialogs = ({
   setBulkDeleteDialogOpen,
   onBulkDeleteConfirm,
   selectedStepsCount,
-  onRefetch
+  onRefetch,
+  circuitId
 }: StepsManagementDialogsProps) => {
   return (
     <>
@@ -40,6 +42,7 @@ export const StepsManagementDialogs = ({
         onOpenChange={setIsFormDialogOpen}
         onSuccess={onFormSuccess}
         editStep={currentStep}
+        circuitId={circuitId}
       />
 
       <DeleteStepDialog

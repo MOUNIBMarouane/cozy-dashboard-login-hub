@@ -1,5 +1,6 @@
 
 import { CircleCheck, CircleDashed } from 'lucide-react';
+import { useStepForm } from './StepFormProvider';
 
 interface StepFormProgressProps {
   currentStep: number;
@@ -7,6 +8,7 @@ interface StepFormProgressProps {
 }
 
 export const StepFormProgress = ({ currentStep, totalSteps }: StepFormProgressProps) => {
+  const { isWithinCircuitContext } = useStepForm();
   const steps = Array.from({ length: totalSteps }, (_, i) => i + 1);
 
   return (
@@ -48,24 +50,39 @@ export const StepFormProgress = ({ currentStep, totalSteps }: StepFormProgressPr
       
       <div className="w-full flex justify-center text-center mt-2">
         <p className="text-sm text-muted-foreground">
-          Step {currentStep}: {getStepTitle(currentStep)}
+          Step {currentStep}: {getStepTitle(currentStep, isWithinCircuitContext)}
         </p>
       </div>
     </div>
   );
 };
 
-function getStepTitle(step: number): string {
-  switch (step) {
-    case 1:
-      return 'Basic Information';
-    case 2:
-      return 'Circuit Assignment';
-    case 3:
-      return 'Step Settings';
-    case 4:
-      return 'Review';
-    default:
-      return '';
+function getStepTitle(step: number, isWithinCircuitContext: boolean): string {
+  if (isWithinCircuitContext) {
+    // Titles when in circuit context (3 steps)
+    switch (step) {
+      case 1:
+        return 'Basic Information';
+      case 2:
+        return 'Step Settings';
+      case 3:
+        return 'Review';
+      default:
+        return '';
+    }
+  } else {
+    // Titles for standard flow (4 steps)
+    switch (step) {
+      case 1:
+        return 'Basic Information';
+      case 2:
+        return 'Circuit Assignment';
+      case 3:
+        return 'Step Settings';
+      case 4:
+        return 'Review';
+      default:
+        return '';
+    }
   }
 }

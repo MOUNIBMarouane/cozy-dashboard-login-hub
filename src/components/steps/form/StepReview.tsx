@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 
 export const StepReview = () => {
-  const { formData, isEditMode } = useStepForm();
+  const { formData, isEditMode, isWithinCircuitContext } = useStepForm();
 
   // Get circuits for displaying circuit name
   const { data: circuits = [], isLoading: isLoadingCircuits } = useQuery({
@@ -55,23 +55,31 @@ export const StepReview = () => {
               </div>
             </div>
 
-            <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">Circuit Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <div className="rounded-md bg-muted p-3">
-                  <div className="text-sm font-medium">Circuit</div>
-                  <div className="mt-1">{circuitName}</div>
-                </div>
-                <div className="rounded-md bg-muted p-3">
-                  <div className="text-sm font-medium">Order Index</div>
-                  <div className="mt-1">{formData.orderIndex}</div>
+            {!isWithinCircuitContext && (
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-1">Circuit Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div className="rounded-md bg-muted p-3">
+                    <div className="text-sm font-medium">Circuit</div>
+                    <div className="mt-1">{circuitName}</div>
+                  </div>
+                  <div className="rounded-md bg-muted p-3">
+                    <div className="text-sm font-medium">Order Index</div>
+                    <div className="mt-1">{formData.orderIndex}</div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-1">Step Settings</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {isWithinCircuitContext && (
+                  <div className="rounded-md bg-muted p-3">
+                    <div className="text-sm font-medium">Order Index</div>
+                    <div className="mt-1">{formData.orderIndex}</div>
+                  </div>
+                )}
                 <div className="rounded-md bg-muted p-3">
                   <div className="text-sm font-medium">Responsible Role</div>
                   <div className="mt-1">{roleName}</div>

@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import stepService from '@/services/stepService';
 
@@ -24,6 +24,8 @@ interface StepFormContextType {
   isSubmitting: boolean;
   isEditMode: boolean;
   stepId?: number;
+  isWithinCircuitContext: boolean;
+  totalSteps: number;
 }
 
 const initialFormData: StepFormData = {
@@ -49,14 +51,22 @@ interface StepFormProviderProps {
   children: React.ReactNode;
   editStep?: Step;
   onSuccess?: () => void;
+  circuitId?: number; // Add circuitId prop for when form is used within a circuit page
 }
 
 export const StepFormProvider: React.FC<StepFormProviderProps> = ({ 
   children, 
   editStep,
-  onSuccess 
+  onSuccess,
+  circuitId: propCircuitId 
 }) => {
   const navigate = useNavigate();
+  const { circuitId: urlCircuitId } = useParams<{ circuitId: string }>();
+  
+  // Determine if we're within a circuit context (either from props or URL params)
+  const contextCircuitId = propCircuitId || (urlCircuitId ? parseInt(urlCircuitId, 10) : undefined);
+  const isWithinCircuitContext = !!contextCircuitId;
+  
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormDataState] = useState<StepFormData>(() => {
@@ -70,16 +80,28 @@ export const StepFormProvider: React.FC<StepFormProviderProps> = ({
         isFinalStep: editStep.isFinalStep,
       };
     }
+    
+    // If we have a circuit context, pre-fill the circuitId
+    if (contextCircuitId) {
+      return {
+        ...initialFormData,
+        circuitId: contextCircuitId
+      };
+    }
+    
     return initialFormData;
   });
 
+  // Calculate total steps based on whether we're in a circuit context
+  const totalSteps = isWithinCircuitContext ? 3 : 4; // Skip circuit selection if in circuit context
+  
   const isEditMode = !!editStep;
 
   const setFormData = (data: Partial<StepFormData>) => {
     setFormDataState(prev => ({ ...prev, ...data }));
   };
 
-  const nextStep = () => setCurrentStep(prev => prev + 1);
+  const nextStep = () => setCurrentStep(prev => Math.min(totalSteps, prev + 1));
   const prevStep = () => setCurrentStep(prev => Math.max(1, prev - 1));
 
   const resetForm = () => {
@@ -142,6 +164,8 @@ export const StepFormProvider: React.FC<StepFormProviderProps> = ({
         isSubmitting,
         isEditMode,
         stepId: editStep?.id,
+        isWithinCircuitContext,
+        totalSteps,
       }}
     >
       {children}

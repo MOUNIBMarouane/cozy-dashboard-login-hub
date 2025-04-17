@@ -14,10 +14,10 @@ export const StepFormActions = ({ onCancel }: StepFormActionsProps) => {
     prevStep, 
     submitForm, 
     isSubmitting,
-    isEditMode 
+    isEditMode,
+    totalSteps
   } = useStepForm();
 
-  const totalSteps = 4;
   const isFirstStep = currentStep === 1;
   const isLastStep = currentStep === totalSteps;
 

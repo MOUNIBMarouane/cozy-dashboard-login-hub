@@ -113,12 +113,13 @@ export default function CircuitStepsPage() {
         onBulkDelete={handleBulkDelete}
       />
       
-      {/* Step Form Dialog */}
+      {/* Step Form Dialog - Now passing the circuit ID */}
       <StepFormDialog
         open={formDialogOpen}
         onOpenChange={setFormDialogOpen}
         onSuccess={refetchSteps}
         editStep={selectedStep ?? undefined}
+        circuitId={parseInt(circuitId, 10)}
       />
       
       {/* Delete Step Dialog */}

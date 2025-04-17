@@ -12,17 +12,44 @@ interface MultiStepStepFormProps {
 }
 
 export const MultiStepStepForm = ({ onCancel }: MultiStepStepFormProps) => {
-  const { currentStep } = useStepForm();
+  const { currentStep, isWithinCircuitContext, totalSteps } = useStepForm();
+  
+  const renderStepContent = () => {
+    if (isWithinCircuitContext) {
+      // When in circuit context, skip the circuit selection step
+      switch (currentStep) {
+        case 1:
+          return <StepBasicInfo />;
+        case 2:
+          return <StepSettings />;
+        case 3:
+          return <StepReview />;
+        default:
+          return <StepBasicInfo />;
+      }
+    } else {
+      // Standard flow with circuit selection
+      switch (currentStep) {
+        case 1:
+          return <StepBasicInfo />;
+        case 2:
+          return <StepCircuitInfo />;
+        case 3:
+          return <StepSettings />;
+        case 4:
+          return <StepReview />;
+        default:
+          return <StepBasicInfo />;
+      }
+    }
+  };
   
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <StepFormProgress currentStep={currentStep} totalSteps={4} />
+      <StepFormProgress currentStep={currentStep} totalSteps={totalSteps} />
       
       <div className="py-4">
-        {currentStep === 1 && <StepBasicInfo />}
-        {currentStep === 2 && <StepCircuitInfo />}
-        {currentStep === 3 && <StepSettings />}
-        {currentStep === 4 && <StepReview />}
+        {renderStepContent()}
       </div>
       
       <StepFormActions onCancel={onCancel} />
