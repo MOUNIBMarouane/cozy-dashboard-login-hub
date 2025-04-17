@@ -12,7 +12,7 @@ import { MultiStepStepForm } from '../form/MultiStepStepForm';
 interface StepFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
   editStep?: Step;
 }
 
@@ -23,7 +23,9 @@ export const StepFormDialog = ({
   editStep,
 }: StepFormDialogProps) => {
   const handleSuccess = () => {
-    onSuccess();
+    if (onSuccess) {
+      onSuccess();
+    }
     onOpenChange(false);
   };
 
@@ -36,7 +38,7 @@ export const StepFormDialog = ({
           </DialogTitle>
           <DialogDescription>
             {editStep
-              ? 'Update this step's details'
+              ? "Update this step's details"
               : 'Create a new step for your workflow circuit'}
           </DialogDescription>
         </DialogHeader>
