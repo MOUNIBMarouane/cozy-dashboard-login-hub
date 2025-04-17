@@ -7,6 +7,7 @@ import { Loader2, CheckCircle, XCircle, Clock } from 'lucide-react';
 import circuitService from '@/services/circuitService';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DocumentHistoryDto } from '@/models/documentCircuit';
 
 interface CircuitHistoryTimelineProps {
   documentId: number;
@@ -69,7 +70,7 @@ export default function CircuitHistoryTimeline({ documentId }: CircuitHistoryTim
           <div className="absolute left-[1.6rem] top-0 bottom-0 w-0.5 bg-gray-200" />
           
           <div className="space-y-8">
-            {history.map((item) => (
+            {history.map((item: DocumentHistoryDto) => (
               <div key={item.id} className="relative flex items-start">
                 {/* Timeline Node */}
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white border-2 border-gray-200 z-10">
@@ -79,7 +80,7 @@ export default function CircuitHistoryTimeline({ documentId }: CircuitHistoryTim
                 {/* Content */}
                 <div className="ml-4 flex-1">
                   <div className="flex items-center text-sm font-medium text-gray-900">
-                    <span>{item.circuitDetailTitle || item.circuitDetail?.title || 'Unknown Step'}</span>
+                    <span>{item.stepTitle || 'Unknown Step'}</span>
                     <span className="mx-2 text-gray-500">•</span>
                     <span className="flex items-center text-gray-500">
                       <Clock className="mr-1 h-3 w-3" />
@@ -88,7 +89,7 @@ export default function CircuitHistoryTimeline({ documentId }: CircuitHistoryTim
                   </div>
                   
                   <div className="mt-1 text-sm text-gray-700">
-                    Processed by: <span className="font-medium">{item.processedBy || item.userName || 'Unknown'}</span>
+                    Processed by: <span className="font-medium">{item.processedBy || 'Unknown'}</span>
                   </div>
                   
                   <div className="mt-2 rounded-md bg-gray-50 p-3 text-sm text-gray-700">

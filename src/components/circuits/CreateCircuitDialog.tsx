@@ -66,8 +66,6 @@ export default function CreateCircuitDialog({
         descriptif: values.descriptif || '',
         isActive: values.isActive,
         hasOrderedFlow: values.hasOrderedFlow,
-        createdAt: new Date().toISOString(), // Add required properties
-        updatedAt: new Date().toISOString(), // Add required properties
       });
       
       toast.success('Circuit created successfully');
@@ -166,14 +164,9 @@ export default function CreateCircuitDialog({
 
             <DialogFooter>
               <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
+                type="submit"
                 disabled={isSubmitting}
               >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Creating...' : 'Create Circuit'}
               </Button>
             </DialogFooter>

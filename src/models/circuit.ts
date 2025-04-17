@@ -8,6 +8,7 @@ export interface Circuit {
   hasOrderedFlow: boolean;
   allowBacktrack?: boolean;
   steps?: Step[];
+  crdCounter?: number; // Add this field to match with circuit.d.ts
 }
 
 export interface Step {

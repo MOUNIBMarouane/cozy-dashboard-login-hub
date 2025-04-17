@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AssignCircuitRequest } from '@/models/documentCircuit';
+import { AssignCircuitDto } from '@/models/documentCircuit';
 import ProcessCircuitStepDialog from './ProcessCircuitStepDialog';
 
 interface DocumentCircuitPanelProps {
@@ -48,10 +48,9 @@ const DocumentCircuitPanel = ({ document, onCircuitAssigned }: DocumentCircuitPa
     setError(null);
 
     try {
-      const request: AssignCircuitRequest = {
+      const request: AssignCircuitDto = {
         documentId: document!.id,
         circuitId: circuitId,
-        comments: comments,
       };
       await circuitService.assignDocumentToCircuit(request);
       toast.success('Circuit assigned to document successfully');

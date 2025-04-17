@@ -40,6 +40,10 @@ export interface DocumentHistoryDto {
   processedAt: string;
   comments: string;
   isApproved: boolean;
+  // Adding missing properties found in CircuitHistoryTimeline
+  circuitDetailTitle?: string;
+  circuitDetail?: { title?: string };
+  userName?: string;
 }
 
 export interface AssignCircuitDto {
@@ -84,4 +88,18 @@ export interface PendingDocumentDto {
   currentStepId: number;
   currentStepTitle: string;
   daysInCurrentStep: number;
+}
+
+// Add the missing DocumentCircuitHistory interface
+export interface DocumentCircuitHistory {
+  id: number;
+  documentId: number;
+  circuitDetailId: number;
+  circuitDetail?: { title?: string };
+  processedByUserId?: number;
+  processedBy?: string;
+  userName?: string;
+  processedAt: string;
+  comments: string;
+  isApproved: boolean;
 }
