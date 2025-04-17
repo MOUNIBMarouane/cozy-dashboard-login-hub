@@ -1,21 +1,24 @@
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { Trash2 } from 'lucide-react';
+import api from '@/services/api';
+import { DocumentStatus } from '@/models/documentCircuit';
 
 interface DeleteStatusDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  status: any | null;
+  status: DocumentStatus | null;
   onSuccess: () => void;
 }
 
@@ -25,70 +28,60 @@ export function DeleteStatusDialog({
   status,
   onSuccess,
 }: DeleteStatusDialogProps) {
-  const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!status) return;
     
     setIsDeleting(true);
-    
     try {
-      await fetch(`/api/Status/${status.statusId}`, {
-        method: 'DELETE',
-      });
+      await api.delete(`/Status/${status.statusId}`);
       
-      toast({
-        title: 'Status deleted',
-        description: 'The status has been deleted successfully',
-      });
-      
+      toast.success('Status deleted successfully');
       onSuccess();
       onOpenChange(false);
-      
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'An error occurred while deleting the status',
-        variant: 'destructive',
-      });
       console.error('Error deleting status:', error);
+      toast.error('Failed to delete status');
     } finally {
       setIsDeleting(false);
     }
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-background">
-        <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-red-500" />
-            Delete Status
-          </DialogTitle>
-          <DialogDescription>
-            Are you sure you want to delete the status "{status?.title}"? This action cannot be undone.
-          </DialogDescription>
-        </DialogHeader>
+  if (!status) return null;
 
-        <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent className="bg-background border-border">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2">
+            <Trash2 className="h-5 w-5 text-red-500" />
+            Delete Status
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete the status <span className="font-semibold">{status.title}</span>?
+            This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel
             disabled={isDeleting}
+            className="border-border"
           >
             Cancel
-          </Button>
-          <Button 
-            variant="destructive" 
-            onClick={handleDelete}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              handleDelete();
+            }}
             disabled={isDeleting}
+            className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
           >
-            {isDeleting ? 'Deleting...' : 'Delete Status'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            {isDeleting ? 'Deleting...' : 'Delete'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

@@ -12,13 +12,15 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
+import api from '@/services/api';
+import { DocumentStatus } from '@/models/documentCircuit';
 
 interface StatusFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
-  status?: any;
+  status?: DocumentStatus;
   stepId: number;
 }
 
@@ -29,7 +31,6 @@ export function StatusFormDialog({
   status,
   stepId,
 }: StatusFormDialogProps) {
-  const { toast } = useToast();
   const [title, setTitle] = useState(status?.title || '');
   const [isRequired, setIsRequired] = useState(status?.isRequired || false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,48 +42,26 @@ export function StatusFormDialog({
     try {
       if (status) {
         // Update existing status
-        await fetch(`/api/Status/${status.statusId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            title,
-            isRequired,
-          }),
+        await api.put(`/Status/${status.statusId}`, {
+          title,
+          isRequired,
         });
-        toast({
-          title: 'Status updated',
-          description: 'The status has been updated successfully',
-        });
+        toast.success('Status updated successfully');
       } else {
         // Create new status
-        await fetch(`/api/Status/step/${stepId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            title,
-            isRequired,
-          }),
+        await api.post(`/Status/step/${stepId}`, {
+          title,
+          isRequired,
         });
-        toast({
-          title: 'Status created',
-          description: 'The status has been created successfully',
-        });
+        toast.success('Status created successfully');
       }
       
       onSuccess();
       onOpenChange(false);
       
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'An error occurred. Please try again.',
-        variant: 'destructive',
-      });
       console.error('Error submitting status:', error);
+      toast.error('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
