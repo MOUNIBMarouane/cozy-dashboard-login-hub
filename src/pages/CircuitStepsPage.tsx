@@ -55,7 +55,6 @@ export default function CircuitStepsPage() {
   const handleBulkDelete = () => {
     // Implement bulk delete functionality here
     // You would call a service method to delete multiple steps
-    setSelectedSteps([]);
   };
 
   if (isLoading) {
