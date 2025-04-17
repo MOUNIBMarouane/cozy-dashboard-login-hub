@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,7 +29,6 @@ import CreateCircuit from "./pages/CreateCircuit";
 import PendingApprovalsPage from "./pages/PendingApprovals";
 import UserManagement from "./pages/UserManagement";
 import DocumentFlowPage from "./pages/DocumentFlowPage";
-import StatusManagement from "./pages/StatusManagement";
 import { Layout } from './components/layout/Layout';
 import Settings from "./pages/Settings";
 import { SettingsProvider } from "./context/SettingsContext";
@@ -94,9 +92,6 @@ const App = () => (
                   <Route path="/circuits" element={<CircuitsPage />} />
                   <Route path="/create-circuit" element={<ProtectedRoute requiresManagement requiredRole={["Admin", "FullUser"]}><CreateCircuit /></ProtectedRoute>} />
                   <Route path="/pending-approvals" element={<PendingApprovalsPage />} />
-                  
-                  {/* Status Management route */}
-                  <Route path="/status/:stepId" element={<ProtectedRoute requiresManagement requiredRole={["Admin", "FullUser"]}><StatusManagement /></ProtectedRoute>} />
                   
                   {/* Settings route */}
                   <Route path="/settings" element={<Settings />} />

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import circuitService from '@/services/circuitService';
-import { DocumentWorkflowStatus, PerformActionDto } from '@/models/documentCircuit';
+import { DocumentWorkflowStatus, ProcessCircuitRequest } from '@/models/documentCircuit';
 
 export function useDocumentWorkflow(documentId: number) {
   const [isActionLoading, setIsActionLoading] = useState(false);
@@ -36,7 +36,7 @@ export function useDocumentWorkflow(documentId: number) {
     
     setIsActionLoading(true);
     try {
-      const request: PerformActionDto = {
+      const request: ProcessCircuitRequest = {
         documentId,
         actionId,
         comments,

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Save } from 'lucide-react';
@@ -13,14 +14,14 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from '@/components/ui/button';
-import { Document, DocumentType, UpdateDocumentDto } from '@/models/document';
+import { Document, DocumentType, UpdateDocumentRequest } from '@/models/document';
 
 interface DocumentEditFormProps {
   document: Document | null;
   documentTypes: DocumentType[];
   isLoading: boolean;
   isSubmitting: boolean;
-  onSubmit: (documentData: UpdateDocumentDto) => Promise<void>;
+  onSubmit: (documentData: UpdateDocumentRequest) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -118,7 +119,7 @@ const DocumentEditForm = ({
     if (!validateForm()) return;
     
     // Only include fields that have been edited
-    const documentData: UpdateDocumentDto = {};
+    const documentData: UpdateDocumentRequest = {};
     
     if (editedFields.typeId) documentData.typeId = selectedTypeId || undefined;
     if (editedFields.title) documentData.title = title;

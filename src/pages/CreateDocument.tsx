@@ -18,7 +18,7 @@ import { ArrowLeft, ArrowRight, FileText, LogOut, UserCog, Save, Check } from 'l
 import DocuVerseLogo from '@/components/DocuVerseLogo';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import documentService from '@/services/documentService';
-import { DocumentType, CreateDocumentDto } from '@/models/document';
+import { DocumentType, CreateDocumentRequest } from '@/models/document';
 import { DatePickerInput } from '@/components/document/DatePickerInput';
 
 export default function CreateDocument() {
@@ -113,14 +113,12 @@ export default function CreateDocument() {
 
     try {
       setIsSubmitting(true);
-      const documentData: CreateDocumentDto = {
+      const documentData: CreateDocumentRequest = {
         title,
         content,
         typeId: selectedTypeId,
         documentAlias,
         docDate,
-        createdByUserId: user?.id ? Number(user.id) : 0, // Add required properties
-        status: 0 // Draft status
       };
 
       const createdDocument = await documentService.createDocument(documentData);

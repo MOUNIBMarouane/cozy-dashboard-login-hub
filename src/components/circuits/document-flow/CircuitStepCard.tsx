@@ -1,14 +1,14 @@
 
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DocumentHistoryDto } from '@/models/documentCircuit';
+import { DocumentCircuitHistory } from '@/models/documentCircuit';
 import { CircuitStepHistory } from './CircuitStepHistory';
 import { CircuitStepFooter } from './CircuitStepFooter';
 
 interface CircuitStepCardProps {
   detail: any;
   currentStepId: number | undefined | null;
-  historyForStep: DocumentHistoryDto[];
+  historyForStep: DocumentCircuitHistory[];
   isSimpleUser: boolean;
   onMoveClick: () => void;
   onProcessClick: () => void;

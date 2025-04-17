@@ -11,21 +11,9 @@ import { WeeklyStatsChart } from "@/components/dashboard/WeeklyStatsChart";
 import { RecentDocumentsCard } from "@/components/dashboard/RecentDocumentsCard";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { sampleChartData, sampleBarData } from "@/components/dashboard/chartData";
-import { User } from "@/models/auth";
 
 export default function Dashboard() {
   const { user } = useAuth();
-  
-  // Convert UserInfo to User type for compatibility
-  const userForComponents: User | null = user ? {
-    email: user.email,
-    firstName: user.firstName || '',
-    lastName: user.lastName || '',
-    username: user.username || '',
-    id: user.id?.toString() || '',
-    role: user.role,
-    profilePicture: user.profilePicture
-  } : null;
 
   const { data: recentDocuments } = useQuery({
     queryKey: ["recent-documents"],
@@ -44,9 +32,9 @@ export default function Dashboard() {
       <DashboardStats documentsCount={recentDocuments?.length || 0} />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <WelcomeCard user={userForComponents} />
+        <WelcomeCard user={user} />
         <CompletionRateCard />
-        <ActivityScoreCard user={userForComponents} />
+        <ActivityScoreCard user={user} />
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

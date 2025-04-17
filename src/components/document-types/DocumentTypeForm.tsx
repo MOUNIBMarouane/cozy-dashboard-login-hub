@@ -106,8 +106,8 @@ export const DocumentTypeForm = ({
         await documentService.updateDocumentType(documentType.id, {
           typeName: data.typeName,
           typeAttr: data.typeAttr || undefined,
-          typeKey: documentType.typeKey
-          // Remove documentCounter as it doesn't exist in DocumentTypeDto
+          typeKey: documentType.typeKey,
+          documentCounter: documentType.documentCounter
         });
       } else {
         await documentService.createDocumentType({

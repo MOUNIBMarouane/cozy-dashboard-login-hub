@@ -41,27 +41,22 @@ export interface DocumentUser {
   email: string;
 }
 
-// Update this to match what our backend expects
-export interface CreateDocumentDto {
+export interface CreateDocumentRequest {
   title: string;
-  content?: string;
+  content: string;
   documentAlias?: string;
-  docDate?: string;
-  createdByUserId: number;
-  circuitId?: number;
   typeId: number;
-  subTypeId?: number;
-  status: number;
+  docDate?: string;
+  circuitId?: number;
 }
 
-export interface UpdateDocumentDto {
+export interface UpdateDocumentRequest {
   title?: string;
   content?: string;
   documentAlias?: string;
   typeId?: number;
   docDate?: string;
   circuitId?: number;
-  status?: number;
 }
 
 export interface Ligne {
@@ -111,12 +106,4 @@ export interface CreateSousLigneRequest {
 export interface UpdateSousLigneRequest {
   title?: string;
   attribute?: string;
-}
-
-// Update DocumentTypeDto to match what the API expects
-export interface DocumentTypeDto {
-  typeAlias?: string;
-  typeKey?: string;
-  typeName: string;
-  typeAttr?: string;
 }

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CircuitStepCard } from './CircuitStepCard';
-import { DocumentHistoryDto, DocumentWorkflowStatus } from '@/models/documentCircuit';
+import { DocumentCircuitHistory, DocumentWorkflowStatus } from '@/models/documentCircuit';
 import { Document } from '@/models/document';
 import { DraggableDocumentCard } from './DraggableDocumentCard';
 import { useDocumentMovement } from '@/hooks/useDocumentMovement';
@@ -11,7 +11,7 @@ import { CircuitStepsSectionHeader } from './CircuitStepsSectionHeader';
 
 interface CircuitStepsSectionProps {
   circuitDetails: any[];
-  circuitHistory: DocumentHistoryDto[];
+  circuitHistory: DocumentCircuitHistory[];
   document: Document;
   workflowStatus: DocumentWorkflowStatus;
   isSimpleUser: boolean;
@@ -110,7 +110,7 @@ export const CircuitStepsSection = ({
       <div className="overflow-x-auto">
         <div className="flex space-x-4 pb-4 min-w-full">
           {circuitDetails?.map((detail) => {
-            const historyForStep = circuitHistory?.filter(h => h.stepTitle === detail.title) || [];
+            const historyForStep = circuitHistory?.filter(h => h.circuitDetailId === detail.id) || [];
             const isOver = draggedOverStepId === detail.id;
             const isCurrentStep = detail.id === currentStepId;
             

@@ -2,10 +2,10 @@
 import { Check, X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DocumentHistoryDto } from '@/models/documentCircuit';
+import { DocumentCircuitHistory } from '@/models/documentCircuit';
 
 interface CircuitHistoryItemProps {
-  history: DocumentHistoryDto;
+  history: DocumentCircuitHistory;
 }
 
 export const CircuitHistoryItem = ({ history }: CircuitHistoryItemProps) => {
@@ -14,7 +14,7 @@ export const CircuitHistoryItem = ({ history }: CircuitHistoryItemProps) => {
       <CardContent className="p-3">
         <div className="flex justify-between items-start mb-1">
           <span className="font-medium text-sm">
-            Processed by: {history.processedBy || 'Unknown'}
+            Processed by: {history.userName || history.processedBy || 'Unknown'}
           </span>
           <Badge variant={history.isApproved ? "success" : "destructive"}>
             {history.isApproved ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}

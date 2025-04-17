@@ -1,90 +1,87 @@
 
-import { Plus, MoreVertical, Eye, Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, FileText, Info } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { Circuit } from '@/models/circuit';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface CircuitListActionsProps {
-  searchQuery?: string;
-  circuit?: Circuit;
-  isSimpleUser?: boolean;
-  onEdit?: (circuit: Circuit) => void;
-  onDelete?: (circuit: Circuit) => void;
-  onViewDetails?: (circuit: Circuit) => void;
+  circuit: Circuit;
+  isSimpleUser: boolean;
+  onEdit: (circuit: Circuit) => void;
+  onDelete: (circuit: Circuit) => void;
+  onViewDetails: (circuit: Circuit) => void;
 }
 
 export function CircuitListActions({ 
-  searchQuery,
   circuit,
   isSimpleUser,
   onEdit,
   onDelete,
   onViewDetails
 }: CircuitListActionsProps) {
-  // If circuit is not provided, this is for the main list actions (with search query and new button)
-  if (!circuit) {
-    return (
-      <div className="flex items-center justify-between mb-4">
-        {searchQuery && (
-          <div className="text-sm text-blue-400">
-            Showing results for: <span className="font-medium">"{searchQuery}"</span>
-          </div>
-        )}
-        <div className="ml-auto">
-          <Link to="/create-circuit">
-            <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
-              <Plus className="mr-2 h-4 w-4" /> New Circuit
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const handleEdit = () => {
+    if (isSimpleUser) {
+      toast.error('You do not have permission to edit circuits');
+      return;
+    }
+    onEdit(circuit);
+  };
 
-  // For circuit row actions
+  const handleDelete = () => {
+    if (isSimpleUser) {
+      toast.error('You do not have permission to delete circuits');
+      return;
+    }
+    onDelete(circuit);
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreVertical className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem 
-          onClick={() => onViewDetails?.(circuit)}
-          className="cursor-pointer"
-        >
-          <Eye className="mr-2 h-4 w-4" />
-          View Details
-        </DropdownMenuItem>
-        
-        {!isSimpleUser && (
-          <>
-            <DropdownMenuItem 
-              onClick={() => onEdit?.(circuit)}
-              className="cursor-pointer"
-            >
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </DropdownMenuItem>
-            
-            <DropdownMenuItem 
-              onClick={() => onDelete?.(circuit)}
-              className="cursor-pointer text-red-600 hover:text-red-700 focus:text-red-700"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete
-            </DropdownMenuItem>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex justify-end gap-1">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost" 
+            size="icon"
+            className="h-8 w-8 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-900/40"
+            onClick={() => onViewDetails(circuit)}
+          >
+            {isSimpleUser ? <Info className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>View details</TooltipContent>
+      </Tooltip>
+      
+      {!isSimpleUser && (
+        <>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-900/40"
+                onClick={handleEdit}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Edit circuit</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/30"
+                onClick={handleDelete}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Delete circuit</TooltipContent>
+          </Tooltip>
+        </>
+      )}
+    </div>
   );
 }

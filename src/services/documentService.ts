@@ -1,163 +1,269 @@
 
-import { api } from './api';
-import { Document } from '@/models/document';
+import api from './api';
+import { Document, DocumentType, CreateDocumentRequest, UpdateDocumentRequest, 
+         Ligne, CreateLigneRequest, UpdateLigneRequest,
+         SousLigne, CreateSousLigneRequest, UpdateSousLigneRequest } from '../models/document';
 
-// Document types
-export interface CreateDocumentDto {
-  title: string;
-  content?: string;
-  documentAlias?: string;
-  docDate?: string | Date;
-  createdByUserId: number;
-  circuitId?: number;
-  typeId: number;
-  subTypeId?: number;
-  status: number;
-}
+const documentService = {
+  // Document methods
+  getAllDocuments: async (): Promise<Document[]> => {
+    try {
+      const response = await api.get('/Documents');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+      throw error;
+    }
+  },
 
-export interface UpdateDocumentDto {
-  title?: string;
-  content?: string;
-  documentAlias?: string;
-  docDate?: string | Date;
-  typeId?: number;
-  subTypeId?: number;
-  circuitId?: number;
-  status?: number;
-}
+  getDocumentById: async (id: number): Promise<Document> => {
+    try {
+      const response = await api.get(`/Documents/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching document with ID ${id}:`, error);
+      throw error;
+    }
+  },
 
-// Line and SousLigne types
-export interface CreateLigneRequest {
-  documentId: number;
-  title: string;
-  article: string;
-  prix: number;
-}
+  getRecentDocuments: async (limit: number = 5): Promise<Document[]> => {
+    try {
+      const response = await api.get(`/Documents/recent?limit=${limit}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching recent documents:', error);
+      // If the API doesn't have this endpoint yet, fall back to getting all documents and sorting them
+      const allDocs = await documentService.getAllDocuments();
+      return allDocs
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+        .slice(0, limit);
+    }
+  },
 
-export interface UpdateLigneRequest {
-  title?: string;
-  article?: string;
-  prix?: number;
-}
+  createDocument: async (document: CreateDocumentRequest): Promise<Document> => {
+    try {
+      const response = await api.post('/Documents', document);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating document:', error);
+      throw error;
+    }
+  },
 
-export interface CreateSousLigneRequest {
-  ligneId: number;
-  title: string;
-  attribute: string;
-}
+  updateDocument: async (id: number, document: UpdateDocumentRequest): Promise<void> => {
+    try {
+      await api.put(`/Documents/${id}`, document);
+    } catch (error) {
+      console.error(`Error updating document with ID ${id}:`, error);
+      throw error;
+    }
+  },
 
-export interface UpdateSousLigneRequest {
-  title?: string;
-  attribute?: string;
-}
+  deleteDocument: async (id: number): Promise<void> => {
+    try {
+      await api.delete(`/Documents/${id}`);
+    } catch (error) {
+      console.error(`Error deleting document with ID ${id}:`, error);
+      throw error;
+    }
+  },
 
-// Document type management
-export interface DocumentTypeDto {
-  typeAlias?: string;
-  typeKey?: string;
-  typeName: string;
-  typeAttr?: string;
-}
+  deleteMultipleDocuments: async (ids: number[]): Promise<void> => {
+    try {
+      // Since the API doesn't support bulk deletion, we'll delete one by one
+      await Promise.all(ids.map(id => api.delete(`/Documents/${id}`)));
+    } catch (error) {
+      console.error('Error deleting multiple documents:', error);
+      throw error;
+    }
+  },
 
-class DocumentService {
-  // Document core operations
-  async getAllDocuments(): Promise<Document[]> {
-    const response = await api.get('/api/Documents');
-    return response.data;
-  }
+  // Document Types methods
+  getAllDocumentTypes: async (): Promise<DocumentType[]> => {
+    try {
+      const response = await api.get('/Documents/Types');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching document types:', error);
+      throw error;
+    }
+  },
 
-  async getDocumentById(id: number): Promise<Document> {
-    const response = await api.get(`/api/Documents/${id}`);
-    return response.data;
-  }
+  createDocumentType: async (documentType: DocumentType): Promise<void> => {
+    try {
+      await api.post('/Documents/Types', documentType);
+    } catch (error) {
+      console.error('Error creating document type:', error);
+      throw error;
+    }
+  },
 
-  async createDocument(document: CreateDocumentDto): Promise<Document> {
-    const response = await api.post('/api/Documents', document);
-    return response.data;
-  }
+  updateDocumentType: async (id: number, documentType: DocumentType): Promise<void> => {
+    try {
+      await api.put(`/Documents/Types/${id}`, documentType);
+    } catch (error) {
+      console.error(`Error updating document type with ID ${id}:`, error);
+      throw error;
+    }
+  },
 
-  async updateDocument(id: number, document: UpdateDocumentDto): Promise<void> {
-    await api.put(`/api/Documents/${id}`, document);
-  }
+  validateTypeName: async (typeName: string): Promise<boolean> => {
+    try {
+      const response = await api.post('/Documents/valide-type', { typeName });
+      return response.data === "True";
+    } catch (error) {
+      console.error('Error validating type name:', error);
+      throw error;
+    }
+  },
 
-  async deleteDocument(id: number): Promise<void> {
-    await api.delete(`/api/Documents/${id}`);
-  }
+  deleteDocumentType: async (id: number): Promise<void> => {
+    try {
+      await api.delete(`/Documents/Types/${id}`);
+    } catch (error) {
+      console.error(`Error deleting document type with ID ${id}:`, error);
+      throw error;
+    }
+  },
   
-  async deleteMultipleDocuments(ids: number[]): Promise<void> {
-    await Promise.all(ids.map(id => this.deleteDocument(id)));
-  }
+  // New method for bulk deletion of document types
+  deleteMultipleDocumentTypes: async (ids: number[]): Promise<void> => {
+    try {
+      // Since the API doesn't support bulk deletion, we'll delete one by one
+      await Promise.all(ids.map(id => api.delete(`/Documents/Types/${id}`)));
+    } catch (error) {
+      console.error('Error deleting multiple document types:', error);
+      throw error;
+    }
+  },
 
-  async getRecentDocuments(limit: number = 5): Promise<Document[]> {
-    const response = await api.get(`/api/Documents/recent?limit=${limit}`);
-    return response.data;
-  }
+  // Ligne methods
+  getAllLignes: async (): Promise<Ligne[]> => {
+    try {
+      const response = await api.get('/Lignes');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching lignes:', error);
+      throw error;
+    }
+  },
 
-  // Document type operations
-  async getAllDocumentTypes(): Promise<DocumentTypeDto[]> {
-    const response = await api.get('/api/Documents/Types');
-    return response.data;
-  }
+  getLigneById: async (id: number): Promise<Ligne> => {
+    try {
+      const response = await api.get(`/Lignes/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching ligne with ID ${id}:`, error);
+      throw error;
+    }
+  },
 
-  async createDocumentType(documentType: DocumentTypeDto): Promise<DocumentTypeDto> {
-    const response = await api.post('/api/Documents/Types', documentType);
-    return response.data;
-  }
+  getLignesByDocumentId: async (documentId: number): Promise<Ligne[]> => {
+    try {
+      const response = await api.get(`/Lignes/by-document/${documentId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching lignes for document ${documentId}:`, error);
+      throw error;
+    }
+  },
 
-  async updateDocumentType(id: number, documentType: DocumentTypeDto): Promise<void> {
-    await api.put(`/api/Documents/Types/${id}`, documentType);
-  }
+  createLigne: async (ligne: CreateLigneRequest): Promise<Ligne> => {
+    try {
+      const response = await api.post('/Lignes', ligne);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating ligne:', error);
+      throw error;
+    }
+  },
 
-  async deleteDocumentType(id: number): Promise<void> {
-    await api.delete(`/api/Documents/Types/${id}`);
-  }
-  
-  async deleteMultipleDocumentTypes(ids: number[]): Promise<void> {
-    await Promise.all(ids.map(id => this.deleteDocumentType(id)));
-  }
-  
-  async validateTypeName(typeName: string): Promise<boolean> {
-    const response = await api.post('/api/Documents/valide-type', { typeName });
-    return response.data;
-  }
+  updateLigne: async (id: number, ligne: UpdateLigneRequest): Promise<void> => {
+    try {
+      await api.put(`/Lignes/${id}`, ligne);
+    } catch (error) {
+      console.error(`Error updating ligne with ID ${id}:`, error);
+      throw error;
+    }
+  },
 
-  // Ligne operations
-  async getLignesByDocumentId(documentId: number): Promise<any[]> {
-    const response = await api.get(`/api/Lignes/by-document/${documentId}`);
-    return response.data;
-  }
+  deleteLigne: async (id: number): Promise<void> => {
+    try {
+      await api.delete(`/Lignes/${id}`);
+    } catch (error) {
+      console.error(`Error deleting ligne with ID ${id}:`, error);
+      throw error;
+    }
+  },
 
-  async createLigne(ligne: CreateLigneRequest): Promise<any> {
-    const response = await api.post('/api/Lignes', ligne);
-    return response.data;
-  }
+  // SousLigne methods
+  getAllSousLignes: async (): Promise<SousLigne[]> => {
+    try {
+      const response = await api.get('/SousLignes');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching sousLignes:', error);
+      throw error;
+    }
+  },
 
-  async updateLigne(id: number, ligne: UpdateLigneRequest): Promise<void> {
-    await api.put(`/api/Lignes/${id}`, ligne);
-  }
+  getSousLigneById: async (id: number): Promise<SousLigne> => {
+    try {
+      const response = await api.get(`/SousLignes/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching sousLigne with ID ${id}:`, error);
+      throw error;
+    }
+  },
 
-  async deleteLigne(id: number): Promise<void> {
-    await api.delete(`/api/Lignes/${id}`);
-  }
+  getSousLignesByLigneId: async (ligneId: number): Promise<SousLigne[]> => {
+    try {
+      const response = await api.get(`/SousLignes/by_ligne/${ligneId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching sousLignes for ligne ${ligneId}:`, error);
+      throw error;
+    }
+  },
 
-  // SousLigne operations
-  async getSousLignesByLigneId(ligneId: number): Promise<any[]> {
-    const response = await api.get(`/api/SousLignes/by_ligne/${ligneId}`);
-    return response.data;
-  }
+  getSousLignesByDocumentId: async (documentId: number): Promise<SousLigne[]> => {
+    try {
+      const response = await api.get(`/SousLignes/by_document/${documentId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching sousLignes for document ${documentId}:`, error);
+      throw error;
+    }
+  },
 
-  async createSousLigne(sousLigne: CreateSousLigneRequest): Promise<any> {
-    const response = await api.post('/api/SousLignes', sousLigne);
-    return response.data;
-  }
+  createSousLigne: async (sousLigne: CreateSousLigneRequest): Promise<SousLigne> => {
+    try {
+      const response = await api.post('/SousLignes', sousLigne);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating sousLigne:', error);
+      throw error;
+    }
+  },
 
-  async updateSousLigne(id: number, sousLigne: UpdateSousLigneRequest): Promise<void> {
-    await api.put(`/api/SousLignes/${id}`, sousLigne);
-  }
+  updateSousLigne: async (id: number, sousLigne: UpdateSousLigneRequest): Promise<void> => {
+    try {
+      await api.put(`/SousLignes/${id}`, sousLigne);
+    } catch (error) {
+      console.error(`Error updating sousLigne with ID ${id}:`, error);
+      throw error;
+    }
+  },
 
-  async deleteSousLigne(id: number): Promise<void> {
-    await api.delete(`/api/SousLignes/${id}`);
+  deleteSousLigne: async (id: number): Promise<void> => {
+    try {
+      await api.delete(`/SousLignes/${id}`);
+    } catch (error) {
+      console.error(`Error deleting sousLigne with ID ${id}:`, error);
+      throw error;
+    }
   }
-}
+};
 
-export default new DocumentService();
+export default documentService;

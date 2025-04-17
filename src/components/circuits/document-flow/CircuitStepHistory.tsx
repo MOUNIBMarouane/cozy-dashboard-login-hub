@@ -1,9 +1,9 @@
 
-import { DocumentHistoryDto } from '@/models/documentCircuit';
+import { DocumentCircuitHistory } from '@/models/documentCircuit';
 import { CircuitHistoryItem } from './CircuitHistoryItem';
 
 interface CircuitStepHistoryProps {
-  historyForStep: DocumentHistoryDto[];
+  historyForStep: DocumentCircuitHistory[];
 }
 
 export const CircuitStepHistory = ({ historyForStep }: CircuitStepHistoryProps) => {
