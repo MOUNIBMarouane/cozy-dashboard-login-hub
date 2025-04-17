@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import documentService from '@/services/documentService';
-import { Document, DocumentType, UpdateDocumentRequest } from '@/models/document';
+import { Document, DocumentType, UpdateDocumentDto } from '@/models/document';
 import DocumentEditHeader from '@/components/document/edit/DocumentEditHeader';
 import DocumentEditForm from '@/components/document/edit/DocumentEditForm';
 
@@ -46,7 +45,7 @@ const EditDocument = () => {
     fetchData();
   }, [id, navigate]);
 
-  const handleSubmit = async (documentData: UpdateDocumentRequest) => {
+  const handleSubmit = async (documentData: UpdateDocumentDto) => {
     if (!id) return;
     
     try {
