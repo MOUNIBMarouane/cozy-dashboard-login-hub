@@ -52,7 +52,7 @@ export function useDocumentMovement({ onMoveSuccess }: UseDocumentMovementProps 
         // Moving backward - use return-to-previous endpoint
         await circuitService.moveDocumentToStep({
           documentId,
-          circuitDetailId: targetStepId,
+          comments: comments || `Returned document to previous step #${targetStepId}`
         });
         toast.success('Document returned to previous step successfully');
       } else {
