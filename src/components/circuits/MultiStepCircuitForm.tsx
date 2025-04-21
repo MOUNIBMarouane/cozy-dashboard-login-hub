@@ -1,16 +1,16 @@
 
-import { useCircuitForm } from '@/context/CircuitFormContext';
+import { useState } from 'react';
 import StepOneTitle from './steps/StepOneTitle';
-import StepTwoDescription from './steps/StepThreeSettings';
-import StepThreeSettings from './steps/StepFourCircuitSteps';
-import StepFourCircuitSteps from './steps/StepFiveReview';
-import StepFiveReview from './steps/StepTwoDescription';
+import StepTwoDescription from './steps/StepTwoDescription';
+import StepThreeReview from './steps/StepThreeReview';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 
 // Step indicator component
 const StepIndicator = ({ currentStep }: { currentStep: number }) => {
   return (
     <div className="flex justify-center space-x-2 mb-8">
-      {[1, 2, 3, 4, 5].map((step) => (
+      {[1, 2, 3].map((step) => (
         <div key={step} className="flex items-center">
           <div
             className={`w-9 h-9 rounded-full flex items-center justify-center font-semibold shadow-md transition-all border
@@ -27,7 +27,7 @@ const StepIndicator = ({ currentStep }: { currentStep: number }) => {
               <span className="text-base">{step}</span>
             )}
           </div>
-          {step < 5 && (
+          {step < 3 && (
             <div
               className={`h-1 w-10 sm:w-12 md:w-16 rounded-full transition-colors
                 ${step < currentStep ? 'bg-blue-600' : 'bg-gray-800'}`}
@@ -44,8 +44,6 @@ const StepTitle = ({ currentStep }: { currentStep: number }) => {
   const titles = [
     'Circuit Title',
     'Circuit Description',
-    'Circuit Settings',
-    'Circuit Steps (Optional)',
     'Review and Create'
   ];
   return (
@@ -54,22 +52,120 @@ const StepTitle = ({ currentStep }: { currentStep: number }) => {
 };
 
 export default function MultiStepCircuitForm() {
-  const { currentStep } = useCircuitForm();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formValues, setFormValues] = useState({ title: '', descriptif: '' });
+  const [errors, setErrors] = useState<{ title?: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const handleFieldChange = (key: keyof typeof formValues, value: string) => {
+    setFormValues((prev) => ({ ...prev, [key]: value }));
+    if (key === 'title') {
+      setErrors((prev) => ({ ...prev, title: undefined }));
+    }
+  };
+  
+  const handleNextStep = () => {
+    if (currentStep === 1 && !formValues.title.trim()) {
+      setErrors({ title: 'Title is required' });
+      return;
+    }
+    setCurrentStep(prev => Math.min(prev + 1, 3));
+  };
+  
+  const handlePrevStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+  
+  const handleEditStep = (step: 1 | 2) => {
+    setCurrentStep(step);
+  };
+  
+  const handleSubmit = () => {
+    // Handle form submission logic
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      // Handle success
+      console.log('Form submitted:', formValues);
+      
+      // Reset form
+      setFormValues({ title: '', descriptif: '' });
+      setCurrentStep(1);
+    }, 1000);
+  };
 
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <StepOneTitle />;
+        return (
+          <div>
+            <StepOneTitle 
+              value={formValues.title} 
+              onChange={(value) => handleFieldChange('title', value)} 
+              error={errors.title}
+            />
+            <div className="flex justify-between pt-4">
+              {/* No back button on first step */}
+              <div></div>
+              <Button
+                type="button"
+                onClick={handleNextStep}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Next <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        );
       case 2:
-        return <StepTwoDescription />;
+        return (
+          <div>
+            <StepTwoDescription 
+              value={formValues.descriptif} 
+              onChange={(value) => handleFieldChange('descriptif', value)} 
+            />
+            <div className="flex justify-between pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handlePrevStep}
+                className="bg-black border-none text-gray-200 hover:bg-blue-950"
+              >
+                <ArrowLeft className="mr-1 h-4 w-4" /> Back
+              </Button>
+              <Button
+                type="button"
+                onClick={handleNextStep}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Next <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        );
       case 3:
-        return <StepThreeSettings />;
-      case 4:
-        return <StepFourCircuitSteps />;
-      case 5:
-        return <StepFiveReview />;
+        return (
+          <StepThreeReview
+            title={formValues.title}
+            descriptif={formValues.descriptif}
+            onEdit={handleEditStep}
+            onBack={handlePrevStep}
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+          />
+        );
       default:
-        return <StepOneTitle />;
+        return (
+          <div>
+            <StepOneTitle 
+              value={formValues.title} 
+              onChange={(value) => handleFieldChange('title', value)} 
+              error={errors.title} 
+            />
+          </div>
+        );
     }
   };
 
