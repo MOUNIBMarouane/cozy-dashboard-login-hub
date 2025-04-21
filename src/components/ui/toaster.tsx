@@ -13,13 +13,13 @@ import { AlertCircle, X, Info, CheckCircle } from "lucide-react"
 export function Toaster() {
   const { toasts, dismiss } = useToast();
 
-  // Show only the last toast, if any
+  // Show only the latest toast, if any
   const latestToast = toasts.length ? toasts[0] : null;
 
   if (!latestToast) return null;
 
   // Determine the icon and colors based on toast variant
-  const getToastStyles = (variant?: string) => {
+  const getToastStyles = (variant?: 'default' | 'destructive' | 'info' | 'success') => {
     switch (variant) {
       case 'destructive':
         return {
@@ -48,7 +48,7 @@ export function Toaster() {
     }
   };
 
-  const { icon, bg, iconBg } = getToastStyles(latestToast.variant);
+  const { icon, bg, iconBg } = getToastStyles(latestToast.variant as 'default' | 'destructive' | 'info' | 'success');
 
   return (
     <ToastProvider>
