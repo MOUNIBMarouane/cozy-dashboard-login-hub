@@ -1,5 +1,5 @@
+
 import { useCircuitForm } from '@/context/CircuitFormContext';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import StepOneTitle from './steps/StepOneTitle';
 import StepTwoDescription from './steps/StepThreeSettings';
 import StepThreeSettings from './steps/StepFourCircuitSteps';
@@ -13,20 +13,24 @@ const StepIndicator = ({ currentStep }: { currentStep: number }) => {
       {[1, 2, 3, 4, 5].map((step) => (
         <div key={step} className="flex items-center">
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all
+            className={`w-9 h-9 rounded-full flex items-center justify-center font-semibold shadow-md transition-all border
               ${step === currentStep
-                ? 'bg-blue-600 text-white ring-4 ring-blue-600/20'
+                ? 'bg-blue-600 text-white border-blue-500 scale-110'
                 : step < currentStep
-                ? 'bg-blue-600/20 text-blue-600 border-2 border-blue-600'
-                : 'bg-gray-800 text-gray-400 border border-gray-700'
+                  ? 'bg-blue-900/40 text-blue-400 border-blue-500'
+                  : 'bg-gray-900/50 text-gray-500 border-gray-700'
             }`}
           >
-            {step < currentStep ? '✓' : step}
+            {step < currentStep ? (
+              <span>&#10003;</span>
+            ) : (
+              <span className="text-base">{step}</span>
+            )}
           </div>
           {step < 5 && (
             <div
-              className={`h-[2px] w-12 transition-colors
-                ${step < currentStep ? 'bg-blue-600' : 'bg-gray-700'}`}
+              className={`h-1 w-10 sm:w-12 md:w-16 rounded-full transition-colors
+                ${step < currentStep ? 'bg-blue-600' : 'bg-gray-800'}`}
             ></div>
           )}
         </div>
@@ -44,9 +48,8 @@ const StepTitle = ({ currentStep }: { currentStep: number }) => {
     'Circuit Steps (Optional)',
     'Review and Create'
   ];
-
   return (
-    <h3 className="text-2xl font-semibold text-center text-white mb-6">{titles[currentStep - 1]}</h3>
+    <h3 className="text-2xl font-semibold text-center text-white mb-2">{titles[currentStep - 1]}</h3>
   );
 };
 
@@ -71,15 +74,10 @@ export default function MultiStepCircuitForm() {
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto border-gray-800 bg-[#0d1117]">
-      <CardHeader className="space-y-1 pb-2 border-b border-gray-800">
-        <StepIndicator currentStep={currentStep} />
-        <StepTitle currentStep={currentStep} />
-      </CardHeader>
-      
-      <CardContent className="pt-6">
-        {renderStep()}
-      </CardContent>
-    </Card>
+    <div className="w-full flex flex-col items-center">
+      <StepIndicator currentStep={currentStep} />
+      <StepTitle currentStep={currentStep} />
+      <div className="mt-2 w-full max-w-2xl">{renderStep()}</div>
+    </div>
   );
 }
