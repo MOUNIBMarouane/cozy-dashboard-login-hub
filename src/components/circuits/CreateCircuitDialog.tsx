@@ -1,4 +1,4 @@
 
-import CreateCircuitDialogBase from './CreateCircuitDialogBase';
+import CreateCircuitDialogContainer from './CreateCircuitDialogContainer';
 
-export default CreateCircuitDialogBase;
+export default CreateCircuitDialogContainer;
