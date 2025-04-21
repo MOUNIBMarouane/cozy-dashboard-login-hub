@@ -25,11 +25,11 @@ const DocumentTypesHeader = ({
     <div className="bg-[#0f1642] p-4 md:p-6 border-b border-blue-900/30 flex-shrink-0">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link to="/documents" className="inline-flex items-center text-blue-400 hover:text-blue-300">
+          {/* <Link to="/documents" className="inline-flex items-center text-blue-400 hover:text-blue-300">
             <ArrowLeft className="h-4 w-4 mr-1" />
             <span>Back</span>
-          </Link>
-          <div className="h-4 w-px bg-blue-800/50"></div>
+          </Link> */}
+          {/* <div className="h-4 w-px bg-blue-800/50"></div> */}
           <div>
             <h1 className="text-2xl font-bold text-white">Document Types</h1>
             <p className="text-sm text-blue-300 mt-1">

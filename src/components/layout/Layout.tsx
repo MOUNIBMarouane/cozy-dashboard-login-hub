@@ -48,7 +48,7 @@ export function Layout() {
             
             {/* Main content */}
             <main className="flex-1 overflow-auto p-4">
-              <div className={`${theme === "dark" ? "bg-[#111633]/95" : "bg-white/95"} h-full rounded-xl border border-border shadow-lg p-4 overflow-auto`}>
+              <div className={`${theme === "dark" ? "bg-[#111633]/95" : "bg-white/95"} h-full rounded-xl border border-border shadow-lg  overflow-auto`}>
                 <Outlet />
               </div>
             </main>
