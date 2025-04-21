@@ -27,7 +27,6 @@ import DocumentLignesPage from "./pages/DocumentLignesPage";
 import CircuitsPage from "./pages/Circuits";
 import CircuitStepsPage from "./pages/CircuitStepsPage";
 import StepStatusesPage from "./pages/StepStatusesPage";
-import CreateCircuit from "./pages/CreateCircuit";
 import PendingApprovalsPage from "./pages/PendingApprovals";
 import UserManagement from "./pages/UserManagement";
 import DocumentFlowPage from "./pages/DocumentFlowPage";
