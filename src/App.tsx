@@ -94,7 +94,7 @@ const App = () => (
                   <Route path="/circuits" element={<CircuitsPage />} />
                   <Route path="/circuits/:circuitId/steps" element={<CircuitStepsPage />} />
                   <Route path="/circuits/:circuitId/steps/:stepId/statuses" element={<StepStatusesPage />} />
-                  <Route path="/create-circuit" element={<ProtectedRoute requiresManagement requiredRole={["Admin", "FullUser"]}><CreateCircuit /></ProtectedRoute>} />
+                  {/* Removed the /create-circuit route */}
                   <Route path="/pending-approvals" element={<PendingApprovalsPage />} />
                   
                   {/* Step Management route - REMOVED */}
