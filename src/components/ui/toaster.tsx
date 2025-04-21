@@ -8,7 +8,7 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
-import { X } from "lucide-react"
+import { AlertCircle, X, Info, CheckCircle } from "lucide-react"
 
 export function Toaster() {
   const { toasts, dismiss } = useToast();
@@ -17,6 +17,38 @@ export function Toaster() {
   const latestToast = toasts.length ? toasts[0] : null;
 
   if (!latestToast) return null;
+
+  // Determine the icon and colors based on toast variant
+  const getToastStyles = (variant?: string) => {
+    switch (variant) {
+      case 'destructive':
+        return {
+          icon: <AlertCircle className="w-5 h-5 text-white" />,
+          bg: '#ea384c', // Red
+          iconBg: '#273052'
+        };
+      case 'success':
+        return {
+          icon: <CheckCircle className="w-5 h-5 text-white" />,
+          bg: '#10b981', // Green
+          iconBg: '#273052'
+        };
+      case 'info':
+        return {
+          icon: <Info className="w-5 h-5 text-white" />,
+          bg: '#3b82f6', // Blue
+          iconBg: '#273052'
+        };
+      default:
+        return {
+          icon: <AlertCircle className="w-5 h-5 text-white" />,
+          bg: '#ea384c', // Default to red for errors
+          iconBg: '#273052'
+        };
+    }
+  };
+
+  const { icon, bg, iconBg } = getToastStyles(latestToast.variant);
 
   return (
     <ToastProvider>
@@ -39,12 +71,26 @@ export function Toaster() {
         <div className="flex items-start flex-1">
           {/* Icon */}
           <div className="mr-3 mt-0.5">
-            <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#273052]">
-              {/* Use an icon for error/info */}
+            <span 
+              className="inline-flex items-center justify-center w-7 h-7 rounded-full" 
+              style={{ backgroundColor: iconBg }}
+            >
+              {/* Icon based on toast type */}
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" fill="#ea384c" />
-                <path d="M12 7.5V13" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
-                <circle cx="12" cy="16" r="1" fill="#fff"/>
+                <circle cx="12" cy="12" r="10" fill={bg} />
+                {latestToast.variant === 'info' ? (
+                  <>
+                    <path d="M12 8v1" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M12 12v4" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+                  </>
+                ) : latestToast.variant === 'success' ? (
+                  <path d="M8 12l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                ) : (
+                  <>
+                    <path d="M12 7.5V13" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+                    <circle cx="12" cy="16" r="1" fill="#fff"/>
+                  </>
+                )}
               </svg>
             </span>
           </div>
@@ -57,7 +103,7 @@ export function Toaster() {
             )}
             {(latestToast.description || latestToast.title === undefined) && (
               <ToastDescription className="text-sm font-normal text-blue-100 max-w-[260px] break-words">
-                {latestToast.description}
+                {latestToast.description || latestToast.title}
               </ToastDescription>
             )}
           </div>
@@ -72,9 +118,6 @@ export function Toaster() {
           <X className="w-5 h-5 text-blue-200 group-hover:text-red-400" />
         </button>
       </Toast>
-      {/* The viewport might not be necessary since we're showing only one toast */}
-      {/* <ToastViewport /> */}
     </ToastProvider>
   )
 }
-
