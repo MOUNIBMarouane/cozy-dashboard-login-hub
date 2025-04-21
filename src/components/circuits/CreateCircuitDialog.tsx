@@ -25,16 +25,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { ArrowRight, ArrowLeft, Edit, Check, X } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Edit, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 
 const formSchema = z.object({
   title: z.string().min(3, { message: 'Title must be at least 3 characters' }),
   descriptif: z.string().optional(),
-  isActive: z.boolean().default(true),
-  hasOrderedFlow: z.boolean().default(true),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -60,8 +56,6 @@ export default function CreateCircuitDialog({
     defaultValues: {
       title: '',
       descriptif: '',
-      isActive: true,
-      hasOrderedFlow: true,
     },
   });
 
@@ -78,7 +72,9 @@ export default function CreateCircuitDialog({
   };
 
   const handleBack = () => setStep((prev) => ((prev - 1) as Step));
-  const handleEdit = (targetStep: Step) => setStep(targetStep);
+  const handleEdit = (targetStep: Step) => {
+    setStep(targetStep);
+  };
 
   const handleClose = () => {
     setStep(1);
@@ -92,8 +88,7 @@ export default function CreateCircuitDialog({
       await circuitService.createCircuit({
         title: values.title,
         descriptif: values.descriptif || '',
-        isActive: values.isActive,
-        hasOrderedFlow: values.hasOrderedFlow,
+        // Removed fields: isActive, hasOrderedFlow
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
@@ -110,11 +105,18 @@ export default function CreateCircuitDialog({
     }
   };
 
+  // Style helpers
+  const dialogPanelClass = "bg-[#101942] border border-blue-900 shadow-2xl rounded-xl";
+  const labelClass = "text-blue-200 font-medium";
+  const editBtnClass = "ml-2 text-gray-400 hover:text-blue-400 pl-1 pr-1 py-0.5 rounded border border-transparent hover:border-blue-400 transition duration-150";
+  const inputClass = "bg-[#0a1033] border-blue-800/80 text-blue-100 placeholder:text-blue-400 focus:border-blue-500 focus:ring-blue-500/80";
+  const errorMsgClass = "text-red-400 text-xs";
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className={`sm:max-w-[480px] ${dialogPanelClass}`}>
         <DialogHeader>
-          <DialogTitle>Create Circuit</DialogTitle>
+          <DialogTitle className="text-xl text-white">Create Circuit</DialogTitle>
           <DialogDescription>
             Create a new circuit for document workflow
           </DialogDescription>
@@ -133,11 +135,17 @@ export default function CreateCircuitDialog({
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Title *</FormLabel>
+                      <FormLabel className={labelClass}>Title *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter circuit title" {...field} autoFocus />
+                        <Input
+                          placeholder="Enter circuit title"
+                          {...field}
+                          autoFocus
+                          className={inputClass + " h-11"}
+                          disabled={isSubmitting}
+                        />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className={errorMsgClass} />
                     </FormItem>
                   )}
                 />
@@ -147,6 +155,7 @@ export default function CreateCircuitDialog({
                     variant="outline"
                     onClick={handleClose}
                     disabled={isSubmitting}
+                    className="bg-black border-none text-gray-200 hover:bg-blue-950"
                   >
                     Cancel
                   </Button>
@@ -154,6 +163,7 @@ export default function CreateCircuitDialog({
                     type="button"
                     onClick={handleNext}
                     disabled={isSubmitting}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     Next <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
@@ -168,60 +178,26 @@ export default function CreateCircuitDialog({
                   name="descriptif"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel className={labelClass}>Description</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Enter circuit description"
+                          placeholder="Enter circuit description (optional)"
                           {...field}
+                          className={inputClass + " min-h-[100px]"}
+                          disabled={isSubmitting}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className={errorMsgClass} />
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="isActive"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                        <div className="space-y-0.5">
-                          <FormLabel>Active</FormLabel>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="hasOrderedFlow"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                        <div className="space-y-0.5">
-                          <FormLabel>Sequential Flow</FormLabel>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
                 <div className="flex justify-between pt-2">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={handleBack}
                     disabled={isSubmitting}
+                    className="bg-black border-none text-gray-200 hover:bg-blue-950"
                   >
                     <ArrowLeft className="mr-1 h-4 w-4" /> Back
                   </Button>
@@ -229,6 +205,7 @@ export default function CreateCircuitDialog({
                     type="button"
                     onClick={handleNext}
                     disabled={isSubmitting}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     Next <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
@@ -238,44 +215,47 @@ export default function CreateCircuitDialog({
 
             {step === 3 && (
               <>
-                <Card className="mb-2">
+                <Card className="mb-2 bg-[#141c37] border-blue-900 shadow-md transition-all">
                   <CardHeader>
-                    <CardTitle>
+                    <CardTitle className="text-white text-lg flex items-center gap-2">
                       Review Circuit
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="ml-2 text-gray-400 hover:text-blue-500"
                         type="button"
+                        className={editBtnClass}
                         onClick={() => handleEdit(1)}
                         disabled={isSubmitting}
                       >
-                        <Edit className="w-4 h-4 mr-1" />
+                        <Edit className="w-4 h-4 mr-0.5" />
                         Edit Title
                       </Button>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pb-2">
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-5 text-blue-200">
                       <div>
-                        <span className="font-semibold text-gray-400">Title:</span>
-                        <span className="ml-2">{watchAllFields.title}</span>
+                        <span className="font-semibold">Title:</span>
+                        <span className="ml-2 text-blue-100">{watchAllFields.title}</span>
                       </div>
                       <div>
-                        <span className="font-semibold text-gray-400">Description:</span>
-                        <span className="ml-2">{watchAllFields.descriptif || <span className="italic text-gray-500">No description</span>}</span>
-                      </div>
-                      <div className="flex gap-4">
-                        <span className="font-semibold text-gray-400">Status:</span>
-                        <Badge variant={watchAllFields.isActive ? "default" : "secondary"}>
-                          {watchAllFields.isActive ? 'Active' : 'Inactive'}
-                        </Badge>
-                      </div>
-                      <div className="flex gap-4">
-                        <span className="font-semibold text-gray-400">Flow Type:</span>
-                        <Badge variant="outline">
-                          {watchAllFields.hasOrderedFlow ? 'Sequential' : 'Parallel'}
-                        </Badge>
+                        <span className="font-semibold">Description:</span>
+                        <span className="ml-2 text-blue-300">
+                          {watchAllFields.descriptif?.trim()
+                            ? watchAllFields.descriptif
+                            : <span className="italic text-gray-400">No description</span>}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          type="button"
+                          className={editBtnClass + " ml-3"}
+                          onClick={() => handleEdit(2)}
+                          disabled={isSubmitting}
+                        >
+                          <Edit className="w-4 h-4 mr-0.5" />
+                          Edit Description
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -286,22 +266,14 @@ export default function CreateCircuitDialog({
                     variant="outline"
                     onClick={handleBack}
                     disabled={isSubmitting}
+                    className="bg-black border-none text-gray-200 hover:bg-blue-950"
                   >
                     <ArrowLeft className="mr-1 h-4 w-4" /> Back
                   </Button>
                   <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => handleEdit(2)}
-                    disabled={isSubmitting}
-                  >
-                    <Edit className="w-4 h-4 mr-1" />
-                    Edit Description/Options
-                  </Button>
-                  <Button
                     type="submit"
                     disabled={isSubmitting || !watchAllFields.title}
-                    className="bg-blue-700 text-white"
+                    className="bg-blue-700 text-white min-w-[130px] flex items-center justify-center"
                   >
                     {isSubmitting ? (
                       <>
