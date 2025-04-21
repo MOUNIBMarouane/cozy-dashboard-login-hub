@@ -88,7 +88,10 @@ export default function CreateCircuitDialog({
       await circuitService.createCircuit({
         title: values.title,
         descriptif: values.descriptif || '',
-        // Removed fields: isActive, hasOrderedFlow
+        // Add the missing properties
+        isActive: true,
+        hasOrderedFlow: false,
+        allowBacktrack: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
