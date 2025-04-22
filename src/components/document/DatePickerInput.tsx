@@ -25,7 +25,7 @@ export function DatePickerInput({ date, onDateChange, error }: DatePickerInputPr
           variant="outline"
           className={cn(
             "w-full justify-start text-left h-12 text-base bg-gray-900 border-gray-800 text-white hover:bg-gray-800",
-            error && "border-red-500"
+            error ? "border-red-500" : ""
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
