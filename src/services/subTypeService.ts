@@ -1,4 +1,3 @@
-
 import api from './api';
 import { SubType, CreateSubTypeDto, UpdateSubTypeDto } from '../models/subType';
 
@@ -25,7 +24,7 @@ const subTypeService = {
 
   getSubTypesByDocType: async (docTypeId: number): Promise<SubType[]> => {
     try {
-      const response = await api.get(`/SubType/by-document-type/${docTypeId}`);
+      const response = await api.get(`/api/SubType/by-document-type/${docTypeId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching subtypes for document type ${docTypeId}:`, error);

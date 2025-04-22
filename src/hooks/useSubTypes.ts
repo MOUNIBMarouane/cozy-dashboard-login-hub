@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { SubType } from '@/models/subType';
 import subTypeService from '@/services/subTypeService';

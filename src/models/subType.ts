@@ -1,4 +1,3 @@
-
 import { DocumentType } from "./document";
 
 export interface SubType {
@@ -9,7 +8,12 @@ export interface SubType {
   startDate: Date | string;
   endDate: Date | string;
   documentTypeId: number;
-  documentType?: DocumentType;
+  documentType?: {
+    typeAlias: string;
+    typeKey: string;
+    typeName: string;
+    typeAttr: string;
+  };
   isActive: boolean;
 }
 
