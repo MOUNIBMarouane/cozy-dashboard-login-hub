@@ -46,6 +46,7 @@ export default function DocumentsFilterBar() {
   const handleApplyAdvancedFilters = () => {
     // When advanced filters are applied, pass them to the main filter system
     const combinedFilters = {
+      searchQuery: searchQuery, // Add the searchQuery property
       searchField,
       statusFilter,
       typeFilter,
