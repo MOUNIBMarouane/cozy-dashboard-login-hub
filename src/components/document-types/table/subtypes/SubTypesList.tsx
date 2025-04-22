@@ -5,7 +5,7 @@ import { useSubTypes } from '@/hooks/useSubTypes';
 import { SubTypesTable } from './SubTypesTable';
 import SubTypeListHeader from './SubTypeListHeader';
 import SubTypeDialogs from './SubTypeDialogs';
-import { toast } from 'sonner';
+import { ErrorMessage } from '@/components/document-flow/ErrorMessage';
 
 interface SubTypesListProps {
   documentType: DocumentType;
@@ -15,6 +15,7 @@ export default function SubTypesList({ documentType }: SubTypesListProps) {
   const {
     subTypes,
     isLoading,
+    error,
     createDialogOpen,
     setCreateDialogOpen,
     editDialogOpen,
@@ -30,6 +31,7 @@ export default function SubTypesList({ documentType }: SubTypesListProps) {
   } = useSubTypes(documentType.id!);
 
   useEffect(() => {
+    console.log("Fetching subtypes for document type ID:", documentType.id);
     fetchSubTypes();
   }, [documentType.id, fetchSubTypes]);
 
@@ -53,6 +55,8 @@ export default function SubTypesList({ documentType }: SubTypesListProps) {
         documentTypeName={documentType.typeName}
         onCreateClick={handleCreateClick}
       />
+
+      {error && <ErrorMessage error={error} />}
 
       <SubTypesTable
         subTypes={subTypes}

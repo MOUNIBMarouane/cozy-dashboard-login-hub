@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { SubType } from '@/models/subType';
 import subTypeService from '@/services/subTypeService';
@@ -6,6 +7,7 @@ import { toast } from 'sonner';
 export const useSubTypes = (documentTypeId: number) => {
   const [subTypes, setSubTypes] = useState<SubType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -14,10 +16,14 @@ export const useSubTypes = (documentTypeId: number) => {
   const fetchSubTypes = useCallback(async () => {
     try {
       setIsLoading(true);
+      setError(null);
+      console.log("Calling subTypeService.getSubTypesByDocType with docTypeId:", documentTypeId);
       const data = await subTypeService.getSubTypesByDocType(documentTypeId);
+      console.log("Received subtypes data:", data);
       setSubTypes(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching subtypes:', error);
+      setError(error?.message || 'Failed to load subtypes');
       toast.error('Failed to load subtypes');
     } finally {
       setIsLoading(false);
@@ -66,6 +72,7 @@ export const useSubTypes = (documentTypeId: number) => {
   return {
     subTypes,
     isLoading,
+    error,
     createDialogOpen,
     setCreateDialogOpen,
     editDialogOpen,

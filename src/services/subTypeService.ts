@@ -1,3 +1,4 @@
+
 import api from './api';
 import { SubType, CreateSubTypeDto, UpdateSubTypeDto } from '../models/subType';
 

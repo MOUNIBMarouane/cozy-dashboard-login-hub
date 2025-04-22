@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import documentTypeService from '@/services/documentTypeService';
 import SubTypesList from '@/components/document-types/table/subtypes/SubTypesList';
 import SubTypeManagementHeader from '@/components/sub-types/components/SubTypeManagementHeader';
@@ -12,16 +12,29 @@ export default function SubTypeManagementPage() {
   const { id } = useParams<{ id: string }>();
   const [documentType, setDocumentType] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDocumentType = async () => {
       try {
-        if (!id) return;
+        if (!id) {
+          setError("No document type ID provided");
+          setIsLoading(false);
+          return;
+        }
+        
         setIsLoading(true);
+        setError(null);
+        
+        console.log("Fetching document type with ID:", id);
         const data = await documentTypeService.getDocumentType(parseInt(id));
+        console.log("Document type data received:", data);
+        
         setDocumentType(data);
       } catch (error) {
         console.error('Failed to fetch document type:', error);
+        setError('Failed to load document type');
         toast.error('Failed to load document type');
       } finally {
         setIsLoading(false);
@@ -35,7 +48,7 @@ export default function SubTypeManagementPage() {
     return <SubTypeManagementLoading />;
   }
 
-  if (!documentType) {
+  if (error || !documentType) {
     return <SubTypeManagementError />;
   }
 
