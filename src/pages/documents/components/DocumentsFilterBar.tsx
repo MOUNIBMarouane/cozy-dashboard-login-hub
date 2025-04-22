@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useDocumentsFilter } from '../hooks/useDocumentsFilter';
+import { useAdvancedFilters } from '../hooks/useAdvancedFilters';
 import { Button } from "@/components/ui/button";
 import { Filter } from 'lucide-react';
 import { SearchBar } from './filters/SearchBar';
@@ -19,9 +20,27 @@ export default function DocumentsFilterBar() {
 
   const [searchField, setSearchField] = useState("all");
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("any");
-  const [typeFilter, setTypeFilter] = useState("any");
   const [isDatePickerEnabled, setIsDatePickerEnabled] = useState(false);
+
+  const {
+    statusFilter,
+    setStatusFilter,
+    typeFilter,
+    setTypeFilter,
+    dateRange: advancedDateRange,
+    setDateRange: setAdvancedDateRange,
+    resetFilters: resetAdvancedFilters,
+    applyFilters: applyAdvancedFilters
+  } = useAdvancedFilters((filters) => {
+    // When advanced filters are applied, also pass them to the main filter system
+    const combinedFilters = {
+      searchField,
+      statusFilter: filters.statusFilter,
+      typeFilter: filters.typeFilter,
+      dateRange: filters.dateRange
+    };
+    applyFilters(combinedFilters);
+  });
 
   useEffect(() => {
     setIsDatePickerEnabled(searchField === 'docDate');
@@ -30,22 +49,17 @@ export default function DocumentsFilterBar() {
     }
   }, [searchField, setDateRange]);
 
-  const handleApplyFilters = () => {
-    const filters = {
-      searchField,
-      statusFilter,
-      typeFilter,
-      dateRange
-    };
-    applyFilters(filters);
+  const handleCloseAdvancedFilters = () => {
     setShowAdvancedFilters(false);
   };
 
-  const handleClearFilters = () => {
-    setStatusFilter("any");
-    setTypeFilter("any");
-    setDateRange(undefined);
-    resetFilters();
+  const handleApplyAdvancedFilters = () => {
+    applyAdvancedFilters();
+    setShowAdvancedFilters(false);
+  };
+
+  const handleClearAdvancedFilters = () => {
+    resetAdvancedFilters();
   };
 
   return (
@@ -80,11 +94,11 @@ export default function DocumentsFilterBar() {
           setStatusFilter={setStatusFilter}
           typeFilter={typeFilter}
           setTypeFilter={setTypeFilter}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          onClose={() => setShowAdvancedFilters(false)}
-          onApply={handleApplyFilters}
-          onClear={handleClearFilters}
+          dateRange={advancedDateRange}
+          setDateRange={setAdvancedDateRange}
+          onClose={handleCloseAdvancedFilters}
+          onApply={handleApplyAdvancedFilters}
+          onClear={handleClearAdvancedFilters}
         />
       )}
       

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DateRangePicker } from "@/components/ui/date-range-picker"
 import { X } from "lucide-react"
+import { STATUS_FILTERS, TYPE_FILTERS } from "../../types/filters"
 
 interface AdvancedFiltersProps {
   statusFilter: string
@@ -49,11 +50,11 @@ export function AdvancedFilters({
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent className="bg-[#0a1033] border-blue-900/30">
-              <SelectItem value="any">Any Status</SelectItem>
-              <SelectItem value="0">Draft</SelectItem>
-              <SelectItem value="1">In Progress</SelectItem>
-              <SelectItem value="2">Completed</SelectItem>
-              <SelectItem value="3">Rejected</SelectItem>
+              {STATUS_FILTERS.map(filter => (
+                <SelectItem key={filter.id} value={filter.value}>
+                  {filter.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -65,11 +66,11 @@ export function AdvancedFilters({
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
             <SelectContent className="bg-[#0a1033] border-blue-900/30">
-              <SelectItem value="any">Any Type</SelectItem>
-              <SelectItem value="1">Proposal</SelectItem>
-              <SelectItem value="2">Report</SelectItem>
-              <SelectItem value="3">Minutes</SelectItem>
-              <SelectItem value="4">Specifications</SelectItem>
+              {TYPE_FILTERS.map(filter => (
+                <SelectItem key={filter.id} value={filter.value}>
+                  {filter.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

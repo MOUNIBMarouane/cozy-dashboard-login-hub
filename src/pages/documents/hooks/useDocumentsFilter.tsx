@@ -1,13 +1,7 @@
 
 import { useState, createContext, useContext, ReactNode } from 'react';
 import { DateRange } from "react-day-picker";
-
-interface FilterOptions {
-  searchField?: string;
-  statusFilter?: string;
-  typeFilter?: string;
-  dateRange?: DateRange | undefined;
-}
+import { FilterOptions } from '../types/filters';
 
 interface DocumentsFilterContextType {
   searchQuery: string;
