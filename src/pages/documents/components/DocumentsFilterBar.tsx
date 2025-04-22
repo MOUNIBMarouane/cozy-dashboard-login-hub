@@ -110,12 +110,12 @@ export default function DocumentsFilterBar() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="text-xs text-blue-300 mb-1 block">Document Status</label>
-              <Select defaultValue="">
+              <Select defaultValue="any">
                 <SelectTrigger className="bg-blue-900/20 border-blue-800/30">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any Status</SelectItem>
+                  <SelectItem value="any">Any Status</SelectItem>
                   <SelectItem value="0">Draft</SelectItem>
                   <SelectItem value="1">In Progress</SelectItem>
                   <SelectItem value="2">Completed</SelectItem>
@@ -126,12 +126,12 @@ export default function DocumentsFilterBar() {
             
             <div>
               <label className="text-xs text-blue-300 mb-1 block">Document Type</label>
-              <Select defaultValue="">
+              <Select defaultValue="any">
                 <SelectTrigger className="bg-blue-900/20 border-blue-800/30">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any Type</SelectItem>
+                  <SelectItem value="any">Any Type</SelectItem>
                   <SelectItem value="1">Proposal</SelectItem>
                   <SelectItem value="2">Report</SelectItem>
                   <SelectItem value="3">Minutes</SelectItem>
@@ -154,12 +154,14 @@ export default function DocumentsFilterBar() {
             <Button 
               variant="outline" 
               size="sm"
+              onClick={handleClearFilters}
               className="border-blue-800/50 text-blue-300 hover:bg-blue-900/30"
             >
               Clear
             </Button>
             <Button 
               size="sm"
+              onClick={handleApplyFilters}
               className="bg-blue-600 hover:bg-blue-700"
             >
               Apply Filters
@@ -194,4 +196,14 @@ export default function DocumentsFilterBar() {
       )}
     </div>
   );
+  
+  // Add missing functions for the buttons in the advanced filters section
+  function handleClearFilters() {
+    setDateRange(undefined);
+  }
+  
+  function handleApplyFilters() {
+    // Add your filter application logic here
+    setShowAdvancedFilters(false);
+  }
 }
