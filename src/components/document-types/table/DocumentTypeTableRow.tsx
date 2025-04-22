@@ -1,16 +1,12 @@
 
+import { useState } from 'react';
+import { DocumentType } from '@/models/document';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Trash } from 'lucide-react';
-import { DocumentType } from '@/models/document';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import SubTypesList from './subtypes/SubTypesList';
 
 interface DocumentTypeTableRowProps {
   type: DocumentType;
@@ -20,77 +16,91 @@ interface DocumentTypeTableRowProps {
   onEditType: (type: DocumentType) => void;
 }
 
-export const DocumentTypeTableRow = ({
+export function DocumentTypeTableRow({
   type,
   isSelected,
   onSelectType,
   onDeleteType,
-  onEditType
-}: DocumentTypeTableRowProps) => {
-  return (
-    <TableRow 
-      key={type.id} 
-      className={`border-b border-blue-900/20 hover:bg-blue-900/10 ${isSelected ? 'bg-blue-900/20' : ''}`}
-    >
-      <TableCell className="py-2">
-        <Checkbox 
-          checked={isSelected}
-          onCheckedChange={(checked) => onSelectType(type.id!, checked as boolean)}
-          disabled={type.documentCounter! > 0}
-          aria-label={`Select ${type.typeName}`}
-        />
-      </TableCell>
-      <TableCell className="py-2">
-        <Badge variant="outline" className="px-2 py-0.5 text-xs font-mono bg-blue-900/30 text-blue-200 border-blue-800/40">
-          {type.typeKey}
-        </Badge>
-      </TableCell>
-      <TableCell className="font-medium text-white py-2">{type.typeName}</TableCell>
-      <TableCell className="text-blue-300 py-2">{type.typeAttr || "-"}</TableCell>
-      <TableCell className="text-right py-2">
-        <div className="flex justify-end gap-1">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-7 w-7 text-blue-400 hover:text-blue-200 hover:bg-blue-900/30"
-                  onClick={() => onEditType(type)}
-                >
-                  <Edit className="h-3.5 w-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="left">
-                <p>Edit type</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+  onEditType,
+}: DocumentTypeTableRowProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className={`h-7 w-7 text-red-400 hover:text-red-300 hover:bg-red-900/20 ${
-                    type.documentCounter! > 0 ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                  onClick={() => type.documentCounter! === 0 && onDeleteType(type.id!)}
-                  disabled={type.documentCounter! > 0}
-                >
-                  <Trash className="h-3.5 w-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="left">
-                {type.documentCounter! > 0 
-                  ? "Cannot delete types with documents" 
-                  : "Delete type"}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      </TableCell>
-    </TableRow>
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  return (
+    <>
+      <TableRow 
+        className={`transition-all hover:bg-blue-900/20 ${isExpanded ? 'bg-blue-900/10' : ''}`}
+      >
+        <TableCell className="w-12">
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={(checked) => onSelectType(type.id!, checked as boolean)}
+            disabled={type.documentCounter !== undefined && type.documentCounter > 0}
+          />
+        </TableCell>
+        <TableCell>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 p-0 hover:bg-blue-900/20"
+            onClick={toggleExpand}
+          >
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4 text-blue-400" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-blue-400" />
+            )}
+          </Button>
+        </TableCell>
+        <TableCell className="text-blue-100">{type.typeKey}</TableCell>
+        <TableCell>{type.typeName}</TableCell>
+        <TableCell>{type.typeAttr}</TableCell>
+        <TableCell>
+          <Badge 
+            variant={type.documentCounter === 0 ? 'default' : 'secondary'}
+            className="font-mono"
+          >
+            {type.documentCounter || 0}
+          </Badge>
+        </TableCell>
+        <TableCell className="text-right">
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-blue-400 hover:text-blue-300 hover:bg-blue-900/30"
+              onClick={() => onEditType(type)}
+            >
+              <Edit2 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`h-8 w-8 ${
+                type.documentCounter && type.documentCounter > 0
+                  ? 'text-gray-500 cursor-not-allowed'
+                  : 'text-red-400 hover:text-red-300 hover:bg-red-900/20'
+              }`}
+              onClick={() => type.documentCounter === 0 && type.id && onDeleteType(type.id)}
+              disabled={type.documentCounter !== undefined && type.documentCounter > 0}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+      {isExpanded && (
+        <TableRow>
+          <TableCell colSpan={7} className="p-0 border-0">
+            <div className="p-4 bg-blue-950/30 border-t border-b border-blue-900/30">
+              <SubTypesList documentType={type} />
+            </div>
+          </TableCell>
+        </TableRow>
+      )}
+    </>
   );
-};
+}
