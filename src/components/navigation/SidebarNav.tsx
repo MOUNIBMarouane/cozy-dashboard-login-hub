@@ -1,6 +1,7 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { LayoutDashboard, FileText, GitBranch, Layers, Users } from "lucide-react"; // removed ListOrdered
+import { LayoutDashboard, FileText, GitBranch, Layers, Users, CalendarRange } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 
 export function SidebarNav() {
@@ -67,19 +68,34 @@ export function SidebarNav() {
           
           {/* Document Types - Only for non-simple users */}
           {!isSimpleUser && (
-            <li>
-              <Link 
-                to="/document-types-management"
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive('/document-types-management') 
-                    ? 'bg-blue-600/40 text-blue-200' 
-                    : 'text-blue-100 hover:bg-blue-800/30 hover:text-blue-50'
-                }`}
-              >
-                <Layers className="h-5 w-5" />
-                <span>Types Management</span>
-              </Link>
-            </li>
+            <>
+              <li>
+                <Link 
+                  to="/document-types-management"
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive('/document-types-management') 
+                      ? 'bg-blue-600/40 text-blue-200' 
+                      : 'text-blue-100 hover:bg-blue-800/30 hover:text-blue-50'
+                  }`}
+                >
+                  <Layers className="h-5 w-5" />
+                  <span>Types Management</span>
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/subtype-management"
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive('/subtype-management') 
+                      ? 'bg-blue-600/40 text-blue-200' 
+                      : 'text-blue-100 hover:bg-blue-800/30 hover:text-blue-50'
+                  }`}
+                >
+                  <CalendarRange className="h-5 w-5" />
+                  <span>Subtypes</span>
+                </Link>
+              </li>
+            </>
           )}
           
           {/* Circuits */}
@@ -96,8 +112,6 @@ export function SidebarNav() {
               <span>Circuits</span>
             </Link>
           </li>
-          
-          {/* Steps Management - REMOVED */}
         </ul>
       </div>
     </div>
