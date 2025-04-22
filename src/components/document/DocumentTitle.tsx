@@ -1,3 +1,4 @@
+
 import { Document } from "@/models/document";
 import DocumentStatusBadge from "./DocumentStatusBadge";
 
@@ -16,9 +17,11 @@ const DocumentTitle = ({ document, isLoading }: DocumentTitleProps) => {
         </h1>
         {document && (
           <div className="flex items-center gap-2 text-blue-300/80 mt-1">
-            <span className="font-mono text-xs">{document.documentKey}</span>
+            <span className="font-mono text-xs">Document Code: {document.documentKey}</span>
             <span className="text-blue-400/50">•</span>
             <span className="text-sm">{document.documentType.typeName}</span>
+            <span className="text-blue-400/50">•</span>
+            <span className="text-sm">Date: {new Date(document.docDate).toLocaleDateString()}</span>
           </div>
         )}
       </div>

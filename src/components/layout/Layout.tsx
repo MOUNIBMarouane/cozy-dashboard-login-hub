@@ -1,3 +1,4 @@
+
 import { Outlet } from "react-router-dom";
 import { MainNavbar } from "@/components/navigation/MainNavbar";
 import { SidebarNav } from "@/components/navigation/SidebarNav";
@@ -25,7 +26,7 @@ export function Layout() {
         }}
       >
         {/* Dark overlay for background */}
-        <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-[#070b28]/80' : 'bg-slate-100/80'} z-0`}></div>
+        <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-[#070b28]/90' : 'bg-slate-100/80'} z-0`}></div>
         
         {/* Main layout structure - z-10 to appear above the overlay */}
         <div className="relative flex h-screen overflow-hidden z-10">
@@ -48,7 +49,7 @@ export function Layout() {
             
             {/* Main content */}
             <main className="flex-1 overflow-auto p-4">
-              <div className={`${theme === "dark" ? "bg-[#111633]/95" : "bg-white/95"} h-full rounded-xl border border-border shadow-lg  overflow-auto`}>
+              <div className={`${theme === "dark" ? "bg-[#111633]/95" : "bg-white/95"} h-full rounded-xl border border-border shadow-lg overflow-auto`}>
                 <Outlet />
               </div>
             </main>

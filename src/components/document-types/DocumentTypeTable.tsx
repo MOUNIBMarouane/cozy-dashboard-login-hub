@@ -17,6 +17,8 @@ interface DocumentTypeTableProps {
   sortDirection: 'asc' | 'desc';
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  onToggleFilters?: () => void;
+  showFilters?: boolean;
 }
 
 const DocumentTypeTable = ({
@@ -30,7 +32,9 @@ const DocumentTypeTable = ({
   sortField,
   sortDirection,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  onToggleFilters,
+  showFilters
 }: DocumentTypeTableProps) => {
   const areAllEligibleSelected = types.length > 0 && 
     types.filter(type => type.documentCounter === 0).length === selectedTypes.length;
@@ -41,6 +45,8 @@ const DocumentTypeTable = ({
       <DocumentTypeSearchBar
         searchQuery={searchQuery}
         onSearchChange={onSearchChange}
+        onToggleFilters={onToggleFilters}
+        showFilters={showFilters}
       />
 
       <div className="border-t border-blue-900/20">
