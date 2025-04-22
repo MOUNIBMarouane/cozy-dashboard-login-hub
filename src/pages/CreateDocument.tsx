@@ -5,20 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from 'sonner';
-import { ArrowLeft, ArrowRight, FileText, LogOut, UserCog, Save, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, Save, Check } from 'lucide-react';
 import DocuVerseLogo from '@/components/DocuVerseLogo';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import documentService from '@/services/documentService';
+import subTypeService from '@/services/subTypeService';
 import { DocumentType, CreateDocumentRequest } from '@/models/document';
+import { SubType } from '@/models/subType';
 import { DatePickerInput } from '@/components/document/DatePickerInput';
 
 export default function CreateDocument() {
@@ -26,15 +21,18 @@ export default function CreateDocument() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
+  const [subTypes, setSubTypes] = useState<SubType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Form data
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
+  const [selectedSubTypeId, setSelectedSubTypeId] = useState<number | null>(null);
   const [title, setTitle] = useState('');
   const [documentAlias, setDocumentAlias] = useState('');
   const [docDate, setDocDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [content, setContent] = useState('');
+  const [dateError, setDateError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDocumentTypes = async () => {
@@ -52,6 +50,40 @@ export default function CreateDocument() {
 
     fetchDocumentTypes();
   }, []);
+
+  useEffect(() => {
+    const fetchSubTypes = async () => {
+      if (selectedTypeId) {
+        try {
+          setIsLoading(true);
+          const data = await subTypeService.getSubTypesByDocType(selectedTypeId);
+          setSubTypes(data);
+          // Clear selected subtype when changing document type
+          setSelectedSubTypeId(null);
+        } catch (error) {
+          console.error('Failed to fetch subtypes:', error);
+          toast.error('Failed to load subtypes');
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setSubTypes([]);
+        setSelectedSubTypeId(null);
+      }
+    };
+
+    fetchSubTypes();
+  }, [selectedTypeId]);
+
+  const validateDate = (date: string, subType: SubType | null): boolean => {
+    if (!subType) return true;
+    
+    const selectedDate = new Date(date);
+    const startDate = new Date(subType.startDate);
+    const endDate = new Date(subType.endDate);
+
+    return selectedDate >= startDate && selectedDate <= endDate;
+  };
 
   const handleLogout = () => {
     logout(navigate);
@@ -71,11 +103,49 @@ export default function CreateDocument() {
     setStep(prevStep => prevStep - 1);
   };
 
+  const handleDocDateChange = (newDate: Date | undefined) => {
+    if (newDate) {
+      const dateStr = newDate.toISOString().split('T')[0];
+      setDocDate(dateStr);
+
+      const selectedSubType = subTypes.find(st => st.id === selectedSubTypeId);
+      if (selectedSubType && !validateDate(dateStr, selectedSubType)) {
+        setDateError(`Date must be between ${new Date(selectedSubType.startDate).toLocaleDateString()} and ${new Date(selectedSubType.endDate).toLocaleDateString()}`);
+      } else {
+        setDateError(null);
+      }
+    }
+  };
+
+  const handleTypeChange = (value: string) => {
+    const typeId = Number(value);
+    setSelectedTypeId(typeId);
+    setSelectedSubTypeId(null); // Clear subtype when type changes
+    setDateError(null); // Clear date error when type changes
+  };
+
+  const handleSubTypeChange = (value: string) => {
+    const subTypeId = Number(value);
+    setSelectedSubTypeId(subTypeId);
+    
+    // Validate current date against new subtype
+    const selectedSubType = subTypes.find(st => st.id === subTypeId);
+    if (selectedSubType && !validateDate(docDate, selectedSubType)) {
+      setDateError(`Date must be between ${new Date(selectedSubType.startDate).toLocaleDateString()} and ${new Date(selectedSubType.endDate).toLocaleDateString()}`);
+    } else {
+      setDateError(null);
+    }
+  };
+
   const validateCurrentStep = () => {
     switch (step) {
       case 1:
         if (!selectedTypeId) {
           toast.error('Please select a document type');
+          return false;
+        }
+        if (subTypes.length > 0 && !selectedSubTypeId) {
+          toast.error('Please select a subtype');
           return false;
         }
         return true;
@@ -88,6 +158,10 @@ export default function CreateDocument() {
       case 3:
         if (!docDate) {
           toast.error('Please select a document date');
+          return false;
+        }
+        if (dateError) {
+          toast.error(dateError);
           return false;
         }
         return true;
@@ -119,6 +193,7 @@ export default function CreateDocument() {
         typeId: selectedTypeId,
         documentAlias,
         docDate,
+        subTypeId: selectedSubTypeId
       };
 
       const createdDocument = await documentService.createDocument(documentData);
@@ -147,7 +222,7 @@ export default function CreateDocument() {
               <Label htmlFor="documentType" className="text-sm font-medium text-gray-200">Document Type*</Label>
               <Select 
                 value={selectedTypeId?.toString() || ''} 
-                onValueChange={(value) => setSelectedTypeId(Number(value))}
+                onValueChange={handleTypeChange}
               >
                 <SelectTrigger className="h-12 text-base bg-gray-900 border-gray-800 text-white">
                   <SelectValue placeholder="Select document type" />
@@ -161,6 +236,34 @@ export default function CreateDocument() {
                 </SelectContent>
               </Select>
             </div>
+
+            {selectedTypeId && subTypes.length > 0 && (
+              <div className="space-y-3">
+                <Label htmlFor="subType" className="text-sm font-medium text-gray-200">Subtype*</Label>
+                <Select 
+                  value={selectedSubTypeId?.toString() || ''} 
+                  onValueChange={handleSubTypeChange}
+                >
+                  <SelectTrigger className="h-12 text-base bg-gray-900 border-gray-800 text-white">
+                    <SelectValue placeholder="Select subtype" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-900 border-gray-800">
+                    {subTypes.map(subType => (
+                      <SelectItem key={subType.id} value={subType.id.toString()} className="text-gray-200">
+                        {subType.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedSubTypeId && (
+                  <p className="text-sm text-blue-400">
+                    Valid from {new Date(subTypes.find(st => st.id === selectedSubTypeId)?.startDate!).toLocaleDateString()} 
+                    to {new Date(subTypes.find(st => st.id === selectedSubTypeId)?.endDate!).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="space-y-3">
               <Label htmlFor="documentAlias" className="text-sm font-medium text-gray-200">Document Alias (Optional)</Label>
               <Input 
@@ -175,6 +278,7 @@ export default function CreateDocument() {
                 Short code to include in document key (e.g., INV for Invoice)
               </p>
             </div>
+
             <div className="flex justify-between pt-6">
               <Button variant="outline" className="border-gray-700 hover:bg-gray-800" onClick={() => navigate('/documents')}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -219,8 +323,11 @@ export default function CreateDocument() {
               <Label htmlFor="docDate" className="text-sm font-medium text-gray-200">Document Date*</Label>
               <DatePickerInput 
                 date={new Date(docDate)} 
-                onDateChange={handleDateChange}
+                onDateChange={handleDocDateChange}
               />
+              {dateError && (
+                <p className="text-sm text-red-500">{dateError}</p>
+              )}
             </div>
             <div className="flex justify-between pt-6">
               <Button variant="outline" className="border-gray-700 hover:bg-gray-800" onClick={handlePrevStep}>
