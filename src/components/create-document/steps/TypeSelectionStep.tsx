@@ -74,20 +74,6 @@ export const TypeSelectionStep = ({
         </div>
       )}
 
-      <div className="space-y-3">
-        <Label htmlFor="documentAlias" className="text-sm font-medium text-gray-200">Document Alias (Optional)</Label>
-        <Input 
-          id="documentAlias" 
-          value={documentAlias} 
-          onChange={e => onAliasChange(e.target.value)}
-          placeholder="e.g., INV for Invoice"
-          maxLength={10}
-          className="h-12 text-base bg-gray-900 border-gray-800 text-white placeholder:text-gray-500"
-        />
-        <p className="text-sm text-gray-500">
-          Short code to include in document key (e.g., INV for Invoice)
-        </p>
-      </div>
     </div>
   );
 };
