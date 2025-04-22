@@ -34,6 +34,7 @@ import DocumentFlowPage from "./pages/DocumentFlowPage";
 import { Layout } from './components/layout/Layout';
 import Settings from "./pages/Settings";
 import { SettingsProvider } from "./context/SettingsContext";
+import SubTypeManagementPage from "./pages/SubTypeManagementPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -81,6 +82,7 @@ const App = () => (
                   {/* Document Types Management routes */}
                   <Route path="/document-types" element={<DocumentTypes />} />
                   <Route path="/document-types-management" element={<ProtectedRoute requiresManagement requiredRole={["Admin", "FullUser"]}><DocumentTypesManagement /></ProtectedRoute>} />
+                  <Route path="/document-types/:id/subtypes" element={<ProtectedRoute requiresManagement requiredRole={["Admin", "FullUser"]}><SubTypeManagementPage /></ProtectedRoute>} />
                   <Route path="/documents/create" element={<ProtectedRoute requiresManagement requiredRole={["Admin", "FullUser"]}><CreateDocument /></ProtectedRoute>} />
                   <Route path="/documents/:id" element={<ViewDocument />} />
                   <Route path="/documents/:id/edit" element={<ProtectedRoute requiresManagement requiredRole={["Admin", "FullUser"]}><EditDocument /></ProtectedRoute>} />
