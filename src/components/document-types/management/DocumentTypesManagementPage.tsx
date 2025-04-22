@@ -125,6 +125,8 @@ const DocumentTypesManagementPage = () => {
         onEditType={handleEditType}
         onSelectType={handleSelectType}
         onSelectAll={handleSelectAll}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
         {...documentTypesProps}
       />
 
