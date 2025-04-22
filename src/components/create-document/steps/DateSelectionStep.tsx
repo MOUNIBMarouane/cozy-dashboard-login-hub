@@ -15,6 +15,7 @@ export const DateSelectionStep = ({ docDate, dateError, onDateChange }: DateSele
       <DatePickerInput 
         date={new Date(docDate)} 
         onDateChange={onDateChange}
+        error={!!dateError}
       />
       {dateError && (
         <p className="text-sm text-red-500">{dateError}</p>
