@@ -1,12 +1,16 @@
 
 import { useState, useEffect } from 'react';
 import { useDocumentsFilter } from '../hooks/useDocumentsFilter';
-import { useAdvancedFilters } from '../hooks/useAdvancedFilters';
 import { Button } from "@/components/ui/button";
 import { Filter } from 'lucide-react';
-import { SearchBar } from './filters/SearchBar';
-import { AdvancedFilters } from './filters/AdvancedFilters';
-import { ActiveFilters } from './filters/ActiveFilters';
+import { 
+  TableSearchBar, 
+  TableAdvancedFilters, 
+  TableActiveFilters,
+  DEFAULT_STATUS_FILTERS,
+  DEFAULT_TYPE_FILTERS,
+  DEFAULT_DOCUMENT_SEARCH_FIELDS
+} from '@/components/table';
 
 export default function DocumentsFilterBar() {
   const { 
@@ -14,6 +18,7 @@ export default function DocumentsFilterBar() {
     setSearchQuery, 
     dateRange, 
     setDateRange,
+    activeFilters,
     applyFilters,
     resetFilters
   } = useDocumentsFilter();
@@ -22,44 +27,59 @@ export default function DocumentsFilterBar() {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [isDatePickerEnabled, setIsDatePickerEnabled] = useState(false);
 
-  const {
-    statusFilter,
-    setStatusFilter,
-    typeFilter,
-    setTypeFilter,
-    dateRange: advancedDateRange,
-    setDateRange: setAdvancedDateRange,
-    resetFilters: resetAdvancedFilters,
-    applyFilters: applyAdvancedFilters
-  } = useAdvancedFilters((filters) => {
-    // When advanced filters are applied, also pass them to the main filter system
-    const combinedFilters = {
-      searchField,
-      statusFilter: filters.statusFilter,
-      typeFilter: filters.typeFilter,
-      dateRange: filters.dateRange
-    };
-    applyFilters(combinedFilters);
-  });
+  // Advanced filters state
+  const [statusFilter, setStatusFilter] = useState("any");
+  const [typeFilter, setTypeFilter] = useState("any");
+  const [advancedDateRange, setAdvancedDateRange] = useState(dateRange);
 
   useEffect(() => {
     setIsDatePickerEnabled(searchField === 'docDate');
     if (searchField !== 'docDate' && dateRange) {
       setDateRange(undefined);
     }
-  }, [searchField, setDateRange]);
+  }, [searchField, dateRange, setDateRange]);
 
   const handleCloseAdvancedFilters = () => {
     setShowAdvancedFilters(false);
   };
 
   const handleApplyAdvancedFilters = () => {
-    applyAdvancedFilters();
+    // When advanced filters are applied, pass them to the main filter system
+    const combinedFilters = {
+      searchField,
+      statusFilter,
+      typeFilter,
+      dateRange: advancedDateRange
+    };
+    applyFilters(combinedFilters);
     setShowAdvancedFilters(false);
   };
 
   const handleClearAdvancedFilters = () => {
-    resetAdvancedFilters();
+    setStatusFilter("any");
+    setTypeFilter("any");
+    setAdvancedDateRange(undefined);
+    resetFilters();
+  };
+  
+  const handleClearDateRange = () => {
+    setDateRange(undefined);
+  };
+
+  const handleClearStatusFilter = () => {
+    setStatusFilter("any");
+    applyFilters({
+      ...activeFilters,
+      statusFilter: "any"
+    });
+  };
+
+  const handleClearTypeFilter = () => {
+    setTypeFilter("any");
+    applyFilters({
+      ...activeFilters,
+      typeFilter: "any"
+    });
   };
 
   return (
@@ -67,33 +87,29 @@ export default function DocumentsFilterBar() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="text-lg text-white">Document List</div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <SearchBar
+          <TableSearchBar
             searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
+            onSearchChange={setSearchQuery}
             searchField={searchField}
-            setSearchField={setSearchField}
+            onSearchFieldChange={setSearchField}
+            searchFields={DEFAULT_DOCUMENT_SEARCH_FIELDS}
+            showDatePicker={isDatePickerEnabled}
             dateRange={dateRange}
-            setDateRange={setDateRange}
-            isDatePickerEnabled={isDatePickerEnabled}
+            onDateRangeChange={setDateRange}
+            onToggleAdvancedFilters={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            placeholderText="Search documents..."
           />
-          
-          <Button
-            variant="outline"
-            size="icon"
-            className={`${showAdvancedFilters ? 'bg-blue-800/30 text-blue-300' : 'text-blue-300/70'}`}
-            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-          >
-            <Filter className="h-4 w-4" />
-          </Button>
         </div>
       </div>
       
       {showAdvancedFilters && (
-        <AdvancedFilters
+        <TableAdvancedFilters
           statusFilter={statusFilter}
           setStatusFilter={setStatusFilter}
+          statusOptions={DEFAULT_STATUS_FILTERS}
           typeFilter={typeFilter}
           setTypeFilter={setTypeFilter}
+          typeOptions={DEFAULT_TYPE_FILTERS}
           dateRange={advancedDateRange}
           setDateRange={setAdvancedDateRange}
           onClose={handleCloseAdvancedFilters}
@@ -102,9 +118,16 @@ export default function DocumentsFilterBar() {
         />
       )}
       
-      <ActiveFilters
+      <TableActiveFilters
         dateRange={dateRange}
-        setDateRange={setDateRange}
+        onClearDateRange={handleClearDateRange}
+        statusFilter={activeFilters.statusFilter}
+        statusOptions={DEFAULT_STATUS_FILTERS}
+        onClearStatus={handleClearStatusFilter}
+        typeFilter={activeFilters.typeFilter}
+        typeOptions={DEFAULT_TYPE_FILTERS}
+        onClearType={handleClearTypeFilter}
+        onClearAll={resetFilters}
       />
     </div>
   );
