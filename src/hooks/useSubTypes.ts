@@ -17,9 +17,11 @@ export const useSubTypes = (documentTypeId: number) => {
     try {
       setIsLoading(true);
       setError(null);
-      console.log("Calling subTypeService.getSubTypesByDocType with docTypeId:", documentTypeId);
+      console.log("useSubTypes: Calling subTypeService.getSubTypesByDocType with docTypeId:", documentTypeId);
+      
+      // Use the correct API endpoint
       const data = await subTypeService.getSubTypesByDocType(documentTypeId);
-      console.log("Received subtypes data:", data);
+      console.log("useSubTypes: Received subtypes data:", data);
       setSubTypes(data);
     } catch (error: any) {
       console.error('Error fetching subtypes:', error);

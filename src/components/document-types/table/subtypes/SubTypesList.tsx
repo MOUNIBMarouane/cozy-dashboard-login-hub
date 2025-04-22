@@ -1,6 +1,5 @@
 
 import { useEffect } from 'react';
-import { DocumentType } from '@/models/document';
 import { useSubTypes } from '@/hooks/useSubTypes';
 import { SubTypesTable } from './SubTypesTable';
 import SubTypeListHeader from './SubTypeListHeader';
@@ -8,10 +7,10 @@ import SubTypeDialogs from './SubTypeDialogs';
 import { ErrorMessage } from '@/components/document-flow/ErrorMessage';
 
 interface SubTypesListProps {
-  documentType: DocumentType;
+  documentTypeId: number;
 }
 
-export default function SubTypesList({ documentType }: SubTypesListProps) {
+export default function SubTypesList({ documentTypeId }: SubTypesListProps) {
   const {
     subTypes,
     isLoading,
@@ -28,12 +27,12 @@ export default function SubTypesList({ documentType }: SubTypesListProps) {
     handleCreate,
     handleEdit,
     handleDelete
-  } = useSubTypes(documentType.id!);
+  } = useSubTypes(documentTypeId);
 
   useEffect(() => {
-    console.log("Fetching subtypes for document type ID:", documentType.id);
+    console.log("SubTypesList: Fetching subtypes for document type ID:", documentTypeId);
     fetchSubTypes();
-  }, [documentType.id, fetchSubTypes]);
+  }, [documentTypeId, fetchSubTypes]);
 
   const handleCreateClick = () => {
     setCreateDialogOpen(true);
@@ -52,7 +51,7 @@ export default function SubTypesList({ documentType }: SubTypesListProps) {
   return (
     <div className="space-y-4">
       <SubTypeListHeader 
-        documentTypeName={documentType.typeName}
+        documentTypeName={`Document Type ${documentTypeId}`}
         onCreateClick={handleCreateClick}
       />
 
@@ -73,7 +72,7 @@ export default function SubTypesList({ documentType }: SubTypesListProps) {
         deleteDialogOpen={deleteDialogOpen}
         setDeleteDialogOpen={setDeleteDialogOpen}
         selectedSubType={selectedSubType}
-        documentType={documentType}
+        documentTypeId={documentTypeId}
         onCreateSubmit={handleCreate}
         onEditSubmit={handleEdit}
         onDeleteConfirm={handleDelete}

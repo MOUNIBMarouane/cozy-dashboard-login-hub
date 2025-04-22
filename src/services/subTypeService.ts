@@ -25,7 +25,9 @@ const subTypeService = {
 
   getSubTypesByDocType: async (docTypeId: number): Promise<SubType[]> => {
     try {
-      const response = await api.get(`/api/SubType/by-document-type/${docTypeId}`);
+      console.log(`Fetching subtypes for document type ID ${docTypeId} using correct endpoint`);
+      const response = await api.get(`/SubType/by-document-type/${docTypeId}`);
+      console.log('Subtypes response:', response);
       return response.data;
     } catch (error) {
       console.error(`Error fetching subtypes for document type ${docTypeId}:`, error);
