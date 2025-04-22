@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDocumentsFilter } from '../hooks/useDocumentsFilter';
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -15,11 +15,46 @@ export default function DocumentsFilterBar() {
     searchQuery, 
     setSearchQuery, 
     dateRange, 
-    setDateRange 
+    setDateRange,
+    applyFilters,
+    resetFilters
   } = useDocumentsFilter();
 
   const [searchField, setSearchField] = useState("all");
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("any");
+  const [typeFilter, setTypeFilter] = useState("any");
+  const [isDatePickerEnabled, setIsDatePickerEnabled] = useState(false);
+
+  // Enable date picker only when search field is "docDate"
+  useEffect(() => {
+    setIsDatePickerEnabled(searchField === 'docDate');
+    if (searchField !== 'docDate' && dateRange) {
+      setDateRange(undefined);
+    }
+  }, [searchField, setDateRange]);
+
+  const handleApplyFilters = () => {
+    const filters = {
+      searchField,
+      statusFilter,
+      typeFilter,
+      dateRange
+    };
+    
+    // Apply filters using the context function
+    applyFilters(filters);
+    
+    // Close the advanced filters panel
+    setShowAdvancedFilters(false);
+  };
+
+  const handleClearFilters = () => {
+    setStatusFilter("any");
+    setTypeFilter("any");
+    setDateRange(undefined);
+    resetFilters();
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -46,10 +81,10 @@ export default function DocumentsFilterBar() {
           </Button>
           
           <Select value={searchField} onValueChange={setSearchField}>
-            <SelectTrigger className="w-[140px] ml-2">
+            <SelectTrigger className="w-[140px] ml-2 bg-blue-900/20 border-blue-800/30 text-white">
               <SelectValue placeholder="All fields" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-[#0a1033] border-blue-900/30">
               <SelectItem value="all">All fields</SelectItem>
               <SelectItem value="documentKey">Document Code</SelectItem>
               <SelectItem value="title">Title</SelectItem>
@@ -59,7 +94,7 @@ export default function DocumentsFilterBar() {
             </SelectContent>
           </Select>
           
-          {searchField === 'docDate' ? (
+          {isDatePickerEnabled ? (
             <DateRangePicker
               date={dateRange}
               onDateChange={setDateRange}
@@ -80,15 +115,16 @@ export default function DocumentsFilterBar() {
                 <Button 
                   variant="outline" 
                   size="icon"
-                  className="text-gray-400 border-blue-900/30 hover:text-blue-300"
+                  disabled={!isDatePickerEnabled}
+                  className="text-gray-400 border-blue-900/30 hover:text-blue-300 opacity-50 cursor-not-allowed"
                 >
                   <Calendar className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-4" align="end">
+              <PopoverContent className="w-auto p-4 bg-[#0a1033] border-blue-900/30" align="end">
                 <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Filter by Date</h4>
-                  <p className="text-xs text-muted-foreground">
+                  <h4 className="font-medium text-sm text-white">Filter by Date</h4>
+                  <p className="text-xs text-blue-300/70">
                     Select "Document Date" in the dropdown to enable date filtering
                   </p>
                 </div>
@@ -99,10 +135,10 @@ export default function DocumentsFilterBar() {
       </div>
       
       {showAdvancedFilters && (
-        <div className="bg-[#0a1033] border border-blue-900/30 rounded-md p-4 mt-2">
+        <div className="bg-[#0a1033] border border-blue-900/30 rounded-md p-4 mt-2 shadow-lg">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-sm font-medium text-white">Advanced Filters</h3>
-            <Button variant="ghost" size="sm" onClick={() => setShowAdvancedFilters(false)} className="h-7 w-7 p-0">
+            <Button variant="ghost" size="sm" onClick={() => setShowAdvancedFilters(false)} className="h-7 w-7 p-0 text-blue-300 hover:text-blue-200 hover:bg-blue-900/30">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -110,11 +146,11 @@ export default function DocumentsFilterBar() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="text-xs text-blue-300 mb-1 block">Document Status</label>
-              <Select defaultValue="any">
-                <SelectTrigger className="bg-blue-900/20 border-blue-800/30">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="bg-blue-900/20 border-blue-800/30 text-white">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-[#0a1033] border-blue-900/30">
                   <SelectItem value="any">Any Status</SelectItem>
                   <SelectItem value="0">Draft</SelectItem>
                   <SelectItem value="1">In Progress</SelectItem>
@@ -126,11 +162,11 @@ export default function DocumentsFilterBar() {
             
             <div>
               <label className="text-xs text-blue-300 mb-1 block">Document Type</label>
-              <Select defaultValue="any">
-                <SelectTrigger className="bg-blue-900/20 border-blue-800/30">
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="bg-blue-900/20 border-blue-800/30 text-white">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-[#0a1033] border-blue-900/30">
                   <SelectItem value="any">Any Type</SelectItem>
                   <SelectItem value="1">Proposal</SelectItem>
                   <SelectItem value="2">Report</SelectItem>
@@ -196,14 +232,4 @@ export default function DocumentsFilterBar() {
       )}
     </div>
   );
-  
-  // Add missing functions for the buttons in the advanced filters section
-  function handleClearFilters() {
-    setDateRange(undefined);
-  }
-  
-  function handleApplyFilters() {
-    // Add your filter application logic here
-    setShowAdvancedFilters(false);
-  }
 }
