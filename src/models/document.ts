@@ -1,4 +1,3 @@
-
 export interface Document {
   id: number;
   title: string;
@@ -46,6 +45,7 @@ export interface CreateDocumentRequest {
   content: string;
   documentAlias?: string;
   typeId: number;
+  subTypeId?: number | null;
   docDate?: string;
   circuitId?: number;
 }
