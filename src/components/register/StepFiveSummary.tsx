@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useMultiStepForm } from '@/context/form';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -7,7 +7,7 @@ import { CheckCircle2, AlertTriangle } from 'lucide-react';
 
 const StepFiveSummary: React.FC = () => {
   const { formData, prevStep, registerUser, stepValidation } = useMultiStepForm();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -106,7 +106,7 @@ const StepFiveSummary: React.FC = () => {
           className="flex-1"
           variant="outline"
           onClick={prevStep}
-          disabled={isSubmitting}
+          disabled={isSubmitting || stepValidation.isLoading}
         >
           Back
         </Button>
@@ -114,9 +114,9 @@ const StepFiveSummary: React.FC = () => {
           type="button"
           className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0"
           onClick={handleSubmit}
-          disabled={isSubmitting}
+          disabled={isSubmitting || stepValidation.isLoading}
         >
-          {isSubmitting ? 'Registering...' : 'Complete Registration'}
+          {isSubmitting || stepValidation.isLoading ? 'Registering...' : 'Complete Registration'}
         </Button>
       </div>
     </div>

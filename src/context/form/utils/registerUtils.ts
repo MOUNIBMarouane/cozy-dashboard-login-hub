@@ -57,7 +57,7 @@ export const registerUser = async (
     console.error('Registration error:', error);
     
     // Get specific error message from the response if available
-    const errorMessage = error.response?.data || 'Registration failed.';
+    const errorMessage = error.response?.data || 'Registration failed. Please try again.';
     
     // Update step validation with the error message
     setStepValidation((prev) => ({
