@@ -19,7 +19,7 @@ export const prepareUserData = (formData: FormData) => {
   if (formData.userType === 'personal') {
     return {
       ...userData,
-      userType: 'personal',
+      userType: 'personal' as const, // Type assertion to narrow the type
       Identity: formData.cin || '',
       Address: formData.personalAddress || '',
       city: formData.city || '',
@@ -29,7 +29,7 @@ export const prepareUserData = (formData: FormData) => {
   } else {
     return {
       ...userData,
-      userType: 'company',
+      userType: 'company' as const, // Type assertion to narrow the type
       companyName: formData.companyName || '',
       companyIRC: formData.companyIRC || '',
       companyAddress: formData.companyAddress || '',
