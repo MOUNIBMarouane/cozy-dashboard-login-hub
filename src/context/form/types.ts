@@ -1,3 +1,4 @@
+
 export type UserType = 'personal' | 'company';
 
 export interface StepValidation {
@@ -6,8 +7,12 @@ export interface StepValidation {
     username?: string;
     email?: string;
     registration?: string;
+    verification?: string;
   };
 }
+
+// Add the SetStepValidation type
+export type SetStepValidation = React.Dispatch<React.SetStateAction<StepValidation>>;
 
 export interface FormData {
   userType: UserType;
@@ -43,3 +48,19 @@ export const initialFormData: FormData = {
   adminSecretKey: '',
   validationError: ''
 };
+
+// Add the MultiStepFormContextType
+export interface MultiStepFormContextType {
+  currentStep: number;
+  formData: FormData;
+  stepValidation: StepValidation;
+  nextStep: () => void;
+  prevStep: () => void;
+  setCurrentStep: (step: number) => void;
+  setFormData: (data: Partial<FormData>) => void;
+  validateUsername: () => Promise<boolean>;
+  validateEmail: () => Promise<boolean>;
+  registerUser: () => Promise<boolean>;
+  verifyEmail: (code: string) => Promise<boolean>;
+  resetForm: () => void;
+}
