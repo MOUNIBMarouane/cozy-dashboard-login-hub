@@ -3,30 +3,17 @@ import React, { useState } from 'react';
 import { useMultiStepForm } from '@/context/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 
 const StepThreePersonalAddress: React.FC = () => {
   const { formData, setFormData, nextStep, prevStep } = useMultiStepForm();
-  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
-
-  // Address, city, country are OPTIONAL; user can skip any of them
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ [name]: value });
-    setTouched({ ...touched, [name]: true });
   };
 
-  // No error unless user tries to proceed
-  const validate = (): boolean => {
-    setErrors({});
-    return true;
-  };
-
+  // No validation - fields are all optional
   const handleNext = () => {
-    // All fields are optional, always allow to proceed.
-    validate();
     nextStep();
   };
 
@@ -42,7 +29,6 @@ const StepThreePersonalAddress: React.FC = () => {
           value={formData.personalAddress || ''}
           onChange={handleChange}
           placeholder="Enter your address (optional)"
-          error={false}
         />
       </div>
       <div>
@@ -55,7 +41,6 @@ const StepThreePersonalAddress: React.FC = () => {
           value={formData.city || ''}
           onChange={handleChange}
           placeholder="Your city (optional)"
-          error={false}
         />
       </div>
       <div>
@@ -68,7 +53,6 @@ const StepThreePersonalAddress: React.FC = () => {
           value={formData.country || ''}
           onChange={handleChange}
           placeholder="Your country (optional)"
-          error={false}
         />
       </div>
       <div className="flex gap-4 pt-2">

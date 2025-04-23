@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MultiStepFormContext from './MultiStepFormContext';
@@ -37,34 +38,24 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
     setFormDataState((prev) => ({ ...prev, ...data }));
   };
 
-  // Next step logic, handle extra step for personal user
+  // Next step logic, handle extra steps.
   const nextStep = () => {
-    // If personal user and we are at step 2, move to address step (3)
-    if (formData.userType === 'personal' && currentStep === 2) {
-      setCurrentStep(3);
+    // Personal flow: 1. Info, 2. Credentials, 3. Address, 4. Admin Key, 5. Summary
+    if (formData.userType === 'personal') {
+      if (currentStep < 5) setCurrentStep(currentStep + 1);
     }
-    // If personal user and on address, move to summary next
-    else if (formData.userType === 'personal' && currentStep === 3) {
-      setCurrentStep(4);
-    }
-    // Company logic - normal 1->2->3->4
-    else if (formData.userType === 'company' && currentStep < 4) {
-      setCurrentStep((prev) => prev + 1);
-    }
-    // Else if on summary, or already at 4, stay at 4
-    else {
-      setCurrentStep((prev) => (prev < 4 ? prev + 1 : prev));
+    // Company flow: 1. Info, 2. Credentials, 3. Admin Key, 4. Summary
+    else if (formData.userType === 'company') {
+      if (currentStep < 4) setCurrentStep(currentStep + 1);
     }
   };
 
-  // Previous step logic, handle special case for personal account (address)
+  // Previous step logic
   const prevStep = () => {
-    if (formData.userType === 'personal' && currentStep === 3) {
-      setCurrentStep(2);
-    } else if (formData.userType === 'personal' && currentStep === 4) {
-      setCurrentStep(3);
-    } else if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+    if (formData.userType === 'personal') {
+      if (currentStep > 1) setCurrentStep(currentStep - 1);
+    } else if (formData.userType === 'company') {
+      if (currentStep > 1) setCurrentStep(currentStep - 1);
     }
   };
 

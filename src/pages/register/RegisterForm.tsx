@@ -1,29 +1,36 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import StepOneUserInfo from '@/components/register/StepOneUserInfo';
 import StepTwoEmailPassword from '@/components/register/StepTwoEmailPassword';
-import StepThreeAdminKey from '@/components/register/StepThreeAdminKey';
-import StepFourSummary from '@/components/register/StepFourSummary';
 import StepThreePersonalAddress from '@/components/register/StepThreePersonalAddress';
+import StepFourAdminKey from '@/components/register/StepFourAdminKey';
+import StepFiveSummary from '@/components/register/StepFiveSummary';
 import { useMultiStepForm } from '@/context/form';
 import StepIndicator from './StepIndicator';
 import StepTitle from './StepTitle';
 import RightSideContent from './RightSideContent';
 
+// For personal users: 1. info, 2. credentials, 3. address, 4. admin key, 5. summary
+// For company users:  1. info, 2. credentials, 3. admin key, 4. summary
+
 const RegisterForm: React.FC = () => {
   const { currentStep, formData } = useMultiStepForm();
+  const isPersonal = formData.userType === 'personal';
 
-  // For personal users: 1. info, 2. credentials, 3. address, 4. summary
-  // For company users:  1. info, 2. credentials, 3. adminKey, 4. summary
+  // For step indicators and titles, always show 5 steps for personal, 4 for company
+  const stepCount = isPersonal ? 5 : 4;
+  const indicatorStep = currentStep > stepCount ? stepCount : currentStep;
 
   const renderStep = () => {
-    if(formData.userType === 'personal') {
+    if (isPersonal) {
       switch (currentStep) {
         case 1: return <StepOneUserInfo />;
         case 2: return <StepTwoEmailPassword />;
         case 3: return <StepThreePersonalAddress />;
-        case 4: return <StepFourSummary />;
+        case 4: return <StepFourAdminKey />;
+        case 5: return <StepFiveSummary />;
         default: return <StepOneUserInfo />;
       }
     }
@@ -31,14 +38,11 @@ const RegisterForm: React.FC = () => {
     switch (currentStep) {
       case 1: return <StepOneUserInfo />;
       case 2: return <StepTwoEmailPassword />;
-      case 3: return <StepThreeAdminKey />;
-      case 4: return <StepFourSummary />;
+      case 3: return <StepFourAdminKey />;
+      case 4: return <StepFiveSummary />;
       default: return <StepOneUserInfo />;
     }
   };
-
-  // Step indicator and title must stay at step 1-4 always, so we pass currentStep.
-  // Side display should keep working as before.
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row overflow-hidden">
@@ -47,8 +51,8 @@ const RegisterForm: React.FC = () => {
         <div className="w-full max-w-2xl py-8">
           <Card className="border-gray-800 bg-gradient-to-b from-[#161b22] to-[#0d1117] shadow-2xl">
             <CardHeader className="space-y-1 pb-2 px-8 pt-6 border-b border-gray-800">
-              <StepIndicator currentStep={currentStep} />
-              <StepTitle currentStep={currentStep} />
+              <StepIndicator currentStep={indicatorStep} stepCount={stepCount} />
+              <StepTitle currentStep={indicatorStep} stepCount={stepCount} />
             </CardHeader>
             
             <CardContent className="pt-8 px-8">
@@ -79,7 +83,7 @@ const RegisterForm: React.FC = () => {
         ></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center p-16">
           <div className="text-center max-w-xl">
-            <RightSideContent currentStep={currentStep} />
+            <RightSideContent currentStep={indicatorStep} />
           </div>
         </div>
       </div>
@@ -88,3 +92,4 @@ const RegisterForm: React.FC = () => {
 };
 
 export default RegisterForm;
+
