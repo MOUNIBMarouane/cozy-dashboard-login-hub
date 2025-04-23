@@ -18,10 +18,14 @@ const StepFiveSummary = () => {
     prevStep, 
     registerUser, 
     stepValidation, 
-    setCurrentStep 
+    setCurrentStep,
+    setFormData
   } = useMultiStepForm();
   
   const handleSubmit = async () => {
+    // Clear any previous validation errors
+    setFormData({ validationError: "" });
+    
     const success = await registerUser();
     if (success) {
       toast.success('Registration successful! Please check your email for verification.');
@@ -34,6 +38,13 @@ const StepFiveSummary = () => {
 
   return (
     <div className="space-y-6">
+      {/* Global validation error */}
+      {(formData.validationError || stepValidation.errors.registration) && (
+        <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-md">
+          {formData.validationError || stepValidation.errors.registration}
+        </div>
+      )}
+      
       <div className="text-center mb-4">
         <h3 className="text-2xl font-semibold mb-2">Review Your Information</h3>
         <p className="text-sm text-gray-400">Please verify all information before submitting</p>
@@ -286,11 +297,6 @@ const StepFiveSummary = () => {
           )}
         </Button>
       </div>
-      {stepValidation.errors.registration && (
-        <p className="text-xs text-red-500 text-center mt-2">
-          {stepValidation.errors.registration}
-        </p>
-      )}
     </div>
   );
 };

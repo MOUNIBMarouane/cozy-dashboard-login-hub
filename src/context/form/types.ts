@@ -1,50 +1,35 @@
+export type UserType = 'personal' | 'company';
 
-import { Dispatch, SetStateAction } from 'react';
+export interface StepValidation {
+  isLoading: boolean;
+  errors: {
+    username?: string;
+    email?: string;
+    registration?: string;
+  };
+}
 
 export interface FormData {
-  userType: 'personal' | 'company';
+  userType: UserType;
   firstName: string;
   lastName: string;
+  cin?: string;
+  companyName?: string;
+  companyIRC?: string;
+  companyPhone?: string;
+  companyAddress?: string;
+  companyEmail?: string;
+  companyWebsite?: string;
+  personalPhone?: string;
+  personalAddress?: string; 
+  city?: string;
+  country?: string;
   username: string;
   email: string;
   password: string;
   confirmPassword: string;
-  adminSecretKey?: string;
-  // Personal user fields
-  cin?: string;
-  personalAddress?: string; // REQUIRED in step now!
-  city?: string; // add city
-  country?: string; // add country
-  personalPhone?: string;
-  // Company fields
-  companyName?: string;
-  companyIRC?: string;
-  companyAddress?: string;
-  companyPhone?: string;
-  companyEmail?: string;
-  companyWebsite?: string;
-}
-
-export interface StepValidation {
-  isLoading: boolean;
-  errors: Record<string, string>;
-}
-
-export type SetStepValidation = Dispatch<SetStateAction<StepValidation>>;
-
-export interface MultiStepFormContextType {
-  currentStep: number;
-  formData: FormData;
-  stepValidation: StepValidation;
-  nextStep: () => void;
-  prevStep: () => void;
-  setCurrentStep: (step: number) => void;
-  setFormData: (data: Partial<FormData>) => void;
-  validateUsername: () => Promise<boolean>;
-  validateEmail: () => Promise<boolean>;
-  registerUser: () => Promise<boolean>;
-  verifyEmail: (code: string) => Promise<boolean>;
-  resetForm: () => void;
+  adminSecretKey: string;
+  validationError?: string; // Added for form validation errors
 }
 
 export const initialFormData: FormData = {
@@ -56,17 +41,5 @@ export const initialFormData: FormData = {
   password: '',
   confirmPassword: '',
   adminSecretKey: '',
-  // Personal user fields
-  cin: '',
-  personalAddress: '',
-  city: '',       // default empty
-  country: '',    // default empty
-  personalPhone: '',
-  // Company fields
-  companyName: '',
-  companyIRC: '',
-  companyAddress: '',
-  companyPhone: '',
-  companyEmail: '',
-  companyWebsite: '',
+  validationError: ''
 };

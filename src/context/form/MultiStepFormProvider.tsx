@@ -40,6 +40,9 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Next step logic, handle extra steps.
   const nextStep = () => {
+    // Clear validation errors when moving to next step
+    setFormData({ validationError: "" });
+    
     // Personal flow: 1. Info, 2. Credentials, 3. Address, 4. Admin Key, 5. Summary
     if (formData.userType === 'personal') {
       if (currentStep < 5) setCurrentStep(currentStep + 1);
@@ -52,6 +55,9 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Previous step logic
   const prevStep = () => {
+    // Clear validation errors when moving back
+    setFormData({ validationError: "" });
+    
     if (formData.userType === 'personal') {
       if (currentStep > 1) setCurrentStep(currentStep - 1);
     } else if (formData.userType === 'company') {
@@ -74,6 +80,8 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const registerUser = async (): Promise<boolean> => {
+    // Clear any previous validation errors
+    setFormData({ validationError: "" });
     return registerUserUtil(formData, setStepValidation, navigate);
   };
 
