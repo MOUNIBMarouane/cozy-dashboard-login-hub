@@ -4,32 +4,40 @@ import { toast } from 'sonner';
 import { FormData, SetStepValidation } from '../types';
 
 export const prepareUserData = (formData: FormData) => {
-  return {
+  // Create the base user data
+  const userData = {
     firstName: formData.firstName,
     lastName: formData.lastName,
     email: formData.email,
     passwordHash: formData.password,
     confirmPassword: formData.confirmPassword,
     username: formData.username,
-    adminSecretKey: formData.adminSecretKey,
-    userType: formData.userType,
-    ...(formData.userType === 'personal'
-      ? {
-          Identity: formData.cin,
-          Address: formData.personalAddress,
-          city: formData.city,
-          country: formData.country,
-          phoneNumber: formData.personalPhone,
-        }
-      : {
-          companyName: formData.companyName,
-          companyIRC: formData.companyIRC,
-          companyAddress: formData.companyAddress,
-          companyPhone: formData.companyPhone,
-          companyEmail: formData.companyEmail,
-          companyWebsite: formData.companyWebsite,
-        }),
+    adminSecretKey: formData.adminSecretKey || '',
   };
+  
+  // Add user type specific data
+  if (formData.userType === 'personal') {
+    return {
+      ...userData,
+      userType: 'personal',
+      Identity: formData.cin || '',
+      Address: formData.personalAddress || '',
+      city: formData.city || '',
+      country: formData.country || '',
+      phoneNumber: formData.personalPhone || '',
+    };
+  } else {
+    return {
+      ...userData,
+      userType: 'company',
+      companyName: formData.companyName || '',
+      companyIRC: formData.companyIRC || '',
+      companyAddress: formData.companyAddress || '',
+      companyPhone: formData.companyPhone || '',
+      companyEmail: formData.companyEmail || '',
+      companyWebsite: formData.companyWebsite || '',
+    };
+  }
 };
 
 export const registerUser = async (
@@ -37,16 +45,20 @@ export const registerUser = async (
   setStepValidation: SetStepValidation,
   navigateFunction: (path: string) => void
 ): Promise<boolean> => {
+  // Start loading and clear any previous errors
   setStepValidation((prev) => ({ ...prev, isLoading: true, errors: {} }));
+  
   try {
     const userData = prepareUserData(formData);
-    
-    // Clear any previous errors first
-    setStepValidation((prev) => ({ ...prev, errors: {} }));
+    console.log("Sending registration data:", userData);
     
     const response = await authService.register(userData);
+    console.log("Registration response:", response);
     
+    // Clear loading state
     setStepValidation((prev) => ({ ...prev, isLoading: false }));
+    
+    // Show success message
     toast.success('Registration successful! Please check your email for verification.');
     
     // Redirect to verification page with email
@@ -56,8 +68,22 @@ export const registerUser = async (
   } catch (error: any) {
     console.error('Registration error:', error);
     
-    // Get specific error message from the response if available
-    const errorMessage = error.response?.data || 'Registration failed. Please try again.';
+    // Extract error message from API response
+    let errorMessage = 'Registration failed. Please try again.';
+    
+    if (error.response) {
+      // Server responded with an error
+      if (typeof error.response.data === 'string') {
+        errorMessage = error.response.data;
+      } else if (error.response.data && typeof error.response.data.message === 'string') {
+        errorMessage = error.response.data.message;
+      } else if (error.response.data && typeof error.response.data.error === 'string') {
+        errorMessage = error.response.data.error;
+      }
+    } else if (error.message) {
+      // Client-side error with message
+      errorMessage = error.message;
+    }
     
     // Update step validation with the error message
     setStepValidation((prev) => ({
@@ -69,7 +95,6 @@ export const registerUser = async (
     // Display toast error
     toast.error(errorMessage);
     
-    // Return false to indicate registration failed
     return false;
   }
 };
