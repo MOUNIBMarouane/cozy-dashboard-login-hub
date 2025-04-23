@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MultiStepFormContext from './MultiStepFormContext';
@@ -38,8 +37,37 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
     setFormDataState((prev) => ({ ...prev, ...data }));
   };
 
-  const nextStep = () => setCurrentStep((prev) => prev + 1);
-  const prevStep = () => setCurrentStep((prev) => Math.max(1, prev - 1));
+  // Next step logic, handle extra step for personal user
+  const nextStep = () => {
+    // If personal user and we are at step 2, move to address step (3)
+    if (formData.userType === 'personal' && currentStep === 2) {
+      setCurrentStep(3);
+    }
+    // If personal user and on address, move to summary next
+    else if (formData.userType === 'personal' && currentStep === 3) {
+      setCurrentStep(4);
+    }
+    // Company logic - normal 1->2->3->4
+    else if (formData.userType === 'company' && currentStep < 4) {
+      setCurrentStep((prev) => prev + 1);
+    }
+    // Else if on summary, or already at 4, stay at 4
+    else {
+      setCurrentStep((prev) => (prev < 4 ? prev + 1 : prev));
+    }
+  };
+
+  // Previous step logic, handle special case for personal account (address)
+  const prevStep = () => {
+    if (formData.userType === 'personal' && currentStep === 3) {
+      setCurrentStep(2);
+    } else if (formData.userType === 'personal' && currentStep === 4) {
+      setCurrentStep(3);
+    } else if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   const resetForm = () => {
     setCurrentStep(1);
     setFormDataState(initialFormData);

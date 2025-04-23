@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -6,28 +5,40 @@ import StepOneUserInfo from '@/components/register/StepOneUserInfo';
 import StepTwoEmailPassword from '@/components/register/StepTwoEmailPassword';
 import StepThreeAdminKey from '@/components/register/StepThreeAdminKey';
 import StepFourSummary from '@/components/register/StepFourSummary';
+import StepThreePersonalAddress from '@/components/register/StepThreePersonalAddress';
 import { useMultiStepForm } from '@/context/form';
 import StepIndicator from './StepIndicator';
 import StepTitle from './StepTitle';
 import RightSideContent from './RightSideContent';
 
 const RegisterForm: React.FC = () => {
-  const { currentStep } = useMultiStepForm();
+  const { currentStep, formData } = useMultiStepForm();
+
+  // For personal users: 1. info, 2. credentials, 3. address, 4. summary
+  // For company users:  1. info, 2. credentials, 3. adminKey, 4. summary
 
   const renderStep = () => {
+    if(formData.userType === 'personal') {
+      switch (currentStep) {
+        case 1: return <StepOneUserInfo />;
+        case 2: return <StepTwoEmailPassword />;
+        case 3: return <StepThreePersonalAddress />;
+        case 4: return <StepFourSummary />;
+        default: return <StepOneUserInfo />;
+      }
+    }
+    // Company flow:
     switch (currentStep) {
-      case 1:
-        return <StepOneUserInfo />;
-      case 2:
-        return <StepTwoEmailPassword />;
-      case 3:
-        return <StepThreeAdminKey />;
-      case 4:
-        return <StepFourSummary />;
-      default:
-        return <StepOneUserInfo />;
+      case 1: return <StepOneUserInfo />;
+      case 2: return <StepTwoEmailPassword />;
+      case 3: return <StepThreeAdminKey />;
+      case 4: return <StepFourSummary />;
+      default: return <StepOneUserInfo />;
     }
   };
+
+  // Step indicator and title must stay at step 1-4 always, so we pass currentStep.
+  // Side display should keep working as before.
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row overflow-hidden">

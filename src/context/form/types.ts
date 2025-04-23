@@ -12,7 +12,9 @@ export interface FormData {
   adminSecretKey?: string;
   // Personal user fields
   cin?: string;
-  personalAddress?: string;
+  personalAddress?: string; // REQUIRED in step now!
+  city?: string; // add city
+  country?: string; // add country
   personalPhone?: string;
   // Company fields
   companyName?: string;
@@ -57,6 +59,8 @@ export const initialFormData: FormData = {
   // Personal user fields
   cin: '',
   personalAddress: '',
+  city: '',       // default empty
+  country: '',    // default empty
   personalPhone: '',
   // Company fields
   companyName: '',

@@ -13,19 +13,22 @@ export const prepareUserData = (formData: FormData) => {
     username: formData.username,
     adminSecretKey: formData.adminSecretKey,
     userType: formData.userType,
-    // Include additional fields based on user type
-    ...(formData.userType === 'personal' ? {
-      cin: formData.cin,
-      personalAddress: formData.personalAddress,
-      personalPhone: formData.personalPhone,
-    } : {
-      companyName: formData.companyName,
-      companyIRC: formData.companyIRC,
-      companyAddress: formData.companyAddress,
-      companyPhone: formData.companyPhone,
-      companyEmail: formData.companyEmail,
-      companyWebsite: formData.companyWebsite,
-    })
+    ...(formData.userType === 'personal'
+      ? {
+          cin: formData.cin,
+          personalAddress: formData.personalAddress,
+          city: formData.city,
+          country: formData.country,
+          personalPhone: formData.personalPhone,
+        }
+      : {
+          companyName: formData.companyName,
+          companyIRC: formData.companyIRC,
+          companyAddress: formData.companyAddress,
+          companyPhone: formData.companyPhone,
+          companyEmail: formData.companyEmail,
+          companyWebsite: formData.companyWebsite,
+        }),
   };
 };
 
