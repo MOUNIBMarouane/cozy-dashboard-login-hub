@@ -36,6 +36,15 @@ export const MultiStepFormProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const setFormData = (data: Partial<FormData>) => {
     setFormDataState((prev) => ({ ...prev, ...data }));
+    
+    // Clear registration error when user updates any field
+    // This allows resubmission after fixing the error
+    if (stepValidation.errors.registration) {
+      setStepValidation((prev) => ({ 
+        ...prev, 
+        errors: { ...prev.errors, registration: undefined } 
+      }));
+    }
   };
 
   // Next step logic, handle extra steps.

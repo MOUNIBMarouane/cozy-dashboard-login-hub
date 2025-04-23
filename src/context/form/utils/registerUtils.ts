@@ -1,4 +1,3 @@
-
 import authService from '@/services/authService';
 import { toast } from 'sonner';
 import { FormData, SetStepValidation } from '../types';
@@ -41,7 +40,10 @@ export const registerUser = async (
   try {
     const userData = prepareUserData(formData);
     
-    await authService.register(userData);
+    // Clear any previous errors first
+    setStepValidation((prev) => ({ ...prev, errors: {} }));
+    
+    const response = await authService.register(userData);
     
     setStepValidation((prev) => ({ ...prev, isLoading: false }));
     toast.success('Registration successful! Please check your email for verification.');
@@ -52,13 +54,21 @@ export const registerUser = async (
     return true;
   } catch (error: any) {
     console.error('Registration error:', error);
+    
+    // Get specific error message from the response if available
     const errorMessage = error.response?.data || 'Registration failed.';
+    
+    // Update step validation with the error message
     setStepValidation((prev) => ({
       ...prev,
       isLoading: false,
       errors: { registration: errorMessage },
     }));
+    
+    // Display toast error
     toast.error(errorMessage);
+    
+    // Return false to indicate registration failed
     return false;
   }
 };
@@ -107,4 +117,3 @@ export const verifyEmail = async (
     return false;
   }
 };
-
