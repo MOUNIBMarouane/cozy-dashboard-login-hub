@@ -15,11 +15,11 @@ export const prepareUserData = (formData: FormData) => {
     userType: formData.userType,
     ...(formData.userType === 'personal'
       ? {
-          cin: formData.cin,
-          personalAddress: formData.personalAddress,
+          Identity: formData.cin,
+          Address: formData.personalAddress,
           city: formData.city,
           country: formData.country,
-          personalPhone: formData.personalPhone,
+          phoneNumber: formData.personalPhone,
         }
       : {
           companyName: formData.companyName,
@@ -107,3 +107,4 @@ export const verifyEmail = async (
     return false;
   }
 };
+
